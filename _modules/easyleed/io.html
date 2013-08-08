@@ -1,0 +1,270 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Easyleed: LEED I(E)-spectra analysis &mdash; Easyleed 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/easyleed.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="../../_static/theme_extras.js"></script>
+    <link rel="shortcut icon" href="../../_static/icon.ico"/>
+    <link rel="top" title="Easyleed 1.0 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+      <div class="header">
+        <a href="../../index.html">
+          <img class="logo" src="../../_static/logo.png" alt="Logo"/>
+        </a>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="../../index.html">Contents</a>
+        </p>
+
+      </div>
+      
+      <div class="content">
+        <div class="documentwrapper">
+            <div class="body">
+                
+  <h1>Source code for easyleed.io</h1><div class="highlight"><pre>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">easyleed.io</span>
+<span class="sd">-------------</span>
+
+<span class="sd">Import routines for different LEED file formats</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">PyQt4.QtGui</span> <span class="kn">as</span> <span class="nn">qt</span>
+
+<span class="c"># load regular expression package (for parsing of energy from file name)</span>
+<span class="kn">import</span> <span class="nn">re</span>
+
+<span class="kn">from</span> <span class="nn">base</span> <span class="kn">import</span> <span class="n">logger</span>
+
+<span class="c">#### load packages for available file types ####</span>
+<span class="n">formats_available</span> <span class="o">=</span> <span class="p">[</span><span class="s">&#39;IMG&#39;</span><span class="p">]</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">pyfits</span>
+    <span class="n">formats_available</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;FITS&quot;</span><span class="p">)</span>    
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;The pyfits package is not properly installed.&quot;</span><span class="p">)</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">Image</span>
+    <span class="n">formats_available</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&quot;PIL&quot;</span><span class="p">)</span>    
+<span class="k">except</span><span class="p">:</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot;The Image package (Python Imaging Library) is not properly installed.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ImageLoader"><a class="viewcode-back" href="../../api.html#easyleed.io.ImageLoader">[docs]</a><span class="k">class</span> <span class="nc">ImageLoader</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Abstract base class for a class loading LEED images.</span>
+
+<span class="sd">    Subclasses need to provide</span>
+<span class="sd">        - get_image(image_path)</span>
+
+<span class="sd">    Subclasses may override (default: from filename with regex)</span>
+<span class="sd">        - get_energy(image_path)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_paths</span><span class="p">,</span> <span class="n">regex</span><span class="p">):</span>
+        <span class="c"># build a dictionary with energy as key and imagePath as value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">regex</span> <span class="o">=</span> <span class="n">regex</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">image_path</span> <span class="ow">in</span> <span class="n">image_paths</span><span class="p">:</span>
+            <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_energy</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">energy</span><span class="p">]</span> <span class="o">=</span> <span class="n">image_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">energies</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">restart</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">get_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">regex</span><span class="p">,</span> <span class="n">image_path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s">&#39;Invalid filename. Check naming policy.&#39;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">())</span>
+   
+<div class="viewcode-block" id="ImageLoader.current_energy"><a class="viewcode-back" href="../../api.html#easyleed.io.ImageLoader.current_energy">[docs]</a>    <span class="k">def</span> <span class="nf">current_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get current energy. &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+</div>
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+<div class="viewcode-block" id="ImageLoader.restart"><a class="viewcode-back" href="../../api.html#easyleed.io.ImageLoader.restart">[docs]</a>    <span class="k">def</span> <span class="nf">restart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Start at lowest energy again. &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+</div>
+<div class="viewcode-block" id="ImageLoader.previous"><a class="viewcode-back" href="../../api.html#easyleed.io.ImageLoader.previous">[docs]</a>    <span class="k">def</span> <span class="nf">previous</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get image at next lower beam energy. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">(</span><span class="s">&quot;there is no previous image&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+           <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">-=</span> <span class="mi">1</span>
+           <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+           <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">energy</span><span class="p">]),</span> <span class="n">energy</span>
+</div>
+<div class="viewcode-block" id="ImageLoader.next"><a class="viewcode-back" href="../../api.html#easyleed.io.ImageLoader.next">[docs]</a>    <span class="k">def</span> <span class="nf">next</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Get image at next higher beam energy. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">[</span><span class="n">energy</span><span class="p">]),</span> <span class="n">energy</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">StopIteration</span><span class="p">()</span>
+
+    <span class="c"># FIXME: untested</span></div>
+<div class="viewcode-block" id="ImageLoader.custom_iter"><a class="viewcode-back" href="../../api.html#easyleed.io.ImageLoader.custom_iter">[docs]</a>    <span class="k">def</span> <span class="nf">custom_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">energies</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Returns an iterator to iter over the given energies.&quot;&quot;&quot;</span>
+        <span class="n">non_elements</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">energies</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energies</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">non_elements</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&quot;ImageLoader doesn&#39;t have the following elements: </span><span class="si">%s</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">non_elements</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">energy</span> <span class="ow">in</span> <span class="n">energies</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_image</span><span class="p">(</span><span class="n">energy</span><span class="p">),</span> <span class="n">energy</span>
+</div></div>
+<div class="viewcode-block" id="ImgImageLoader"><a class="viewcode-back" href="../../api.html#easyleed.io.ImgImageLoader">[docs]</a><span class="k">class</span> <span class="nc">ImgImageLoader</span><span class="p">(</span><span class="n">ImageLoader</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Load .img image files (HotLeed format). &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="s">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_header</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="s">&quot;Beam Voltage (eV)&quot;</span><span class="p">]</span>
+    
+    <span class="k">def</span> <span class="nf">load_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+        <span class="c"># find header length</span>
+        <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="s">&quot;Header length:&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+        <span class="n">header_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="c"># jump back to beginning</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="c"># read in header</span>
+        <span class="n">header_raw</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">header_length</span><span class="p">)</span>
+        <span class="c">## process header ##</span>
+        <span class="c"># dict containing names of all interesting entrys</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s">&quot;Beam Voltage (eV)&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;Date&quot;</span><span class="p">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;Comment&quot;</span><span class="p">:</span> <span class="s">&quot;&quot;</span><span class="p">,</span> <span class="s">&quot;x1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;y1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;x2&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;y2&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&quot;Number of frames&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s">&#39;length&#39;</span> <span class="p">:</span> <span class="n">header_length</span><span class="p">}</span>
+        <span class="n">headerlines</span> <span class="o">=</span> <span class="n">header_raw</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;</span><span class="se">\n</span><span class="s">&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">headerlines</span><span class="p">:</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;: &quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">header</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                <span class="c"># convert int entrys</span>
+                <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
+                    <span class="n">header</span><span class="p">[</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="c"># convert string entrys</span>
+                <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="s">&quot;&quot;</span><span class="p">):</span>
+                    <span class="n">header</span><span class="p">[</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">header</span>
+
+    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="s">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_header</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> 
+            <span class="c"># jump to begin of image</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s">&#39;length&#39;</span><span class="p">])</span>
+            <span class="c"># read in image</span>
+            <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+            <span class="c"># make numpy array from image</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+            <span class="c"># calculate size of image from header information</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s">&quot;y2&quot;</span><span class="p">]</span><span class="o">-</span><span class="n">header</span><span class="p">[</span><span class="s">&quot;y1&quot;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">header</span><span class="p">[</span><span class="s">&quot;x2&quot;</span><span class="p">]</span><span class="o">-</span><span class="n">header</span><span class="p">[</span><span class="s">&quot;x1&quot;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c"># reshape image as 2d array</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">size</span><span class="p">))</span>
+            <span class="k">return</span> <span class="n">image</span>
+</div>
+<div class="viewcode-block" id="FitsImageLoader"><a class="viewcode-back" href="../../api.html#easyleed.io.FitsImageLoader">[docs]</a><span class="k">class</span> <span class="nc">FitsImageLoader</span><span class="p">(</span><span class="n">ImageLoader</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Load .fit image files (common format). &quot;&quot;&quot;</span>
+    
+    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
+        <span class="n">hdulist</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
+        <span class="n">hdulist</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">data</span>
+</div>
+<div class="viewcode-block" id="PILImageLoader"><a class="viewcode-back" href="../../api.html#easyleed.io.PILImageLoader">[docs]</a><span class="k">class</span> <span class="nc">PILImageLoader</span><span class="p">(</span><span class="n">ImageLoader</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Load image files supported by Python Imaging Library (PIL). &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s">&#39;L&#39;</span><span class="p">),</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+</div>
+<div class="viewcode-block" id="ImageFormat"><a class="viewcode-back" href="../../api.html#easyleed.io.ImageFormat">[docs]</a><span class="k">class</span> <span class="nc">ImageFormat</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot; Class describing an image format. &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abbrev</span><span class="p">,</span> <span class="n">extensions</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        abbrev: abbreviation (e.g. FITS)</span>
+<span class="sd">        extensions: list of corresponding file extensions (e.g. .fit, .fits)</span>
+<span class="sd">        loader: ImageLoader subclass for this format</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">abbrev</span> <span class="o">=</span> <span class="n">abbrev</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extensions</span> <span class="o">=</span> <span class="n">extensions</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loader</span> <span class="o">=</span> <span class="n">loader</span>
+    <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s">&quot;{0}-Files ({1})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">abbrev</span><span class="p">,</span> <span class="s">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extensions</span><span class="p">))</span>
+</div>
+<span class="sd">&quot;&quot;&quot; Dictionary of available ImageFormats. &quot;&quot;&quot;</span>
+<span class="n">IMAGE_FORMATS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">format_</span><span class="p">),</span> <span class="n">format_</span><span class="p">]</span> <span class="k">for</span> <span class="n">format_</span> <span class="ow">in</span> \
+        <span class="p">[</span><span class="n">ImageFormat</span><span class="p">(</span><span class="s">&quot;FITS&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;*.fit&quot;</span><span class="p">,</span> <span class="s">&quot;*.fits&quot;</span><span class="p">],</span> <span class="n">FitsImageLoader</span><span class="p">),</span>
+        <span class="n">ImageFormat</span><span class="p">(</span><span class="s">&quot;PIL&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;*.tif&quot;</span><span class="p">,</span> <span class="s">&quot;*.tiff&quot;</span><span class="p">,</span> <span class="s">&quot;*.png&quot;</span><span class="p">],</span> <span class="n">PILImageLoader</span><span class="p">),</span>
+        <span class="n">ImageFormat</span><span class="p">(</span><span class="s">&quot;IMG&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s">&quot;*.img&quot;</span><span class="p">],</span> <span class="n">ImgImageLoader</span><span class="p">)]</span> \
+             <span class="k">if</span> <span class="n">format_</span><span class="o">.</span><span class="n">abbrev</span> <span class="ow">in</span> <span class="n">formats_available</span><span class="p">)</span>
+
+<div class="viewcode-block" id="normalize255"><a class="viewcode-back" href="../../api.html#easyleed.io.normalize255">[docs]</a><span class="k">def</span> <span class="nf">normalize255</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns a normalized array of uint8.&quot;&quot;&quot;</span>
+    <span class="n">nmin</span><span class="p">,</span> <span class="n">nmax</span> <span class="o">=</span> <span class="n">array</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">array</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">nmin</span><span class="p">:</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="n">array</span> <span class="o">-</span> <span class="n">nmin</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="mf">255.0</span> <span class="o">/</span> <span class="p">(</span><span class="n">nmax</span> <span class="o">-</span> <span class="n">nmin</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scale</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
+        <span class="n">array</span> <span class="o">=</span> <span class="n">array</span> <span class="o">*</span> <span class="n">scale</span>
+    <span class="k">return</span> <span class="n">array</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s">&quot;uint8&quot;</span><span class="p">)</span>
+</div>
+<div class="viewcode-block" id="npimage2qimage"><a class="viewcode-back" href="../../api.html#easyleed.io.npimage2qimage">[docs]</a><span class="k">def</span> <span class="nf">npimage2qimage</span><span class="p">(</span><span class="n">npimage</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Converts numpy grayscale image to qimage.&quot;&quot;&quot;</span>
+    <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">npimage</span><span class="o">.</span><span class="n">shape</span>
+    <span class="n">npimage</span> <span class="o">=</span> <span class="n">normalize255</span><span class="p">(</span><span class="n">npimage</span><span class="p">)</span>
+    <span class="c"># second w to avoid problems if image is not 32-bit aligned</span>
+    <span class="c"># --&gt; indicates bytesPerLine</span>
+    <span class="n">qimage</span> <span class="o">=</span> <span class="n">qt</span><span class="o">.</span><span class="n">QImage</span><span class="p">(</span><span class="n">npimage</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">qt</span><span class="o">.</span><span class="n">QImage</span><span class="o">.</span><span class="n">Format_Indexed8</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">):</span>
+        <span class="n">qimage</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">qt</span><span class="o">.</span><span class="n">qRgb</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">qimage</span></div>
+</pre></div>
+
+            </div>
+        </div>
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="../../index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2010-13, Andreas Mayer, Hanna Salopaasi.
+      Last updated on Aug 08, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

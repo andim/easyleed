@@ -1,0 +1,299 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Easyleed: LEED I(E)-spectra analysis &mdash; Easyleed 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/easyleed.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/theme_extras.js"></script>
+    <link rel="shortcut icon" href="_static/icon.ico"/>
+    <link rel="top" title="Easyleed 1.0 documentation" href="index.html" />
+    <link rel="prev" title="User’s Guide" href="userdoc.html" /> 
+  </head>
+  <body>
+      <div class="header">
+        <a href="index.html">
+          <img class="logo" src="_static/logo.png" alt="Logo"/>
+        </a>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        «&#160;&#160;<a href="userdoc.html">User&#8217;s Guide</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+      
+      <div class="content">
+        <div class="documentwrapper">
+            <div class="body">
+                
+  <div class="section" id="module-easyleed">
+<span id="the-easyleed-api"></span><h1>The Easyleed API<a class="headerlink" href="#module-easyleed" title="Permalink to this headline">¶</a></h1>
+<p>The Easyleed package is divided into several subpackages:</p>
+<ul class="simple">
+<li>base: Core functionality (fitting procedures, Tracker class, etc.)</li>
+<li>kalman: Implementation of Kalman filter classes</li>
+<li>io: Input/Output functionality (reading FITS and IMG files)</li>
+</ul>
+<span class="target" id="module-easyleed.base"></span><div class="section" id="easyleed-base">
+<h2>easyleed.base<a class="headerlink" href="#easyleed-base" title="Permalink to this headline">¶</a></h2>
+<p>Base class providing common functionality for analyzing Leed patterns.</p>
+<dl class="class">
+<dt id="easyleed.base.SpotModel">
+<em class="property">class </em><tt class="descclassname">easyleed.base.</tt><tt class="descname">SpotModel</tt><a class="reference internal" href="_modules/easyleed/base.html#SpotModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.base.SpotModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Data model for a Spot that stores all the information in various lists.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.base.Tracker">
+<em class="property">class </em><tt class="descclassname">easyleed.base.</tt><tt class="descname">Tracker</tt><big>(</big><em>x_in</em>, <em>y_in</em>, <em>radius</em>, <em>energy</em>, <em>input_precision=1</em>, <em>window_scaling=False</em><big>)</big><a class="reference internal" href="_modules/easyleed/base.html#Tracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.base.Tracker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tracks spots through intensity information and velocity prediction.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="easyleed.base.adjust_slice">
+<tt class="descclassname">easyleed.base.</tt><tt class="descname">adjust_slice</tt><big>(</big><em>image</em>, <em>x_sl_min</em>, <em>x_sl_max</em>, <em>y_sl_min</em>, <em>y_sl_max</em><big>)</big><a class="reference internal" href="_modules/easyleed/base.html#adjust_slice"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.base.adjust_slice" title="Permalink to this definition">¶</a></dt>
+<dd><p>Adjusts slice if it is trying to get pieces outside the image.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ones</span><span class="p">((</span><span class="mi">2</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">adjust_slice</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.5</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+<span class="go">(0, 1, 0, 2)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">adjust_slice</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="o">-</span><span class="mf">5.5</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="o">-</span><span class="mf">0.5</span><span class="p">,</span> <span class="mi">10</span><span class="p">)</span>
+<span class="go">(0, 2, 0, 2)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="easyleed.base.calc_distances">
+<tt class="descclassname">easyleed.base.</tt><tt class="descname">calc_distances</tt><big>(</big><em>shape</em>, <em>x</em>, <em>y</em>, <em>squared=True</em><big>)</big><a class="reference internal" href="_modules/easyleed/base.html#calc_distances"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.base.calc_distances" title="Permalink to this definition">¶</a></dt>
+<dd><p>Helper function that returns an array of distances to x, y.
+This array can be useful for fancy indexing of numpy arrays.</p>
+<p>squared: return the squared distance (default: True)</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="easyleed.base.calc_intensity">
+<tt class="descclassname">easyleed.base.</tt><tt class="descname">calc_intensity</tt><big>(</big><em>npimage</em>, <em>x</em>, <em>y</em>, <em>radius</em>, <em>background_substraction=True</em><big>)</big><a class="reference internal" href="_modules/easyleed/base.html#calc_intensity"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.base.calc_intensity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the intensity of a spot.</p>
+<p>npimage: numpy array of intensity values
+x, y: position of the spot
+radius: radius of the spot
+background_substraction: boolean to turn substraction on/off</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="easyleed.base.gaussian2d">
+<tt class="descclassname">easyleed.base.</tt><tt class="descname">gaussian2d</tt><big>(</big><em>height</em>, <em>center_x</em>, <em>center_y</em>, <em>width_x</em>, <em>width_y=None</em>, <em>offset=0</em><big>)</big><a class="reference internal" href="_modules/easyleed/base.html#gaussian2d"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.base.gaussian2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a two dimensional gaussian function with the given parameters</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="easyleed.base.guess_from_Gaussian">
+<tt class="descclassname">easyleed.base.</tt><tt class="descname">guess_from_Gaussian</tt><big>(</big><em>image</em>, <em>*args</em>, <em>**kwargs</em><big>)</big><a class="reference internal" href="_modules/easyleed/base.html#guess_from_Gaussian"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.base.guess_from_Gaussian" title="Permalink to this definition">¶</a></dt>
+<dd><p>Guess position of spot from a Gaussian fit.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="easyleed.base.moments">
+<tt class="descclassname">easyleed.base.</tt><tt class="descname">moments</tt><big>(</big><em>data</em><big>)</big><a class="reference internal" href="_modules/easyleed/base.html#moments"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.base.moments" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculates the moments of 2d data.
+Returns [height, x, y, width_x, width_y]
+the gaussian parameters of a 2D distribution by calculating its
+moments.</p>
+</dd></dl>
+
+</div>
+<span class="target" id="module-easyleed.kalman"></span><div class="section" id="easyleed-kalman">
+<h2>easyleed.kalman<a class="headerlink" href="#easyleed-kalman" title="Permalink to this headline">¶</a></h2>
+<p>Kalman filters for tracking the spots</p>
+<dl class="class">
+<dt id="easyleed.kalman.AbstractKalmanFilter">
+<em class="property">class </em><tt class="descclassname">easyleed.kalman.</tt><tt class="descname">AbstractKalmanFilter</tt><big>(</big><em>x</em>, <em>P</em>, <em>H</em><big>)</big><a class="reference internal" href="_modules/easyleed/kalman.html#AbstractKalmanFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.kalman.AbstractKalmanFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract implementation of a Kalman filter.</p>
+<p>Matrices and Vectors can be given in any input format np.matrix() understands.
+Vectors are internally transposed and should therefore be given as column vectors.</p>
+<dl class="method">
+<dt id="easyleed.kalman.AbstractKalmanFilter.measurement_distance">
+<tt class="descname">measurement_distance</tt><big>(</big><em>z</em>, <em>R=None</em><big>)</big><a class="reference internal" href="_modules/easyleed/kalman.html#AbstractKalmanFilter.measurement_distance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.kalman.AbstractKalmanFilter.measurement_distance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the squared Mahalanobis distance of the given measurement.</p>
+<p>z: measurement vector</p>
+</dd></dl>
+
+<dl class="method">
+<dt>
+<tt class="descname">AbstractKalmanFilter.predict(F, Q=array([[ 0.,  0.,  0.,  0.],</tt></dt>
+<dt>
+<tt class="descname">[ 0.,  0.,  0.,  0.],</tt></dt>
+<dt>
+<tt class="descname">[ 0.,  0.,  0.,  0.],</tt></dt>
+<dt>
+<tt class="descname">[ 0.,  0.,  0.,  0.]]))</tt></dt>
+<dd><p>Predict next state.</p>
+<p>F: state transition matrix
+Q: process covariance matrix</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.kalman.AbstractKalmanFilter.predict_measurement">
+<tt class="descname">predict_measurement</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/kalman.html#AbstractKalmanFilter.predict_measurement"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.kalman.AbstractKalmanFilter.predict_measurement" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the predicted measurement.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.kalman.AbstractKalmanFilter.predict_measurement_covariance">
+<tt class="descname">predict_measurement_covariance</tt><big>(</big><em>R=None</em><big>)</big><a class="reference internal" href="_modules/easyleed/kalman.html#AbstractKalmanFilter.predict_measurement_covariance"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.kalman.AbstractKalmanFilter.predict_measurement_covariance" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the covariance matrix of a predicted measurement.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.kalman.AbstractKalmanFilter.update">
+<tt class="descname">update</tt><big>(</big><em>z</em>, <em>R</em><big>)</big><a class="reference internal" href="_modules/easyleed/kalman.html#AbstractKalmanFilter.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.kalman.AbstractKalmanFilter.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update state estimate.</p>
+<p>z: measurement vector
+R: measurement covariance matrix</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.kalman.AbstractPVKalmanFilter">
+<em class="property">class </em><tt class="descclassname">easyleed.kalman.</tt><tt class="descname">AbstractPVKalmanFilter</tt><big>(</big><em>x_in</em>, <em>y_in</em>, <em>P</em>, <em>time</em>, <em>vx_in=0</em>, <em>vy_in=0</em><big>)</big><a class="reference internal" href="_modules/easyleed/kalman.html#AbstractPVKalmanFilter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.kalman.AbstractPVKalmanFilter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Kalman filter for 2d-tracking using position and velocity as state variables.</p>
+</dd></dl>
+
+</div>
+<span class="target" id="module-easyleed.io"></span><div class="section" id="easyleed-io">
+<h2>easyleed.io<a class="headerlink" href="#easyleed-io" title="Permalink to this headline">¶</a></h2>
+<p>Import routines for different LEED file formats</p>
+<dl class="class">
+<dt id="easyleed.io.FitsImageLoader">
+<em class="property">class </em><tt class="descclassname">easyleed.io.</tt><tt class="descname">FitsImageLoader</tt><big>(</big><em>image_paths</em>, <em>regex</em><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#FitsImageLoader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.FitsImageLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load .fit image files (common format).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.io.ImageFormat">
+<em class="property">class </em><tt class="descclassname">easyleed.io.</tt><tt class="descname">ImageFormat</tt><big>(</big><em>abbrev</em>, <em>extensions</em>, <em>loader</em><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImageFormat"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageFormat" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class describing an image format.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.io.ImageLoader">
+<em class="property">class </em><tt class="descclassname">easyleed.io.</tt><tt class="descname">ImageLoader</tt><big>(</big><em>image_paths</em>, <em>regex</em><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Abstract base class for a class loading LEED images.</p>
+<dl class="docutils">
+<dt>Subclasses need to provide</dt>
+<dd><ul class="first last simple">
+<li>get_image(image_path)</li>
+</ul>
+</dd>
+<dt>Subclasses may override (default: from filename with regex)</dt>
+<dd><ul class="first last simple">
+<li>get_energy(image_path)</li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="easyleed.io.ImageLoader.current_energy">
+<tt class="descname">current_energy</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader.current_energy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader.current_energy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get current energy.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.io.ImageLoader.custom_iter">
+<tt class="descname">custom_iter</tt><big>(</big><em>energies</em><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader.custom_iter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader.custom_iter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns an iterator to iter over the given energies.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.io.ImageLoader.next">
+<tt class="descname">next</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader.next" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get image at next higher beam energy.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.io.ImageLoader.previous">
+<tt class="descname">previous</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader.previous"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader.previous" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get image at next lower beam energy.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.io.ImageLoader.restart">
+<tt class="descname">restart</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader.restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader.restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Start at lowest energy again.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.io.ImgImageLoader">
+<em class="property">class </em><tt class="descclassname">easyleed.io.</tt><tt class="descname">ImgImageLoader</tt><big>(</big><em>image_paths</em>, <em>regex</em><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImgImageLoader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImgImageLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load .img image files (HotLeed format).</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.io.PILImageLoader">
+<em class="property">class </em><tt class="descclassname">easyleed.io.</tt><tt class="descname">PILImageLoader</tt><big>(</big><em>image_paths</em>, <em>regex</em><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#PILImageLoader"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.PILImageLoader" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load image files supported by Python Imaging Library (PIL).</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="easyleed.io.normalize255">
+<tt class="descclassname">easyleed.io.</tt><tt class="descname">normalize255</tt><big>(</big><em>array</em><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#normalize255"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.normalize255" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a normalized array of uint8.</p>
+</dd></dl>
+
+<dl class="function">
+<dt id="easyleed.io.npimage2qimage">
+<tt class="descclassname">easyleed.io.</tt><tt class="descname">npimage2qimage</tt><big>(</big><em>npimage</em><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#npimage2qimage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.npimage2qimage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts numpy grayscale image to qimage.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+            </div>
+        </div>
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        «&#160;&#160;<a href="userdoc.html">User&#8217;s Guide</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2010-13, Andreas Mayer, Hanna Salopaasi.
+      Last updated on Aug 08, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

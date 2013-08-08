@@ -1,1 +1,128 @@
-Easyleed Homepage
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Easyleed: LEED I(E)-spectra analysis &mdash; Easyleed 1.0 documentation</title>
+    
+    <link rel="stylesheet" href="_static/easyleed.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '1.0',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="_static/theme_extras.js"></script>
+    <link rel="shortcut icon" href="_static/icon.ico"/>
+    <link rel="top" title="Easyleed 1.0 documentation" href="#" />
+    <link rel="next" title="User’s Guide" href="userdoc.html" /> 
+  </head>
+  <body>
+      <div class="header">
+        <a href="#">
+          <img class="logo" src="_static/logo.png" alt="Logo"/>
+        </a>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="#">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="userdoc.html">User&#8217;s Guide</a>&#160;&#160;»
+        </p>
+
+      </div>
+      
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper"><h3>Timeline</h3>
+
+<ul style="list-style-type:disc">
+    <li>August 2013: Moving the code and its documentation to Github.</li>
+    <li>July 2012: Publication of paper on tracking algorithm.</li>
+    <li>July 2010: Start of development.</li>
+</ul>
+
+
+<h3> Contact </h3>
+
+<p>
+If you have any questions, comments or bug reports please <a href="mailto:andisspam@gmail.com">contact us</a>!
+</p>
+        </div>
+      </div>
+      <div class="content">
+        <div class="documentwrapper">
+            <div class="bodywrapper">
+            <div class="body">
+                
+  <div class="section" id="intro">
+<h1>Intro<a class="headerlink" href="#intro" title="Permalink to this headline">¶</a></h1>
+<p>The purpose of the Easyleed program is the extraction of intensity-energy spectra from low-energy electron diffraction patterns.</p>
+<p>The method implemented in this software combines the knowledge about the movement of the spots with detected spot positions using a Kalman filter. More information about the algorithm can be found in our paper:</p>
+<ol class="upperalpha simple">
+<li>Mayer et al. A novel method for the extraction of intensity-energy spectra from low-energy electron diffraction patterns. Comput. Phys. Commun. 183, 1443-1447 (2012), <a class="reference external" href="http://dx.doi.org/10.1016/j.cpc.2012.02.019">doi:10.1016/j.cpc.2012.02.019</a></li>
+</ol>
+</div>
+<div class="section" id="download-and-installation">
+<h1>Download and Installation<a class="headerlink" href="#download-and-installation" title="Permalink to this headline">¶</a></h1>
+<p>The newest version of the software can be downloaded as a zip-file:</p>
+<p><a class="reference download internal" href="_downloads/source.zip"><tt class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Easyleed</span></tt></a>, last update August 08, 2013</p>
+<p>After downloading this file extract its content to a directory. If you have already installed the dependencies (see below), you are ready to go and can open the graphical user interface by running <tt class="docutils literal"><span class="pre">run-gui.py</span></tt>.</p>
+<p>Easyleed is written in <a class="reference external" href="http://www.python.org/">Python</a> and relies on a number of libraries. The easiest way is to install the Python distribution <a class="reference external" href="http://code.google.com/p/pythonxy/">Python(x,y)</a>, that contains all the libraries. Of course, you can also manually install everything. Here is a list of Easyleed&#8217;s dependencies:</p>
+<ul class="simple">
+<li>Python &gt;2.6 <a class="reference external" href="http://www.python.org/">http://www.python.org/</a></li>
+<li>Qt 4.6 <a class="reference external" href="http://qt.nokia.com/">http://qt.nokia.com/</a> and PyQt 4.7 <a class="reference external" href="http://www.riverbankcomputing.co.uk/">http://www.riverbankcomputing.co.uk/</a></li>
+<li>Numpy &gt;1.5 and Scipy &gt;0.9 <a class="reference external" href="http://www.scipy.org/">http://www.scipy.org/</a></li>
+<li>Matplotlib &gt;0.9 <a class="reference external" href="http://matplotlib.org/">http://matplotlib.org/</a></li>
+</ul>
+<p>Depending on your input file type of choice you might need the following library:</p>
+<ul class="simple">
+<li>PyFITS, if you intend to use fits-files as an image input format <a class="reference external" href="http://www.stsci.edu/resources/software_hardware/pyfits/">http://www.stsci.edu/resources/software_hardware/pyfits/</a></li>
+</ul>
+</div>
+<div class="section" id="documentation">
+<h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="userdoc.html">User&#8217;s Guide</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">The Easyleed API</a></li>
+</ul>
+</div>
+</div>
+
+
+            </div>
+            </div>
+        </div>
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="#">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="userdoc.html">User&#8217;s Guide</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2010-13, Andreas Mayer, Hanna Salopaasi.
+      Last updated on Aug 08, 2013.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>
