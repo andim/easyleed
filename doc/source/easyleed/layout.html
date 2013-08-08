@@ -1,0 +1,76 @@
+{#
+    easyleed/layout.html
+    ~~~~~~~~~~~~~~~~~
+
+    Sphinx layout template for the easyleed theme.
+
+    :copyright: Copyright 2012 by Andreas Mayer.
+    :license: BSD, see LICENSE for details.
+#}
+{% extends "basic/layout.html" %}
+{% set title = 'Easyleed: LEED I(E)-spectra analysis' %}
+
+{% set script_files = script_files + ['_static/theme_extras.js'] %}
+{% set css_files = css_files + ['_static/print.css'] %}
+
+{# do not display relbars #}
+{% block relbar1 %}{% endblock %}
+{% block relbar2 %}{% endblock %}
+{%- block sidebarlogo %}{% endblock %}
+
+{% macro nav() %}
+        <p>
+        {%- block haikurel1 %}
+        {%- endblock %}
+        {%- if prev %}
+        «&#160;&#160;<a href="{{ prev.link|e }}">{{ prev.title }}</a>
+        &#160;&#160;::&#160;&#160;
+        {%- endif %}
+        <a class="uplink" href="{{ pathto(master_doc) }}">{{ _('Contents') }}</a>
+        {%- if next %}
+        &#160;&#160;::&#160;&#160;
+        <a href="{{ next.link|e }}">{{ next.title }}</a>&#160;&#160;»
+        {%- endif %}
+        {%- block haikurel2 %}
+        {%- endblock %}
+        </p>
+{% endmacro %}
+
+{% block content %}
+      <div class="header">
+        {%- block haikuheader %}
+        {%- if theme_full_logo != "false" %}
+        <a href="{{ pathto('index') }}">
+          <img class="logo" src="{{ pathto('_static/' + logo, 1) }}" alt="Logo"/>
+        </a>
+        {%- else %}
+        {%- if logo -%}
+          <img class="rightlogo" src="{{ pathto('_static/' + logo, 1) }}" alt="Logo"/>
+        {%- endif -%}
+        <h1 class="heading"><a href="{{ pathto('index') }}">
+          <span>{{ shorttitle|e }}</span></a></h1>
+        <h2 class="heading"><span>{{ title|striptags|e }}</span></h2>
+        {%- endif %}
+        {%- endblock %}
+      </div>
+      <div class="topnav">
+      {{ nav() }}
+      </div>
+      {% block sidebar1 %}{{ sidebar() }}{% endblock %}
+      <div class="content">
+        <div class="documentwrapper">
+          {%- if render_sidebar %}
+            <div class="bodywrapper">
+          {%- endif %}
+            <div class="body">
+                {% block body %}{% endblock %}
+            </div>
+          {%- if render_sidebar %}
+            </div>
+          {%- endif %}
+        </div>
+      </div>
+      <div class="bottomnav">
+      {{ nav() }}
+      </div>
+{% endblock %}
