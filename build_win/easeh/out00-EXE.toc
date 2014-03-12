@@ -1,0 +1,9 @@
+('C:\\Users\\Salopaasi\\My Documents\\pyinstaller-pyinstaller-275d4c9\\easeh\\dist\\easeh.exe',
+ False,
+ False,
+ None,
+ None,
+ [],
+ None,
+ False,
+ 1368793596L)
