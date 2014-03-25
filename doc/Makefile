@@ -41,7 +41,10 @@ help:
 clean:
 	-rm -rf $(BUILDDIR)/*
 
-html:
+source.zip:
+	find ../source/ -name "*.py" | zip source/_static/source.zip -@
+
+html: 
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
@@ -142,5 +145,6 @@ doctest:
 show:
 	firefox build/html/index.html &
 
-upload:
-	scp -r -P 24342 build/html/* mh2-ma@jagdfalke.net:/srv/mh2/http/ma-move/easyleed
+ghpages: html
+	cp -r build/html/* ../../easyleed-github-pages/
+

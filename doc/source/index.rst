@@ -12,7 +12,7 @@ Development of Easyleed was started by Andreas Mayer while working in Renee Dieh
 
 Download 
 =========
-Easyleed is open-source software licensed under the GPL v2. The software can be downloaded as a zip-file (:download:`Download ZIP-File <source.zip>`, last update |today|). Alternatively the developer version of the code can be obtained by cloning the git repository: `<https://github.com/andim/easyleed/>`_
+Easyleed is open-source software licensed under the GPL v2. The software can be downloaded as a zip-file (:download:`Download ZIP-File <_static/source.zip>`, last update |today|). Alternatively the developer version of the code can be obtained by cloning the git repository: `<https://github.com/andim/easyleed/>`_
 
 Installation
 ============
