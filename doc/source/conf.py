@@ -42,7 +42,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Easyleed'
-copyright = u'2012, %s' % easyleed.__author__
+copyright = u'2010-13, %s' % easyleed.__author__
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -149,7 +149,7 @@ html_sidebars = { 'index' : ['indexsidebar.html'], '**': [] }
 #html_split_index = False
 
 # If true, links to the reST sources are added to the pages.
-#html_show_sourcelink = True
+html_show_sourcelink = False
 
 # If true, "Created using Sphinx" is shown in the HTML footer. Default is True.
 #html_show_sphinx = True
