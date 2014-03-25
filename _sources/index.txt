@@ -1,31 +1,36 @@
 Intro
 =====
 
-The purpose of the Easyleed program is the extraction of intensity-energy spectra from low-energy electron diffraction patterns.
+The intensity of diffraction maxima in low energy electron diffraction patterns changes with the energy of the incident beam. By varying the beam energy and recording the intensity of the maxima at each step, structural information about the analyzed surface can be obtained. The purpose of the Easyleed program is to facilitate the extraction of intensity-energy spectra from the experimental images. 
 
-The method implemented in this software combines the knowledge about the movement of the spots with detected spot positions using a Kalman filter. More information about the algorithm can be found in our paper:
+The user selects the spots he wants to track and the software then tries to automatically track the spots throughout all beam energies. The tracking relies on a method combining the knowledge about the movement of the spots with detected spot positions.
 
-A. Mayer et al. A novel method for the extraction of intensity-energy spectra from low-energy electron diffraction patterns. Comput. Phys. Commun. 183, 1443-1447 (2012), `doi:10.1016/j.cpc.2012.02.019 <http://dx.doi.org/10.1016/j.cpc.2012.02.019>`_
+.. image:: /_static/illustration.*
+    :scale: 75%
 
-Download and Installation
-=========================
+Development of Easyleed was started by Andreas Mayer while working in Renee Diehl's lab (Penn State). Hanna Salopaasi has since continued working on Easyleed in Katariina Pussi's lab (Lappeenranta University of Technology). We continue to work on facilitating LEED pattern analysis and therefore appreciate any form of user feedback! 
 
-The newest version of the software can be downloaded as a zip-file:
+Download 
+=========
+Easyleed is open-source software licensed under the GPL v2. The software can be downloaded as a zip-file (:download:`Download ZIP-File <source.zip>`, last update |today|). Alternatively the developer version of the code can be obtained by cloning the git repository: `<https://github.com/andim/easyleed/>`_
 
-:download:`Download Easyleed <source.zip>`, last update |today|
+Installation
+============
 
-After downloading this file extract its content to a directory. If you have already installed the dependencies (see below), you are ready to go and can open the graphical user interface by running ``run-gui.py``.
+After downloading the zip-file extract its content to a directory. If you have already installed the dependencies, you are ready to go and can open the graphical user interface by running ``run-gui.py``.
 
-Easyleed is written in `Python <http://www.python.org/>`_ and relies on a number of libraries. The easiest way is to install the Python distribution `Python(x,y) <http://code.google.com/p/pythonxy/>`_, that contains all the libraries. Of course, you can also manually install everything. Here is a list of Easyleed's dependencies:
+Dependencies
+============
+
+Easyleed is written in `Python <http://www.python.org/>`_ and relies on the following libraries:
 
 - Python >2.6 `<http://www.python.org/>`_
 - Qt 4.6 `<http://qt.nokia.com/>`_ and PyQt 4.7 `<http://www.riverbankcomputing.co.uk/>`_
 - Numpy >1.5 and Scipy >0.9 `<http://www.scipy.org/>`_
 - Matplotlib >0.9 `<http://matplotlib.org/>`_
-
-Depending on your input file type of choice you might need the following library:
-
 - PyFITS, if you intend to use fits-files as an image input format `<http://www.stsci.edu/resources/software_hardware/pyfits/>`_
+
+Under Windows a simple way to get all the required python packages at once is to install the Python distribution `Python(x,y) <http://code.google.com/p/pythonxy/>`_.
 
 Documentation
 =============
@@ -35,3 +40,13 @@ Documentation
    
    userdoc
    api
+   
+Citing Easyleed
+===============
+
+We have described the algorithm, which is implemented in Easyleed in the following article (:download:`Download Bibtex-File<easyleed.bib>`):
+
+A. Mayer, H. Salopaasi, K. Pussi, R.D. Diehl. A novel method for the extraction of intensity-energy spectra from low-energy electron diffraction patterns. Comput. Phys. Commun. 183, 1443-1447 (2012)
+
+You can view the paper using this DOI link: `doi:10.1016/j.cpc.2012.02.019 <http://dx.doi.org/10.1016/j.cpc.2012.02.019>`_ 
+
