@@ -51,7 +51,7 @@ class ImageLoader(object):
         m = re.search(self.regex, image_path)
         if m is None:
             raise IOError('Invalid filename. Check naming policy.')
-        return int(m.group())
+        return float(m.group())
    
     def current_energy(self):
         """ Get current energy. """
@@ -172,7 +172,7 @@ class ImageFormat:
 """ Dictionary of available ImageFormats. """
 IMAGE_FORMATS = dict([str(format_), format_] for format_ in \
         [ImageFormat("FITS", ["*.fit", "*.fits"], FitsImageLoader),
-        ImageFormat("PIL", ["*.tif", "*.tiff", "*.png"], PILImageLoader),
+        ImageFormat("PIL", ["*.tif", "*.tiff", "*.png", "*.jpg"], PILImageLoader),
         ImageFormat("IMG", ["*.img"], ImgImageLoader)] \
              if format_.abbrev in formats_available)
 

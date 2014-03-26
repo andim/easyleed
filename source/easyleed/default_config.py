@@ -9,8 +9,8 @@ import numpy as np
 ####################
 
 # regular expression to extract energy from filename (not used for img files)
-# match between two and three decimal numbers, then lookaround 
-IO_energyRegex = "\d{2,3}(?=\.)"
+# match floating point number, followed by a point e.g. filename3.5.img or filename3.jpg
+IO_energyRegex = "[0-9]*\.?[0-9]+(?=\.)"
 
 ####################
 ####################
