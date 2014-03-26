@@ -21,7 +21,12 @@ __author__ = "Andreas Mayer, Hanna Salopaasi"
 
 # import packages
 # order of loading is important and should not be changed
-import default_config as config
+try:
+    import sys
+    sys.path.append('..')
+    import config
+except:
+    import default_config as config
 import kalman
 import io
 import base
