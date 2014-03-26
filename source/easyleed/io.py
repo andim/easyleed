@@ -22,11 +22,16 @@ try:
     formats_available.append("FITS")    
 except:
     logger.warning("The pyfits package is not properly installed.")
+# try to import PIL in two possible ways (dependent on PIL version)
 try:
-    import Image
+    from PIL import Image
     formats_available.append("PIL")    
 except:
-    logger.warning("The Image package (Python Imaging Library) is not properly installed.")
+    try:
+        import Image
+        formats_available.append("PIL")    
+    except:
+        logger.warning("The Image package (Python Imaging Library) is not properly installed.")
 
 class ImageLoader(object):
     """ Abstract base class for a class loading LEED images.
