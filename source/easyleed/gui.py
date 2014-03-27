@@ -298,7 +298,7 @@ class SetParameters(QWidget):
         self.integrationWindowRadius = QSpinBox(self)
         self.integrationWindowRadius.setWrapping(True)
         self.integrationWindowRadius.setValue(config.Tracking_minWindowSize)
-        self.iwrLabel = QLabel("Minimun radius of the integration window", self)
+        self.iwrLabel = QLabel("Minimal radius of the integration window", self)
 
         self.validationRegionSize = QSpinBox(self)
         self.validationRegionSize.setWrapping(True)
@@ -309,7 +309,7 @@ class SetParameters(QWidget):
         self.determinationCoefficient.setWrapping(True)
         self.determinationCoefficient.setSingleStep(0.01)
         self.determinationCoefficient.setValue(config.Tracking_minRsq)
-        self.dcLabel = QLabel("Minimal coefficient of determinating R^2 for fit", self)
+        self.dcLabel = QLabel("Minimal R^2 to accept fit", self)
 
         self.integrationWindowScale = QCheckBox("Scale integration window with changing energy")
         self.integrationWindowScale.setChecked(config.Tracking_windowScalingOn)
@@ -319,11 +319,11 @@ class SetParameters(QWidget):
 
         self.spotIdentification = QComboBox(self)
         self.spotIdentification.addItem("guess_from_Gaussian")
-        self.siLabel = QLabel("Spot indentification algorithm", self)
+        self.siLabel = QLabel("Spot identification algorithm", self)
 
 
-        self.fnLabel = QLabel("Kalman tracker process noise", self)
-        self.text = QLabel("Set the diagonal values for 4x4 matrix:", self)
+        self.fnLabel = QLabel("Kalman tracker process noise Q", self)
+        self.text = QLabel("Sets diagonal values of covariance matrix", self)
         self.value1 = QLineEdit(self)
         self.value1.setText(str(config.Tracking_processNoise.diagonal()[0]))
         self.value2 = QLineEdit(self)

@@ -37,10 +37,10 @@ QGraphicsSpotView_smallMove = 0.1
 ##########################
 
 # precision of the user input (standard deviation in pixel)
-Tracking_inputPrecision = 10
+Tracking_inputPrecision = 5
 # scale the integration window with changing energy
 Tracking_windowScalingOn = True
-# minimum radius of the integration window (in pixel)
+# minimal radius of the integration window (in pixel)
 Tracking_minWindowSize = 0
 # function for spot identification
 Tracking_guessFunc = "guess_from_Gaussian"
