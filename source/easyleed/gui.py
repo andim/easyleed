@@ -641,7 +641,7 @@ class MainWindow(QMainWindow):
             intensities = [model.m.intensity for model, tracker \
                                 in self.worker.spots_map.itervalues()]
             energy = [model.m.energy for model, tracker in self.worker.spots_map.itervalues()]
-            # setting the axe labels
+            # setting the axes labels
             self.plotwid.axes.set_xlabel("Energy [eV]")
             self.plotwid.axes.set_ylabel("Intensity")
             self.plotwid.axes.set_title("I(E)-curve")
@@ -654,6 +654,11 @@ class MainWindow(QMainWindow):
                     self.plotwid.axes.plot(x, y)
             # and show it
             self.plotwid.canvas.draw()
+            # try to auto-adjust plot margins (might not be available in all matplotlib versions"
+            try:
+                self.plotwid.fig.tight_layout()
+            except:
+                pass
             self.plotwid.show()
             # can save the plot now
             self.fileSavePlotAction.setEnabled(True)
@@ -797,8 +802,7 @@ class MainWindow(QMainWindow):
         # savefile prompt
 	    filename = str(QFileDialog.getSaveFileName(self, "Save the plot to a file"))
 	    if filename:
-            # matplotlib.pyplot save-function, saves as pdf
-		    self.plotwid.canvas.print_figure(filename, format="pdf")
+		    self.plotwid.fig.savefig(filename)
 
     ## Quitting the application
     # special quit-function as the normal window closing might leave something on the background
