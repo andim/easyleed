@@ -42,7 +42,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Easyleed'
-copyright = u'2010-13, %s' % easyleed.__author__
+copyright = u'2010-14, %s' % easyleed.__author__
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -61,7 +61,7 @@ release = version
 # non-false value, then it is used:
 #today = ''
 # Else, today_fmt is used as the format for a strftime call.
-today_fmt = '%B %d, %Y'
+today_fmt = '%Y-%m-%d'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.

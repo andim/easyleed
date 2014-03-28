@@ -19,21 +19,6 @@
 {%- block sidebarlogo %}{% endblock %}
 
 {% macro nav() %}
-        <p>
-        {%- block haikurel1 %}
-        {%- endblock %}
-        {%- if prev %}
-        «&#160;&#160;<a href="{{ prev.link|e }}">{{ prev.title }}</a>
-        &#160;&#160;::&#160;&#160;
-        {%- endif %}
-        <a class="uplink" href="{{ pathto(master_doc) }}">{{ _('Contents') }}</a>
-        {%- if next %}
-        &#160;&#160;::&#160;&#160;
-        <a href="{{ next.link|e }}">{{ next.title }}</a>&#160;&#160;»
-        {%- endif %}
-        {%- block haikurel2 %}
-        {%- endblock %}
-        </p>
 {% endmacro %}
 
 {% block content %}
