@@ -39,34 +39,30 @@
       </div>
       <div class="topnav">
       
-        <p>
-        <a class="uplink" href="#">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="userdoc.html">User&#8217;s Guide</a>&#160;&#160;»
-        </p>
 
       </div>
       
       <div class="sphinxsidebar">
-        <div class="sphinxsidebarwrapper"><h3>Timeline</h3>
+        <div class="sphinxsidebarwrapper">
+<h3>Timeline</h3>
 
 <ul style="list-style-type:disc">
+    <li>March 2014: Fixed a number of minor bugs.</li>
     <li>August 2013: Code and documentation moved to Github.</li>
     <li>July 2012: Publication of paper on tracking algorithm.</li>
     <li>July 2010: Start of development.</li>
 </ul>
 
-
 <h3> Contact </h3>
 
-<p>
 If you have any questions, comments or bug reports please <a href="mailto:andisspam@gmail.com">contact us</a>!
 
 <h3> Links </h3>
 
 <ul style="list-style-type:disc">
-    <li><a href="http://xenon.phys.psu.edu/">Renee Diehl's lab at Penn State University</a></li>
-    <li><a href="http://personal.inet.fi/koti/katariina.pussi/">Katariina Pussi's lab at Lappeenranta University of Technology</a></li>
+    <li><a href="https://github.com/andim/easyleed/">Source code of Easyleed on github</a></li>
+    <li><a href="http://xenon.phys.psu.edu/">Renee Diehl (Penn State University)</a></li>
+    <li><a href="http://personal.inet.fi/koti/katariina.pussi/">Katariina Pussi (Lappeenranta University of Technology)</a></li>
 </ul>
 
         </div>
@@ -79,29 +75,35 @@ If you have any questions, comments or bug reports please <a href="mailto:andiss
   <div class="section" id="intro">
 <h1>Intro<a class="headerlink" href="#intro" title="Permalink to this headline">¶</a></h1>
 <p>The intensity of diffraction maxima in low energy electron diffraction patterns changes with the energy of the incident beam. By varying the beam energy and recording the intensity of the maxima at each step, structural information about the analyzed surface can be obtained. The purpose of the Easyleed program is to facilitate the extraction of intensity-energy spectra from the experimental images.</p>
-<p>The user selects the spots he wants to track and the software then tries to automatically track the spots throughout all beam energies. The tracking relies on a method combining the knowledge about the movement of the spots with detected spot positions.</p>
+<p>The user selects the spots he wants to track and the software then tries to automatically track the spots throughout all beam energies. An algorithm to determine the position of a spot in an image from the intensity information is combined with a dynamical model of the spot movement between successive beam energies to yield superior tracking performance.</p>
 <a class="reference internal image-reference" href="_images/illustration.png"><img alt="_images/illustration.png" src="_images/illustration.png" style="width: 654.75px; height: 318.75px;" /></a>
-<p>Development of Easyleed was started by Andreas Mayer while working in Renee Diehl&#8217;s lab (Penn State). Hanna Salopaasi has since continued working on Easyleed in Katariina Pussi&#8217;s lab (Lappeenranta University of Technology). We continue to work on facilitating LEED pattern analysis and therefore appreciate any form of user feedback!</p>
-</div>
-<div class="section" id="download">
-<h1>Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h1>
-<p>Easyleed is open-source software licensed under the GPL v2. The software can be downloaded as a zip-file (<a class="reference download internal" href="_downloads/source.zip"><tt class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">ZIP-File</span></tt></a>, last update März 26, 2014). Alternatively the developer version of the code can be obtained by cloning the git repository: <a class="reference external" href="https://github.com/andim/easyleed/">https://github.com/andim/easyleed/</a></p>
 </div>
 <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>After downloading the zip-file extract its content to a directory. If you have already installed the dependencies, you are ready to go and can open the graphical user interface by running <tt class="docutils literal"><span class="pre">run-gui.py</span></tt>.</p>
+<div class="section" id="download">
+<h2>Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h2>
+<p>Easyleed is open-source software licensed under the GPL v2. The software can be downloaded as a zip-file (<a class="reference download internal" href="_downloads/source.zip"><tt class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">ZIP-File</span></tt></a>, last update 2014-03-28). Alternatively the developer version of the code can be obtained by cloning the git repository: <a class="reference external" href="https://github.com/andim/easyleed/">https://github.com/andim/easyleed/</a></p>
 </div>
 <div class="section" id="dependencies">
-<h1>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h1>
+<h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
 <p>Easyleed is written in <a class="reference external" href="http://www.python.org/">Python</a> and relies on the following libraries:</p>
 <ul class="simple">
-<li>Python &gt;2.6 <a class="reference external" href="http://www.python.org/">http://www.python.org/</a></li>
+<li>Python 2.6 or 2.7 <a class="reference external" href="http://www.python.org/">http://www.python.org/</a></li>
 <li>Qt 4.6 <a class="reference external" href="http://qt.nokia.com/">http://qt.nokia.com/</a> and PyQt 4.7 <a class="reference external" href="http://www.riverbankcomputing.co.uk/">http://www.riverbankcomputing.co.uk/</a></li>
 <li>Numpy &gt;1.5 and Scipy &gt;0.9 <a class="reference external" href="http://www.scipy.org/">http://www.scipy.org/</a></li>
 <li>Matplotlib &gt;0.9 <a class="reference external" href="http://matplotlib.org/">http://matplotlib.org/</a></li>
-<li>PyFITS, if you intend to use fits-files as an image input format <a class="reference external" href="http://www.stsci.edu/resources/software_hardware/pyfits/">http://www.stsci.edu/resources/software_hardware/pyfits/</a></li>
 </ul>
 <p>Under Windows a simple way to get all the required python packages at once is to install the Python distribution <a class="reference external" href="http://code.google.com/p/pythonxy/">Python(x,y)</a>.</p>
+<p>Dependent on the file format of your input LEED images, you should also install the following packages:</p>
+<ul class="simple">
+<li>Python Imaging Library (for .tif, .png, .jpg) <a class="reference external" href="http://www.pythonware.com/products/pil/">http://www.pythonware.com/products/pil/</a></li>
+<li>PyFITS (for .fits) <a class="reference external" href="http://www.stsci.edu/resources/software_hardware/pyfits/">http://www.stsci.edu/resources/software_hardware/pyfits/</a></li>
+</ul>
+</div>
+<div class="section" id="run">
+<h2>Run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h2>
+<p>After downloading the zip-file extract its content to a directory. If you have already installed the dependencies, you are ready to go and can open the graphical user interface by running <tt class="docutils literal"><span class="pre">run-gui.py</span></tt>.</p>
+</div>
 </div>
 <div class="section" id="documentation">
 <h1>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h1>
@@ -112,13 +114,17 @@ If you have any questions, comments or bug reports please <a href="mailto:andiss
 </ul>
 </div>
 </div>
+<div class="section" id="outro">
+<h1>Outro<a class="headerlink" href="#outro" title="Permalink to this headline">¶</a></h1>
+<p>Development of Easyleed was started by Andreas Mayer while working in Renee Diehl&#8217;s lab (Penn State). Hanna Salopaasi has contributed to the user interface of Easyleed while working in Katariina Pussi&#8217;s lab (Lappeenranta University of Technology). We continue to work on facilitating LEED pattern analysis and therefore appreciate any form of user feedback!</p>
 <div class="section" id="citing-easyleed">
-<h1>Citing Easyleed<a class="headerlink" href="#citing-easyleed" title="Permalink to this headline">¶</a></h1>
+<h2>Citing Easyleed<a class="headerlink" href="#citing-easyleed" title="Permalink to this headline">¶</a></h2>
 <p>We have described the algorithm, which is implemented in Easyleed in the following article (<a class="reference download internal" href="_downloads/easyleed.bib"><tt class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Bibtex-File</span></tt></a>):</p>
 <ol class="upperalpha simple">
 <li>Mayer, H. Salopaasi, K. Pussi, R.D. Diehl. A novel method for the extraction of intensity-energy spectra from low-energy electron diffraction patterns. Comput. Phys. Commun. 183, 1443-1447 (2012)</li>
 </ol>
-<p>You can view the paper using this DOI link: <a class="reference external" href="http://dx.doi.org/10.1016/j.cpc.2012.02.019">doi:10.1016/j.cpc.2012.02.019</a></p>
+<p>The paper is available <a class="reference external" href="http://dx.doi.org/10.1016/j.cpc.2012.02.019">online</a> at the publisher&#8217;s website. If you are unable to assess the paper at your institution, feel free to contact us via email for a preprint.</p>
+</div>
 </div>
 
 
@@ -128,17 +134,12 @@ If you have any questions, comments or bug reports please <a href="mailto:andiss
       </div>
       <div class="bottomnav">
       
-        <p>
-        <a class="uplink" href="#">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="userdoc.html">User&#8217;s Guide</a>&#160;&#160;»
-        </p>
 
       </div>
 
     <div class="footer">
-        &copy; Copyright 2010-13, Andreas Mayer, Hanna Salopaasi.
-      Last updated on Mär 26, 2014.
+        &copy; Copyright 2010-14, Andreas Mayer, Hanna Salopaasi.
+      Last updated on Mär 28, 2014.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>

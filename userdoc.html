@@ -40,13 +40,6 @@
       </div>
       <div class="topnav">
       
-        <p>
-        «&#160;&#160;<a href="index.html">Intro</a>
-        &#160;&#160;::&#160;&#160;
-        <a class="uplink" href="index.html">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="api.html">The Easyleed API</a>&#160;&#160;»
-        </p>
 
       </div>
       
@@ -71,6 +64,17 @@
 <li>Parameter settings can also be saved/loaded</li>
 <li>The selected spot positions can also be saved/loaded</li>
 </ul>
+<div class="section" id="file-naming-policy">
+<h2>File naming policy<a class="headerlink" href="#file-naming-policy" title="Permalink to this headline">¶</a></h2>
+<p>Easyleed tries to infer the beam energy from the filename.</p>
+<p>Examples of valid file names in the default configuration:</p>
+<ul class="simple">
+<li>file30.jpg &#8211;&gt;  at 30eV beam energy</li>
+<li>file30.5.jpg &#8211;&gt;  at 30.5eV beam energy</li>
+</ul>
+<p>For advanced users:
+You can change the regular expression that is used for parsing energies from filenames in the config file.</p>
+</div>
 </div>
 
 
@@ -79,19 +83,12 @@
       </div>
       <div class="bottomnav">
       
-        <p>
-        «&#160;&#160;<a href="index.html">Intro</a>
-        &#160;&#160;::&#160;&#160;
-        <a class="uplink" href="index.html">Contents</a>
-        &#160;&#160;::&#160;&#160;
-        <a href="api.html">The Easyleed API</a>&#160;&#160;»
-        </p>
 
       </div>
 
     <div class="footer">
-        &copy; Copyright 2010-13, Andreas Mayer, Hanna Salopaasi.
-      Last updated on Mär 26, 2014.
+        &copy; Copyright 2010-14, Andreas Mayer, Hanna Salopaasi.
+      Last updated on Mär 28, 2014.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
     </div>
   </body>
