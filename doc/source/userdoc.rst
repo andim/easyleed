@@ -16,3 +16,16 @@ Here is a short step-by-step guide:
 
 - Parameter settings can also be saved/loaded
 - The selected spot positions can also be saved/loaded
+
+File naming policy
+------------------
+
+Easyleed tries to infer the beam energy from the filename. 
+
+Examples of valid file names in the default configuration:
+
+- file30.jpg -->  at 30eV beam energy
+- file30.5.jpg -->  at 30.5eV beam energy
+
+For advanced users:
+You can change the regular expression that is used for parsing energies from filenames in the config file.
