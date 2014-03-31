@@ -1,0 +1,10 @@
+('EasyLEED/dist/EasyLEED',
+ True,
+ False,
+ 'easyleed/doc/source/_static/eicon.ico',
+ None,
+ [],
+ None,
+ True,
+ 0,
+ 1368518382)
