@@ -294,6 +294,11 @@ class SetParameters(QWidget):
         self.inputPrecision.setWrapping(True)
         self.inputPrecision.setValue(config.Tracking_inputPrecision)
         self.ipLabel = QLabel("User input precision", self)
+        
+        self.integrationWindowRadiusNew = QSpinBox(self)
+        self.integrationWindowRadiusNew.setWrapping(True)
+        self.integrationWindowRadiusNew.setValue(config.GraphicsScene_defaultRadius)
+        self.iwrnLabel = QLabel("Default radius of a new spot", self)
 
         self.integrationWindowRadius = QSpinBox(self)
         self.integrationWindowRadius.setWrapping(True)
@@ -354,6 +359,8 @@ class SetParameters(QWidget):
         self.lvLayout = QVBoxLayout()
         self.lvLayout.addWidget(self.ipLabel)
         self.lvLayout.addWidget(self.inputPrecision)
+        self.lvLayout.addWidget(self.iwrnLabel)
+        self.lvLayout.addWidget(self.integrationWindowRadiusNew)
         self.lvLayout.addWidget(self.iwrLabel)
         self.lvLayout.addWidget(self.integrationWindowRadius)
         self.lvLayout.addWidget(self.vrsLabel)
@@ -734,6 +741,8 @@ class MainWindow(QMainWindow):
         '''Parameter setting control'''
         config.Tracking_inputPrecision = self.setparameterswid.inputPrecision.value()
         config.Tracking_windowScalingOn = self.setparameterswid.integrationWindowScale.isChecked()
+        config.Tracking_minWindowSize = self.setparameterswid.integrationWindowRadius.value()
+        config.GraphicsScene_defaultRadius = self.setparameterswid.integrationWindowRadiusNew.value()
         config.Tracking_minWindowSize = self.setparameterswid.integrationWindowRadius.value()
         config.Tracking_guessFunc = self.setparameterswid.spotIdentification.currentText()
         config.Tracking_gamma = self.setparameterswid.validationRegionSize.value()
