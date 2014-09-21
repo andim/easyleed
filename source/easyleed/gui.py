@@ -760,6 +760,7 @@ class MainWindow(QMainWindow):
         '''Loading deault parameter valued from config file'''
         reload(config)
         self.setparameterswid.inputPrecision.setValue(config.Tracking_inputPrecision)
+        self.setparameterswid.integrationWindowRadiusNew.setValue(config.GraphicsScene_defaultRadius)
         self.setparameterswid.integrationWindowRadius.setValue(config.Tracking_minWindowSize)
         self.setparameterswid.validationRegionSize.setValue(config.Tracking_gamma)
         self.setparameterswid.determinationCoefficient.setValue(config.Tracking_minRsq)
