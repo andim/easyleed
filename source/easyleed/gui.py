@@ -344,6 +344,7 @@ class SetParameters(QWidget):
         self.defaultButton = QPushButton('&Default', self)
         self.wrongLabel = QLabel(" ", self)
         self.acceptButton = QPushButton('&Accept', self)
+        self.applyButton = QPushButton('&Apply', self)
         self.cancelButton = QPushButton('&Cancel', self)
 
         #Layouts
@@ -394,6 +395,7 @@ class SetParameters(QWidget):
         self.hLayout.addWidget(self.defaultButton)
         self.hLayout.addWidget(self.wrongLabel)
         self.hLayout.addWidget(self.acceptButton)
+        self.hLayout.addWidget(self.applyButton)
         self.hLayout.addWidget(self.cancelButton)
 
         #adding layouts to the grid
@@ -448,7 +450,7 @@ class MainWindow(QMainWindow):
 
 ######
 
-        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processRestartAction, None, processPlotAction, None, processPlotAverageAction, None, processSetParameters]
+        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processRestartAction, None, processPlotAction, None, processPlotAverageAction, None]
         fileOpenAction = self.createAction("&Open...", self.fileOpen,
                 QKeySequence.Open, None,
                 "Open a directory containing the image files.")
@@ -729,7 +731,7 @@ class MainWindow(QMainWindow):
     def setParameters(self):
 
         QObject.connect(self.setparameterswid.acceptButton, SIGNAL("clicked()"), self.acceptParameters)
-        QObject.connect(self.setparameterswid.cancelButton, SIGNAL("clicked()"), self.setparameterswid.close)
+        QObject.connect(self.setparameterswid.applyButton, SIGNAL("clicked()"), self.applyParameters)
         QObject.connect(self.setparameterswid.defaultButton, SIGNAL("clicked()"), self.defaultValues)
         QObject.connect(self.setparameterswid.saveButton, SIGNAL("clicked()"), self.saveValues)
         QObject.connect(self.setparameterswid.loadButton, SIGNAL("clicked()"), self.loadValues)
@@ -752,6 +754,24 @@ class MainWindow(QMainWindow):
             self.noiseList = [float(self.setparameterswid.value1.text()), float(self.setparameterswid.value2.text()), float(self.setparameterswid.value3.text()), float(self.setparameterswid.value4.text())]
             config.Tracking_processNoise = np.diag(self.noiseList)
             self.setparameterswid.close()
+        except ValueError:
+            self.setparameterswid.setText.wrongLabel("Invalid process noise value")
+
+    #Set user values to the parameters
+    def applyParameters(self):
+        '''Parameter setting control'''
+        config.Tracking_inputPrecision = self.setparameterswid.inputPrecision.value()
+        config.Tracking_windowScalingOn = self.setparameterswid.integrationWindowScale.isChecked()
+        config.Tracking_minWindowSize = self.setparameterswid.integrationWindowRadius.value()
+        config.GraphicsScene_defaultRadius = self.setparameterswid.integrationWindowRadiusNew.value()
+        config.Tracking_minWindowSize = self.setparameterswid.integrationWindowRadius.value()
+        config.Tracking_guessFunc = self.setparameterswid.spotIdentification.currentText()
+        config.Tracking_gamma = self.setparameterswid.validationRegionSize.value()
+        config.Tracking_minRsq = self.setparameterswid.determinationCoefficient.value()
+        config.Processing_backgroundSubstractionOn = self.setparameterswid.backgroundSubstraction.isChecked()
+        try:
+            self.noiseList = [float(self.setparameterswid.value1.text()), float(self.setparameterswid.value2.text()), float(self.setparameterswid.value3.text()), float(self.setparameterswid.value4.text())]
+            config.Tracking_processNoise = np.diag(self.noiseList)
         except ValueError:
             self.setparameterswid.setText.wrongLabel("Invalid process noise value")
 
