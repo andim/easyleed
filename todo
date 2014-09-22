@@ -1,1 +1,2 @@
-
+- Add ability to restart withouth removing points. This could be achieve by splitting the 
+  function into restart vs start all over...
