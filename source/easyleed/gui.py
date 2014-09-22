@@ -214,6 +214,40 @@ class FileDialog(QFileDialog):
 
 ############## H ###########
 
+class AboutWidget(QWidget):
+    '''PyQt widget for About Box Panel'''
+    
+    def __init__(self):
+        super(AboutWidget, self).__init__()
+        
+        self.initUI()
+    
+    def initUI(self):
+        
+        self.setGeometry(300, 300, 300, 150)
+        self.setWindowTitle('About EasyLEED')
+        self.gridLayout = QGridLayout()
+        self.setLayout(self.gridLayout)
+        self.verticalLayout = QVBoxLayout()
+        self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
+        self.label = QLabel("EasyLEED 1.0", self)
+        self.verticalLayout.addWidget(self.label)
+        self.label = QLabel("by A. Mayers, H. Salopaasi, P. Pussi, R.D. Diehl", self)
+        self.verticalLayout.addWidget(self.label)
+        self.label = QLabel("Contact: A. Mayers <andisspam@gmail.com>", self)
+        self.verticalLayout.addWidget(self.label)
+        self.label = QLabel("", self)
+        self.verticalLayout.addWidget(self.label)
+        self.label = QLabel("More details: ", self)
+        self.verticalLayout.addWidget(self.label)
+        self.label = QLabel("Mayer, H. Salopaasi, K. Pussi, R.D. Diehl. Comput. Phys. Commun. 183, 1443-1447 (2012)",self)
+        self.verticalLayout.addWidget(self.label)
+        self.label = QLabel("", self)
+        self.verticalLayout.addWidget(self.label)
+        self.label = QLabel("Enhanced by: Nicola Ferralis <feranick@hotmail.com>", self)
+        self.verticalLayout.addWidget(self.label)
+
+
 class PlotOptionWidget(QWidget):
     '''PyQt widget for selecting plotting options'''
 
@@ -411,6 +445,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("easyLeed %s" % __version__)
 
         #### setup central widget ####
+        self.aboutwid = AboutWidget()
         self.plotoptionwid = PlotOptionWidget()
         self.plotwid = Plot()
         self.setparameterswid = SetParameters()
@@ -625,14 +660,16 @@ class MainWindow(QMainWindow):
             item.setFlag(QGraphicsItem.ItemIsMovable, False)
 
     def helpBoxShow(self):
-       helpFile = open("../doc/source/uiuserguide.txt", 'r')
-       filedata = helpFile.read()
-       self.textBox = QMessageBox.information(self, "Help", filedata, QMessageBox.Ok)
+        #helpFile = open("../doc/source/uiuserguide.txt", 'r')
+        #filedata = helpFile.read()
+        #self.textBox = QMessageBox.information(self, "Help", filedata, QMessageBox.Ok)
+        self.aboutwid.show()
 
     def aboutBoxShow(self):
-       aboutFile = open("../doc/source/uiabout.txt", 'r')
-       filedata = aboutFile.read()
-       self.textBox = QMessageBox.information(self, "About", filedata, QMessageBox.Ok)
+        #aboutFile = open("../doc/source/uiabout.txt", 'r')
+        #filedata = aboutFile.read()
+        #self.textBox = QMessageBox.information(self, "About", filedata, QMessageBox.Ok)
+        self.aboutwid.show()
 
 ##H #
 	## Plotting with matplotlib ##
