@@ -245,7 +245,7 @@ class AboutWidget(QWidget):
         self.verticalLayout.addWidget(self.label)
         self.label = QLabel("", self)
         self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("Enhanced by: Nicola Ferralis <feranick@hotmail.com>", self)
+        self.label = QLabel("With contributions from: Nicola Ferralis <feranick@hotmail.com>", self)
         self.verticalLayout.addWidget(self.label)
 
 
@@ -356,6 +356,9 @@ class SetParameters(QWidget):
 
         self.backgroundSubstraction = QCheckBox("Background substraction")
         self.backgroundSubstraction.setChecked(config.Processing_backgroundSubstractionOn)
+        
+        self.livePlotting = QCheckBox("Plot I(E) intensities during acquisition")
+        self.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
 
         self.spotIdentification = QComboBox(self)
         self.spotIdentification.addItem("guess_from_Gaussian")
@@ -407,6 +410,7 @@ class SetParameters(QWidget):
         self.rvLayout = QVBoxLayout()
         self.rvLayout.addWidget(self.integrationWindowScale)
         self.rvLayout.addWidget(self.backgroundSubstraction)
+        self.rvLayout.addWidget(self.livePlotting)
         self.rvLayout.addWidget(self.siLabel)
         self.rvLayout.addWidget(self.spotIdentification)
         self.rvLayout.addWidget(self.fnLabel)
@@ -649,6 +653,8 @@ class MainWindow(QMainWindow):
             self.setImage(image)
             self.worker.process(image)
             QApplication.processEvents()
+            if config.GraphicsScene_livePlottingOn == True:
+                self.plotting()
         self.view.setInteractive(True)
         self.statusBar().removeWidget(statusWidget)
 
@@ -783,6 +789,7 @@ class MainWindow(QMainWindow):
         config.Tracking_gamma = self.setparameterswid.validationRegionSize.value()
         config.Tracking_minRsq = self.setparameterswid.determinationCoefficient.value()
         config.Processing_backgroundSubstractionOn = self.setparameterswid.backgroundSubstraction.isChecked()
+        config.GraphicsScene_livePlottingOn = self.setparameterswid.livePlotting.isChecked()
 
     #Set user values to the parameters
     def acceptParameters(self):
@@ -818,6 +825,7 @@ class MainWindow(QMainWindow):
         self.setparameterswid.value2.setText(str(config.Tracking_processNoise.diagonal()[1]))
         self.setparameterswid.value3.setText(str(config.Tracking_processNoise.diagonal()[2]))
         self.setparameterswid.value4.setText(str(config.Tracking_processNoise.diagonal()[3]))
+        self.setparameterswid.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
 
     #Save given user values to a file
     def saveValues(self):
@@ -826,7 +834,7 @@ class MainWindow(QMainWindow):
         if filename:
             output = open(filename, 'w')
             backgroundsublist = [float(self.setparameterswid.value1.text()), float(self.setparameterswid.value2.text()), float(self.setparameterswid.value3.text()), float(self.setparameterswid.value4.text())]
-            writelist = [self.setparameterswid.inputPrecision.value(), self.setparameterswid.integrationWindowScale.isChecked(), self.setparameterswid.integrationWindowRadius.value(), self.setparameterswid.spotIdentification.currentText(), self.setparameterswid.validationRegionSize.value(), self.setparameterswid.determinationCoefficient.value(), self.setparameterswid.backgroundSubstraction.isChecked(), backgroundsublist]
+            writelist = [self.setparameterswid.inputPrecision.value(), self.setparameterswid.integrationWindowScale.isChecked(), self.setparameterswid.integrationWindowRadius.value(), self.setparameterswid.spotIdentification.currentText(), self.setparameterswid.validationRegionSize.value(), self.setparameterswid.determinationCoefficient.value(), self.setparameterswid.backgroundSubstraction.isChecked(), backgroundsublist,self.setparameterswid.livePlotting.isChecked()]
             pickle.dump(writelist, output)
 
     #Load user values from a file to the widget
@@ -847,6 +855,7 @@ class MainWindow(QMainWindow):
             self.setparameterswid.value2.setText(str(loadlist[7][1]))
             self.setparameterswid.value3.setText(str(loadlist[7][2]))
             self.setparameterswid.value4.setText(str(loadlist[7][3]))
+            self.setparameterswid.livePlotting.setChecked(loadlist[8])
         except:
             print "Invalid file"
        
