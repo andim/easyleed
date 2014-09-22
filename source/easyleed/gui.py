@@ -12,6 +12,7 @@ import numpy as np
 
 from . import config
 from . import __version__
+from . import __author__
 from base import *
 from io import *
 
@@ -225,29 +226,27 @@ class AboutWidget(QWidget):
     
     def initUI(self):
         
-        self.setGeometry(30, 200, 300, 150)
+        self.setGeometry(100, 200, 400, 200)
         self.setWindowTitle('About EasyLEED')
         self.gridLayout = QGridLayout()
         self.setLayout(self.gridLayout)
         self.verticalLayout = QVBoxLayout()
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
-        self.label = QLabel("EasyLEED 1.0", self)
+        #self.label = QLabel("EasyLEED %s" % __version__, self)
+        self.label=QLabel("<qt><b><big><a href = http://andim.github.io/easyleed/index.html>EasyLEED %s</a></b></big></qt>" % __version__, self);
+        self.label.setOpenExternalLinks(True);
         self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("by A. Mayers, H. Salopaasi, P. Pussi, R.D. Diehl", self)
+        self.label = QLabel("by: %s" % __author__, self)
         self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("Contact: A. Mayers <andisspam@gmail.com>", self)
-        self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("", self)
+        self.label = QLabel("<qt>Contact: <a href = mailto:andisspam@gmail.com>andisspam@gmail.com</a></qt>", self)
+        self.label.setOpenExternalLinks(True);
         self.verticalLayout.addWidget(self.label)
         self.label = QLabel("More details: ", self)
         self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("Mayer, H. Salopaasi, K. Pussi, R.D. Diehl. Comput. Phys. Commun. 183, 1443-1447 (2012)",self)
+        self.label = QLabel("<qt><a href = http://dx.doi.org/10.1016/j.cpc.2012.02.019>Mayer, H. Salopaasi, K. Pussi, R.D. Diehl. Comput. Phys. Commun. 183, 1443-1447 (2012)</a>",self)
+        self.label.setWordWrap(True)
+        self.label.setOpenExternalLinks(True);
         self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("", self)
-        self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("With contributions from: Nicola Ferralis <feranick@hotmail.com>", self)
-        self.verticalLayout.addWidget(self.label)
-
 
 class PlotOptionWidget(QWidget):
     '''PyQt widget for selecting plotting options'''
