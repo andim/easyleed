@@ -1,5 +1,6 @@
 import sys
 import logging
+import webbrowser
 
 from PyQt4.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
 from PyQt4.QtGui import (QApplication, QMainWindow, QGraphicsView,
@@ -661,9 +662,10 @@ class MainWindow(QMainWindow):
 
     def helpBoxShow(self):
         #helpFile = open("../doc/source/uiuserguide.txt", 'r')
-        helpFile = open("../doc/source/userdoc.rst", 'r')
-        filedata = helpFile.read()
-        self.textBox = QMessageBox.information(self, "Help", filedata, QMessageBox.Ok)
+        #helpFile = open("../doc/source/userdoc.rst", 'r')
+        #filedata = helpFile.read()
+        #self.textBox = QMessageBox.information(self, "Help", filedata, QMessageBox.Ok)
+        webbrowser.open("http://andim.github.io/easyleed/userdoc.html")
 
     def aboutBoxShow(self):
         #aboutFile = open("../doc/source/uiabout.txt", 'r')
