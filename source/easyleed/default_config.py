@@ -30,6 +30,9 @@ QGraphicsSpotView_bigMove = 1
 # change in position per key press if Ctrl pressed
 QGraphicsSpotView_smallMove = 0.1
 
+# Live IV plotting during acquisition
+GraphicsScene_livePlottingOn = True
+
 ######################
 ######################
 
