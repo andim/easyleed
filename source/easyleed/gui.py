@@ -919,7 +919,12 @@ class Worker(QObject):
                                 in self.spots_map.itervalues()]
         energy = [model.m.energy for model, tracker in self.spots_map.itervalues()]
         zipped = zip(energy[0], *intensities)
-        np.savetxt(filename + ".int", zipped)
+        
+        if config.Processing_backgroundSubstractionOn == True:
+            np.savetxt(filename + "_bs.int", zipped)
+        else:
+            np.savetxt(filename + "_no-bs.int", zipped)
+        
         x = [model.m.x for model, tracker \
                 in self.spots_map.itervalues()]
         y = [model.m.y for model, tracker \
