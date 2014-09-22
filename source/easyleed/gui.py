@@ -356,7 +356,6 @@ class SetParameters(QWidget):
         self.setLayout(self.gridLayout)
 
         #1st (left) vertical layout
-        #adding items
         self.lvLayout = QVBoxLayout()
         self.lvLayout.addWidget(self.ipLabel)
         self.lvLayout.addWidget(self.inputPrecision)
@@ -370,42 +369,38 @@ class SetParameters(QWidget):
         self.lvLayout.addWidget(self.determinationCoefficient)
 
         #2nd (right) vertical layout
-        #adding items
         self.rvLayout = QVBoxLayout()
         self.rvLayout.addWidget(self.integrationWindowScale)
         self.rvLayout.addWidget(self.backgroundSubstraction)
         self.rvLayout.addWidget(self.siLabel)
         self.rvLayout.addWidget(self.spotIdentification)
-
-        #3rd (process noise) vertical layout
-        self.vpLayout = QVBoxLayout()
+        self.rvLayout.addWidget(self.fnLabel)
+        self.rvLayout.addWidget(self.text)
         self.hpLayout = QHBoxLayout()
-        self.vpLayout.addWidget(self.fnLabel)
-        self.vpLayout.addWidget(self.text)
-        self.hpLayout.addWidget(self.value1)
-        self.hpLayout.addWidget(self.value2)
-        self.hpLayout.addWidget(self.value3)
-        self.hpLayout.addWidget(self.value4)
+        self.rvLayout.addWidget(self.value1)
+        self.rvLayout.addWidget(self.value2)
+        self.rvLayout.addWidget(self.value3)
+        self.rvLayout.addWidget(self.value4)
 
-        #horizontal layout
-        #adding items
+        #horizontal layout left
         self.hLayout = QHBoxLayout()
         self.hLayout.addWidget(self.saveButton)
         self.hLayout.addWidget(self.loadButton)
         self.hLayout.addWidget(self.defaultButton)
         self.hLayout.addWidget(self.wrongLabel)
-        self.hLayout.addWidget(self.acceptButton)
-        self.hLayout.addWidget(self.applyButton)
-        self.hLayout.addWidget(self.cancelButton)
+
+        #horizontal layout right
+        self.h2Layout = QHBoxLayout()
+        self.h2Layout.addWidget(self.applyButton)
+        self.h2Layout.addWidget(self.acceptButton)
+        self.h2Layout.addWidget(self.cancelButton)
 
         #adding layouts to the grid
         self.gridLayout.addLayout(self.lvLayout, 0, 0)
         self.gridLayout.addLayout(self.rvLayout, 0, 1)
-        self.gridLayout.addLayout(self.vpLayout, 4, 0)
         self.gridLayout.addLayout(self.hpLayout, 4, 1)
-        self.gridLayout.addLayout(self.hLayout, 5, 1)
-
-        # apologies for horrific use of PyQt. I'll go back to text based. /Hanna #
+        self.gridLayout.addLayout(self.hLayout, 5, 0)
+        self.gridLayout.addLayout(self.h2Layout, 5, 1)
 
 ##############
 
