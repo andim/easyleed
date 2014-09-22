@@ -225,7 +225,7 @@ class AboutWidget(QWidget):
     
     def initUI(self):
         
-        self.setGeometry(300, 300, 300, 150)
+        self.setGeometry(30, 200, 300, 150)
         self.setWindowTitle('About EasyLEED')
         self.gridLayout = QGridLayout()
         self.setLayout(self.gridLayout)
@@ -259,7 +259,7 @@ class PlotOptionWidget(QWidget):
         
     def initUI(self):
         
-        self.setGeometry(300, 300, 300, 150)
+        self.setGeometry(150, 650, 300, 150)
         self.setWindowTitle('Select plotting method')
         self.gridLayout = QGridLayout()
         self.setLayout(self.gridLayout)
@@ -292,6 +292,7 @@ class Plot(QWidget):
     def create_main_frame(self):       
         # Create the mpl Figure and FigCanvas objects. 
         # 5x4 inches, 100 dots-per-inch
+        self.setGeometry(700, 450, 600, 400)
         self.dpi = 100
         self.fig = Figure((5.0, 4.0), dpi=self.dpi)
         self.canvas = FigureCanvas(self.fig)
@@ -386,7 +387,7 @@ class SetParameters(QWidget):
         self.cancelButton = QPushButton('&Cancel', self)
 
         #Layouts
-        self.setGeometry(300, 300, 300, 150)
+        self.setGeometry(700, 0, 300, 150)
         self.setWindowTitle('Set tracking parameters')
      
         #base grid
@@ -458,6 +459,7 @@ class MainWindow(QMainWindow):
         self.view = GraphicsView()
         self.view.setScene(self.scene)
         self.view.setMinimumSize(660, 480)
+        self.setGeometry(10, 10, 660, 480)
         self.setCentralWidget(self.view)
         
         #### define actions ####
