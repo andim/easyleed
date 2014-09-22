@@ -502,7 +502,7 @@ class MainWindow(QMainWindow):
         self.helpAction = self.createAction("&Help", self.helpBoxShow, None, None, "Show help")
         self.aboutAction = self.createAction("&About", self.aboutBoxShow, None, None, "About Easyleed")
         self.helpActions = [None, self.helpAction, None, self.aboutAction]
-                
+        
         
         self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileQuitAction]
 
@@ -661,9 +661,9 @@ class MainWindow(QMainWindow):
 
     def helpBoxShow(self):
         #helpFile = open("../doc/source/uiuserguide.txt", 'r')
-        #filedata = helpFile.read()
-        #self.textBox = QMessageBox.information(self, "Help", filedata, QMessageBox.Ok)
-        self.aboutwid.show()
+        helpFile = open("../doc/source/userdoc.rst", 'r')
+        filedata = helpFile.read()
+        self.textBox = QMessageBox.information(self, "Help", filedata, QMessageBox.Ok)
 
     def aboutBoxShow(self):
         #aboutFile = open("../doc/source/uiabout.txt", 'r')
