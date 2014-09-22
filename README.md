@@ -12,3 +12,5 @@ Changelog since fork from main tree (https://github.com/andim/easyleed/)
 - Set Preference panel is always visible (i.e. can be accessed with no images loaded).
 - Added "Apply" button in Set Preference, so that settings can be applied without closing the Set Preference panel.
 - Restructured order in Set Parameters (and cleanup).
+- New About Box
+- Restored working Help (redirects to main website - User Manual).
