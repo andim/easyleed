@@ -11,6 +11,7 @@ Changelog since version 1.0.
   * _bs.int: if the intensities were extracted with background subtraction.
   * _no-bs.int: if the intensities were not extracted with background subtraction.
 - Added option to display I(E) spectra during acquisition (live plotting). (NF)
+- Added “Stop” button to stop acquisition (somehow missing). (NF)
 - Restructured order in Set Parameters (and cleanup). (NF)
 - New About Box (NF)
 - Restored working Help (redirects to main website - User Manual). (NF)

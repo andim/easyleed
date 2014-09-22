@@ -457,13 +457,16 @@ class MainWindow(QMainWindow):
         self.scene = GraphicsScene(self)
         self.view = GraphicsView()
         self.view.setScene(self.scene)
-        self.view.setMinimumSize(640, 480)
+        self.view.setMinimumSize(660, 480)
         self.setCentralWidget(self.view)
         
         #### define actions ####
         processRunAction = self.createAction("&Run", self.run,
                 QKeySequence("Ctrl+r"), None,
                 "Run the analysis of the images.")
+        processStopAction = self.createAction("&Stop", self.stopProcessing,
+                QKeySequence("Ctrl+w"), None,
+                "Stop the analysis of the images.")
         processRestartAction = self.createAction("&Restart", self.restart,
                 QKeySequence("Ctrl+z"), None,
                 "Reset chosen points and jump to first image.")
@@ -485,7 +488,7 @@ class MainWindow(QMainWindow):
 
 ######
 
-        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processRestartAction, None, processPlotAction, None, processPlotAverageAction, None]
+        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotAction, None, processPlotAverageAction, None]
         fileOpenAction = self.createAction("&Open...", self.fileOpen,
                 QKeySequence.Open, None,
                 "Open a directory containing the image files.")
@@ -524,7 +527,7 @@ class MainWindow(QMainWindow):
         #### Create tool bar ####
         toolBar = self.addToolBar("&Toolbar")
         # adding actions to the toolbar, addActions-function creates a separator with "None"
-        self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processPreviousAction, None, processNextAction, None, processPlotOptions, None, processSetParameters, None, None, processRestartAction]
+        self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processPreviousAction, None, processNextAction, None, processPlotOptions, None, processSetParameters, None, processRestartAction]
         self.addActions(toolBar, self.toolBarActions)
 
         #### Create status bar ####
