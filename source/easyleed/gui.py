@@ -20,7 +20,7 @@ from io import *
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4agg import NavigationToolbar2QTAgg as NavigationToolbar
+from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.figure import Figure
 import pickle
 from . import my_flatten as flt
@@ -304,12 +304,12 @@ class Plot(QWidget):
         self.axes = self.fig.add_subplot(111)
         
         # Create the navigation toolbar, tied to the canvas
-        #self.mpl_toolbar = NavigationToolbar(self.canvas, self)
+        self.mpl_toolbar = NavigationToolbar2QT(self.canvas, self)
 
         # Layout
         vbox = QVBoxLayout()
+        vbox.addWidget(self.mpl_toolbar)
         vbox.addWidget(self.canvas)
-        #vbox.addWidget(self.mpl_toolbar)
         
         self.setLayout(vbox)
 
