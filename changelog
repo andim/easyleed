@@ -15,4 +15,5 @@ Changelog since version 1.0.
 - Restructured order in Set Parameters (and cleanup). (NF)
 - New About Box (NF)
 - Restored working Help (redirects to main website - User Manual). (NF)
+- Reorganized position of windows/panels to avoid overlapping. (NF)
 
