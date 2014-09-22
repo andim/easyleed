@@ -738,8 +738,7 @@ class MainWindow(QMainWindow):
 
         self.setparameterswid.show()
 
-    #Set user values to the parameters
-    def acceptParameters(self):
+    def SetAllParameters(self):
         '''Parameter setting control'''
         config.Tracking_inputPrecision = self.setparameterswid.inputPrecision.value()
         config.Tracking_windowScalingOn = self.setparameterswid.integrationWindowScale.isChecked()
@@ -750,6 +749,10 @@ class MainWindow(QMainWindow):
         config.Tracking_gamma = self.setparameterswid.validationRegionSize.value()
         config.Tracking_minRsq = self.setparameterswid.determinationCoefficient.value()
         config.Processing_backgroundSubstractionOn = self.setparameterswid.backgroundSubstraction.isChecked()
+
+    #Set user values to the parameters
+    def acceptParameters(self):
+        self.SetAllParameters()
         try:
             self.noiseList = [float(self.setparameterswid.value1.text()), float(self.setparameterswid.value2.text()), float(self.setparameterswid.value3.text()), float(self.setparameterswid.value4.text())]
             config.Tracking_processNoise = np.diag(self.noiseList)
@@ -759,16 +762,7 @@ class MainWindow(QMainWindow):
 
     #Set user values to the parameters
     def applyParameters(self):
-        '''Parameter setting control'''
-        config.Tracking_inputPrecision = self.setparameterswid.inputPrecision.value()
-        config.Tracking_windowScalingOn = self.setparameterswid.integrationWindowScale.isChecked()
-        config.Tracking_minWindowSize = self.setparameterswid.integrationWindowRadius.value()
-        config.GraphicsScene_defaultRadius = self.setparameterswid.integrationWindowRadiusNew.value()
-        config.Tracking_minWindowSize = self.setparameterswid.integrationWindowRadius.value()
-        config.Tracking_guessFunc = self.setparameterswid.spotIdentification.currentText()
-        config.Tracking_gamma = self.setparameterswid.validationRegionSize.value()
-        config.Tracking_minRsq = self.setparameterswid.determinationCoefficient.value()
-        config.Processing_backgroundSubstractionOn = self.setparameterswid.backgroundSubstraction.isChecked()
+        self.SetAllParameters()
         try:
             self.noiseList = [float(self.setparameterswid.value1.text()), float(self.setparameterswid.value2.text()), float(self.setparameterswid.value3.text()), float(self.setparameterswid.value4.text())]
             config.Tracking_processNoise = np.diag(self.noiseList)
