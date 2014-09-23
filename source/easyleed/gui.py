@@ -655,44 +655,48 @@ class MainWindow(QMainWindow):
         self.stopped = True
 
     def run(self):
-        import time
-        time_before = time.time()
         
-        self.stopped = False
-        progress = QProgressBar()
-        stop = QPushButton("Stop", self)
-        self.connect(stop, SIGNAL("clicked()"), self.stopProcessing)
-        progress.setMinimum(int(self.loader.current_energy()))
-        progress.setMaximum(int(self.loader.energies[-1]))
-        statusLayout = QHBoxLayout()
-        statusLayout.addWidget(progress)
-        statusLayout.addWidget(stop)
-        statusWidget = QWidget(self)
-        statusWidget.setLayout(statusLayout)
-        self.statusBar().addWidget(statusWidget)
-        self.view.setInteractive(False)
-        self.scene.clearSelection()
-        self.worker = Worker(self.scene.items(), self.current_energy, parent=self)
-        self.fileSaveAction.setEnabled(True)
-        self.fileSaveSpotsAction.setEnabled(True)
-        for image in self.loader:
-            if self.stopped:
-                break
-            progress.setValue(int(image[1]))
-            QApplication.processEvents()
-            self.setImage(image)
-            self.worker.process(image)
-            QApplication.processEvents()
-            if config.GraphicsScene_livePlottingOn == True:
-                if config.GraphicsScene_plotAverage == False:
-                    self.plotting()
-                else :
-                    self.plotting()
-                    self.plottingAverage()
-        self.view.setInteractive(True)
-        self.statusBar().removeWidget(statusWidget)
-
-        print time.time() - time_before
+        if len(self.scene.items()) == 0:
+            self.statusBar().showMessage("No integration window selected.", 5000)
+        else:
+            import time
+            time_before = time.time()
+        
+            self.stopped = False
+            progress = QProgressBar()
+            stop = QPushButton("Stop", self)
+            self.connect(stop, SIGNAL("clicked()"), self.stopProcessing)
+            progress.setMinimum(int(self.loader.current_energy()))
+            progress.setMaximum(int(self.loader.energies[-1]))
+            statusLayout = QHBoxLayout()
+            statusLayout.addWidget(progress)
+            statusLayout.addWidget(stop)
+            statusWidget = QWidget(self)
+            statusWidget.setLayout(statusLayout)
+            self.statusBar().addWidget(statusWidget)
+            self.view.setInteractive(False)
+            self.scene.clearSelection()
+            self.worker = Worker(self.scene.items(), self.current_energy, parent=self)
+       
+            self.fileSaveAction.setEnabled(True)
+            self.fileSaveSpotsAction.setEnabled(True)
+            for image in self.loader:
+                if self.stopped:
+                    break
+                progress.setValue(int(image[1]))
+                QApplication.processEvents()
+                self.setImage(image)
+                self.worker.process(image)
+                QApplication.processEvents()
+                if config.GraphicsScene_livePlottingOn == True:
+                    if config.GraphicsScene_plotAverage == False:
+                        self.plotting()
+                    else :
+                        self.plotting()
+                        self.plottingAverage()
+            self.view.setInteractive(True)
+            print time.time() - time_before
+            self.statusBar().removeWidget(statusWidget)
 
     def disableInput(self):
         for item in self.scene.items():
