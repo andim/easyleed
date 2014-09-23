@@ -282,8 +282,9 @@ class PlotOptionWidget(QWidget):
 class Plot(QWidget):
     '''Custom PyQt widget canvas for plotting'''
 
-    def __init__(self, parent=None):
-        QWidget.__init__(self, parent)
+    def __init__(self):
+        super(Plot, self).__init__()
+        #QWidget.__init__(self, parent)
         self.setWindowTitle("I(E)-curve")
         
         self.create_main_frame()
@@ -325,15 +326,14 @@ class Plot(QWidget):
         self.setLayout(vbox)
         
         # Define event for checkbox
-        config.GraphicsScene_plotAverage = self.averageCheck.isChecked()
         QObject.connect(self.averageCheck, SIGNAL("clicked()"), self.AvCheck)
     
     def AvCheck(self):
         if self.averageCheck.isChecked() == True:
             config.GraphicsScene_plotAverage = True
-            MainWindow(self).plottingAverage()
         else:
             config.GraphicsScene_plotAverage = False
+            self.axes.cla()
 
 class SetParameters(QWidget): 
     '''PyQt widget for setting tracking parameters'''
@@ -558,7 +558,7 @@ class MainWindow(QMainWindow):
         self.energyLabel = QLabel()
         self.energyLabel.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
         self.statusBar().addPermanentWidget(self.energyLabel)
-  
+    
     def addActions(self, target, actions):
         """
         Convenience function that adds the actions to the target.
