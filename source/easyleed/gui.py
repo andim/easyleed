@@ -700,16 +700,9 @@ class MainWindow(QMainWindow):
             item.setFlag(QGraphicsItem.ItemIsMovable, False)
 
     def helpBoxShow(self):
-        #helpFile = open("../doc/source/uiuserguide.txt", 'r')
-        #helpFile = open("../doc/source/userdoc.rst", 'r')
-        #filedata = helpFile.read()
-        #self.textBox = QMessageBox.information(self, "Help", filedata, QMessageBox.Ok)
         webbrowser.open("http://andim.github.io/easyleed/userdoc.html")
 
     def aboutBoxShow(self):
-        #aboutFile = open("../doc/source/uiabout.txt", 'r')
-        #filedata = aboutFile.read()
-        #self.textBox = QMessageBox.information(self, "About", filedata, QMessageBox.Ok)
         self.aboutwid.show()
 
 ##H #
@@ -723,12 +716,6 @@ class MainWindow(QMainWindow):
             intensities = [model.m.intensity for model, tracker \
                                 in self.worker.spots_map.itervalues()]
             energy = [model.m.energy for model, tracker in self.worker.spots_map.itervalues()]
-            # setting the axes labels
-            #self.plotwid.axes.set_xlabel("Energy [eV]")
-            #self.plotwid.axes.set_ylabel("Intensity")
-            #self.plotwid.axes.set_title("I(E)-curve")
-            # removes the ticks from y-axis
-            #self.plotwid.axes.set_yticks([])
 
             # do the plot
             for x in energy:
@@ -764,12 +751,6 @@ class MainWindow(QMainWindow):
                 average_intensity = sum_intensity/number_of_points
                 list_of_average_intensities.append(average_intensity)
                 sum_intensity = 0
-            # setting the axe labels
-            #self.plotwid.axes.set_xlabel("Energy [eV]")
-            #self.plotwid.axes.set_ylabel("Intensity")
-            #self.plotwid.axes.set_title("I(E)-curve")
-            # removes the ticks from y-axis
-            #self.plotwid.axes.set_yticks([])
 
             self.plotwid.axes.plot(energy[0], list_of_average_intensities,'k-', linewidth=3, label = 'Average')
             self.plotwid.canvas.draw()
