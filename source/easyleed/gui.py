@@ -285,7 +285,7 @@ class Plot(QWidget):
     def __init__(self, parent=None):
         QWidget.__init__(self, parent)
         self.setWindowTitle("I(E)-curve")
-
+        
         self.create_main_frame()
     
     def create_main_frame(self):       
@@ -303,6 +303,13 @@ class Plot(QWidget):
         # work.
         self.axes = self.fig.add_subplot(111)
         
+        self.axes.set_xlabel("Energy [eV]")
+        self.axes.set_ylabel("Intensity")
+        #self.axes.set_title("I(E)-curve")
+        # removes the ticks from y-axis
+        self.axes.set_yticks([])
+
+        
         # Create the navigation toolbar, tied to the canvas
         self.mpl_toolbar = NavigationToolbar2QT(self.canvas, self)
 
@@ -311,7 +318,22 @@ class Plot(QWidget):
         vbox.addWidget(self.mpl_toolbar)
         vbox.addWidget(self.canvas)
         
+        # Add checkbox for average.
+        self.averageCheck = QCheckBox("Show Average")
+        self.averageCheck.setChecked(config.GraphicsScene_plotAverage)
+        vbox.addWidget(self.averageCheck)
         self.setLayout(vbox)
+        
+        # Define event for checkbox
+        config.GraphicsScene_plotAverage = self.averageCheck.isChecked()
+        QObject.connect(self.averageCheck, SIGNAL("clicked()"), self.AvCheck)
+    
+    def AvCheck(self):
+        if self.averageCheck.isChecked() == True:
+            config.GraphicsScene_plotAverage = True
+            MainWindow(self).plottingAverage()
+        else:
+            config.GraphicsScene_plotAverage = False
 
 class SetParameters(QWidget): 
     '''PyQt widget for setting tracking parameters'''
@@ -658,7 +680,11 @@ class MainWindow(QMainWindow):
             self.worker.process(image)
             QApplication.processEvents()
             if config.GraphicsScene_livePlottingOn == True:
-                self.plotting()
+                if config.GraphicsScene_plotAverage == False:
+                    self.plotting()
+                else :
+                    self.plotting()
+                    self.plottingAverage()
         self.view.setInteractive(True)
         self.statusBar().removeWidget(statusWidget)
 
@@ -695,11 +721,11 @@ class MainWindow(QMainWindow):
                                 in self.worker.spots_map.itervalues()]
             energy = [model.m.energy for model, tracker in self.worker.spots_map.itervalues()]
             # setting the axes labels
-            self.plotwid.axes.set_xlabel("Energy [eV]")
-            self.plotwid.axes.set_ylabel("Intensity")
-            self.plotwid.axes.set_title("I(E)-curve")
+            #self.plotwid.axes.set_xlabel("Energy [eV]")
+            #self.plotwid.axes.set_ylabel("Intensity")
+            #self.plotwid.axes.set_title("I(E)-curve")
             # removes the ticks from y-axis
-            self.plotwid.axes.set_yticks([])
+            #self.plotwid.axes.set_yticks([])
 
             # do the plot
             for x in energy:
@@ -736,11 +762,12 @@ class MainWindow(QMainWindow):
                 list_of_average_intensities.append(average_intensity)
                 sum_intensity = 0
             # setting the axe labels
-            self.plotwid.axes.set_xlabel("Energy [eV]")
-            self.plotwid.axes.set_ylabel("Intensity")
-            self.plotwid.axes.set_title("I(E)-curve")
+            #self.plotwid.axes.set_xlabel("Energy [eV]")
+            #self.plotwid.axes.set_ylabel("Intensity")
+            #self.plotwid.axes.set_title("I(E)-curve")
             # removes the ticks from y-axis
-            self.plotwid.axes.set_yticks([])
+            #self.plotwid.axes.set_yticks([])
+
             self.plotwid.axes.plot(energy[0], list_of_average_intensities,'k-', linewidth=3, label = 'Average')
             self.plotwid.canvas.draw()
             self.plotwid.show()
