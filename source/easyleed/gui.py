@@ -248,37 +248,6 @@ class AboutWidget(QWidget):
         self.label.setOpenExternalLinks(True);
         self.verticalLayout.addWidget(self.label)
 
-class PlotOptionWidget(QWidget):
-    '''PyQt widget for selecting plotting options'''
-
-    def __init__(self):
-        super(PlotOptionWidget, self).__init__()
-        
-        self.initUI()
-        
-    def initUI(self):
-        
-        self.setGeometry(150, 650, 300, 150)
-        self.setWindowTitle('Select plotting method')
-        self.gridLayout = QGridLayout()
-        self.setLayout(self.gridLayout)
-        self.rbutton1 = QRadioButton('Plot &intensities', self)
-        self.rbutton2 = QRadioButton('Plot a&verage', self)
-        self.rbutton3 = QRadioButton('&Plot intensities && average', self)
-        self.verticalLayout = QVBoxLayout()
-        self.verticalLayout.addWidget(self.rbutton1)
-        self.verticalLayout.addWidget(self.rbutton2)
-        self.verticalLayout.addWidget(self.rbutton3)
-        self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
-        self.label = QLabel("", self)	
-        self.verticalLayout.addWidget(self.label)
-        self.hLayout = QHBoxLayout()
-        self.pbutton1 = QPushButton('&Accept', self)
-        self.pbutton2 = QPushButton('&Cancel', self)
-        self.hLayout.addWidget(self.pbutton1)
-        self.hLayout.addWidget(self.pbutton2)
-        self.gridLayout.addLayout(self.hLayout, 1, 0, 1, 1)
-
 class Plot(QWidget):
     '''Custom PyQt widget canvas for plotting'''
 
@@ -477,7 +446,6 @@ class MainWindow(QMainWindow):
 
         #### setup central widget ####
         self.aboutwid = AboutWidget()
-        self.plotoptionwid = PlotOptionWidget()
         self.plotwid = Plot()
         self.setparameterswid = SetParameters()
         self.scene = GraphicsScene(self)
