@@ -304,12 +304,8 @@ class Plot(QWidget):
         # work.
         self.axes = self.fig.add_subplot(111)
         
-        self.axes.set_xlabel("Energy [eV]")
-        self.axes.set_ylabel("Intensity")
-        #self.axes.set_title("I(E)-curve")
-        # removes the ticks from y-axis
-        self.axes.set_yticks([])
-
+        # Setup axis, labels...
+        self.setupPlot()
         
         # Create the navigation toolbar, tied to the canvas
         self.mpl_toolbar = NavigationToolbar2QT(self.canvas, self)
@@ -334,9 +330,14 @@ class Plot(QWidget):
         else:
             config.GraphicsScene_plotAverage = False
             self.axes.cla()
-            self.axes.set_xlabel("Energy [eV]")
-            self.axes.set_ylabel("Intensity")
-            self.axes.set_yticks([])
+            self.setupPlot()
+
+    def setupPlot(self):
+        self.axes.set_xlabel("Energy [eV]")
+        self.axes.set_ylabel("Intensity")
+        #self.axes.set_title("I(E)-curve")
+        # removes the ticks from y-axis
+        self.axes.set_yticks([])
 
 class SetParameters(QWidget): 
     '''PyQt widget for setting tracking parameters'''
@@ -760,28 +761,11 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("No plottable data.", 5000)
 
     def plottingOptions(self):
-
-        QObject.connect(self.plotoptionwid.pbutton1, SIGNAL("clicked()"), self.PlotWidgetAccept)
-        QObject.connect(self.plotoptionwid.pbutton2, SIGNAL("clicked()"), self.plotoptionwid.close)
-
-        self.plotoptionwid.show()
-
-    def PlotWidgetAccept(self):        
-        if self.plotoptionwid.rbutton1.isChecked():
-            self.plotwid.axes.cla()
-            self.plotting()
-            self.plotoptionwid.close()
-        elif self.plotoptionwid.rbutton2.isChecked():
-            self.plotwid.axes.cla()
+        self.plotwid.setupPlot()
+        if config.GraphicsScene_plotAverage == True:
             self.plottingAverage()
-            self.plotoptionwid.close()
-        elif self.plotoptionwid.rbutton3.isChecked():
-            self.plotwid.axes.cla()
-            self.plotting()
-            self.plottingAverage()
-            self.plotoptionwid.close()
         else:
-            self.plotoptionwid.label.setText('Check a mode')
+            self.plotting()
 
     def setParameters(self):
 
