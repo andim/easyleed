@@ -478,7 +478,7 @@ class MainWindow(QMainWindow):
         processPlotAverageAction = self.createAction("&Plot average", self.plottingAverage, QKeySequence("Ctrl+g"), None, "Plot the energy/intensity average.")
         #needs still work
         #processSpotsAction = self.createAction("&Process Spots", self.processSpots, QKeySequence("Ctrl+"), None, "Process spots.")
-        processPlotOptions = self.createAction("&Plot...", self.plottingOptions, None, None, "Choose plotting method.")
+        processPlotOptions = self.createAction("&Plot...", self.plottingOptions, None, None, "Plot Intensities.")
         processSetParameters = self.createAction("&Set Parameters", self.setParameters, None, None, "Set tracking parameters.")
 
 ######
