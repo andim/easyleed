@@ -695,7 +695,7 @@ class MainWindow(QMainWindow):
                         self.plotting()
                         self.plottingAverage()
             self.view.setInteractive(True)
-            print time.time() - time_before
+            print "Total time acquisition:", time.time() - time_before, "s"
             self.statusBar().removeWidget(statusWidget)
 
     def disableInput(self):
