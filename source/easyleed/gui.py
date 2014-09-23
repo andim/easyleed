@@ -909,6 +909,7 @@ class MainWindow(QMainWindow):
     # special quit-function as the normal window closing might leave something on the background
     def fileQuit(self):
         '''Special quit-function as the normal window closing might leave something on the background '''
+        self.stopProcessing()
         QApplication.closeAllWindows()
         self.plotwid.canvas.close()
 
