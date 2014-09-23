@@ -334,6 +334,9 @@ class Plot(QWidget):
         else:
             config.GraphicsScene_plotAverage = False
             self.axes.cla()
+            self.axes.set_xlabel("Energy [eV]")
+            self.axes.set_ylabel("Intensity")
+            self.axes.set_yticks([])
 
 class SetParameters(QWidget): 
     '''PyQt widget for setting tracking parameters'''
