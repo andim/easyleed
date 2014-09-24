@@ -616,6 +616,7 @@ class MainWindow(QMainWindow):
         self.plotwid.axes.cla()
         self.plotwid.canvas.draw()
         self.plotwid.close()
+        sliderCurrentPos = self.slider.setValue(1)
 
     def setImage(self, image):
         npimage, energy = image
