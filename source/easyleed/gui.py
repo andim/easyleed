@@ -4,9 +4,9 @@ import webbrowser
 
 from PyQt4.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
 from PyQt4.QtGui import (QApplication, QMainWindow, QGraphicsView,
-    QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen,
+    QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
     QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsItem,
-    QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar,
+    QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
     QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox, QComboBox, QLineEdit, QMessageBox)
 import numpy as np
 
@@ -454,6 +454,8 @@ class MainWindow(QMainWindow):
         self.view.setMinimumSize(660, 480)
         self.setGeometry(10, 10, 660, 480)
         self.setCentralWidget(self.view)
+        global sliderCurrentPos
+        sliderCurrentPos = 1
         
         #### define actions ####
         processRunAction = self.createAction("&Run", self.run,
@@ -524,13 +526,38 @@ class MainWindow(QMainWindow):
         # adding actions to the toolbar, addActions-function creates a separator with "None"
         self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processPreviousAction, None, processNextAction, None, processPlotOptions, None, processSetParameters, None, processRestartAction]
         self.addActions(toolBar, self.toolBarActions)
-
+        
         #### Create status bar ####
         self.statusBar().showMessage("Ready", 5000)
         self.energyLabel = QLabel()
         self.energyLabel.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
+
+        ### Create slider
+        self.slider = QSlider(Qt.Horizontal)
+        self.slider.setEnabled(False)
+        self.statusBar().addPermanentWidget(self.slider)
         self.statusBar().addPermanentWidget(self.energyLabel)
     
+        ### Create event connector for slider
+        QObject.connect(self.slider, SIGNAL("sliderMoved(int)"), self.slider_moved)
+    
+
+    def slider_moved(self, sliderNewPos):
+        """
+        This function tracks what to do with a slider movement.
+            
+        """
+        global sliderCurrentPos
+
+        diff = sliderCurrentPos - sliderNewPos
+        if diff > 0:
+            for i in range(0, diff):
+                self.previous()
+        else:
+            for i in range(diff, 0):
+                self.next_()
+        sliderCurrentPos = sliderNewPos
+
     def addActions(self, target, actions):
         """
         Convenience function that adds the actions to the target.
@@ -596,7 +623,7 @@ class MainWindow(QMainWindow):
         self.view.setSceneRect(QRectF(qimage.rect()))
         self.scene.setBackground(qimage)
         self.current_energy = energy
-        self.energyLabel.setText("Energy %s eV" % self.current_energy)
+        self.energyLabel.setText("Energy: %s eV" % self.current_energy)
 
     def saveIntensity(self):
         filename = str(QFileDialog.getSaveFileName(self, "Save intensities to a file"))
@@ -616,9 +643,15 @@ class MainWindow(QMainWindow):
                 self.loader = filetype.loader(files, config.IO_energyRegex)
                 self.setImage(self.loader.next())
                 self.enableProcessActions(True)
+                self.slider.setEnabled(True)
             except IOError, err:
                 self.statusBar().showMessage('IOError: ' + str(err), 5000)
-            
+        
+        # Set Slider boundaries.
+        self.slider.setRange(1, len(files)+1)
+        sliderCurrentPos = self.slider.setValue(1)
+                
+
     def stopProcessing(self):
         self.stopped = True
 
