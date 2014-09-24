@@ -7,4 +7,6 @@ See also http://andim.github.io/easyleed/.
 
 Authors: Andreas Mayer, Hanna Salopaasi, Nicola Ferralis
 
-Contact: andisspam@gmail.com
+Contacts:
+- A. Mayer <andisspam@gmail.com>
+- N. Ferralis <feranick@hotmail.com>
