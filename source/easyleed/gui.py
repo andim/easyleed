@@ -656,6 +656,7 @@ class MainWindow(QMainWindow):
         self.stopped = True
 
     def run(self):
+        global sliderCurrentPos
         
         if len(self.scene.items()) == 0:
             self.statusBar().showMessage("No integration window selected.", 5000)
@@ -676,6 +677,7 @@ class MainWindow(QMainWindow):
             statusWidget.setLayout(statusLayout)
             self.statusBar().addWidget(statusWidget)
             self.view.setInteractive(False)
+            self.slider.setEnabled(False)
             self.scene.clearSelection()
             self.worker = Worker(self.scene.items(), self.current_energy, parent=self)
        
@@ -695,7 +697,11 @@ class MainWindow(QMainWindow):
                     else :
                         self.plotting()
                         self.plottingAverage()
+                sliderCurrentPos = sliderCurrentPos + 1
+                self.slider.setValue(sliderCurrentPos)
+
             self.view.setInteractive(True)
+            self.slider.setEnabled(True)
             print "Total time acquisition:", time.time() - time_before, "s"
             self.statusBar().removeWidget(statusWidget)
 
