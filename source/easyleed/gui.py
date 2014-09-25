@@ -548,15 +548,20 @@ class MainWindow(QMainWindow):
             
         """
         global sliderCurrentPos
+        self.worker = Worker(self.scene.items(), self.current_energy, parent=self)
 
         diff = sliderCurrentPos - sliderNewPos
         if diff > 0:
             for i in range(0, diff):
                 self.previous()
+                self.worker.process(self.loader.this())
         else:
             for i in range(diff, 0):
                 self.next_()
+                self.worker.process(self.loader.this())
         sliderCurrentPos = sliderNewPos
+        #self.worker.process(self.loader.this())
+
 
     def addActions(self, target, actions):
         """

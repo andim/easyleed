@@ -2,7 +2,9 @@ Changelog since version 1.0.
 =============================
 
 - New energy slider for fast scrolling over open frames. (NF)
+- Integration windows (when present) are tracked with the energy slider. (NF)
 - New entry in Set Parameters panel for size of integration circle. (NF)
+- API: New self.loader.this() method to identify the current image. (NF)
 - Size of default intensity integration circle can now be restored with Default button in 
   Set Parameters (NF)
 - Set Preference panel is always visible (i.e. can be accessed with no images loaded). (NF)

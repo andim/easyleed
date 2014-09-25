@@ -87,6 +87,11 @@ class ImageLoader(object):
         else:
             raise StopIteration()
 
+    def this(self):
+        """ Get image at next higher beam energy. """
+        energy = self.energies[self.index]
+        return self.get_image(self.files[energy]), energy
+
     # FIXME: untested
     def custom_iter(self, energies):
         """ Returns an iterator to iter over the given energies."""
