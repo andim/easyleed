@@ -16,7 +16,7 @@ The Easyleed package is divided into several subpackages:
 
 """
 
-__version__ = "1.0"
+__version__ = "1.1dev"
 __author__ = "Andreas Mayer, Hanna Salopaasi, Nicola Ferralis"
 
 # import packages
