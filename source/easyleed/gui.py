@@ -528,7 +528,7 @@ class MainWindow(QMainWindow):
         #### Create tool bar ####
         toolBar = self.addToolBar("&Toolbar")
         # adding actions to the toolbar, addActions-function creates a separator with "None"
-        self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processPreviousAction, None, processNextAction, None, processPlotOptions, None, processSetParameters, None, processRestartAction]
+        self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processPlotOptions, None, processSetParameters, None, processRestartAction]
         self.addActions(toolBar, self.toolBarActions)
         
         #### Create status bar ####
@@ -536,14 +536,26 @@ class MainWindow(QMainWindow):
         self.energyLabel = QLabel()
         self.energyLabel.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
 
+
+        self.prevButton = QPushButton('&<', self)
+        self.nextButton = QPushButton('&>', self)
+        self.prevButton.setEnabled(False)
+        self.nextButton.setEnabled(False)
+        
         ### Create slider
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setEnabled(False)
+        
+        ### Create "next" and "previous" buttons.
+        self.statusBar().addPermanentWidget(self.prevButton)
+        self.statusBar().addPermanentWidget(self.nextButton)
         self.statusBar().addPermanentWidget(self.slider)
         self.statusBar().addPermanentWidget(self.energyLabel)
     
         ### Create event connector for slider
         QObject.connect(self.slider, SIGNAL("sliderMoved(int)"), self.slider_moved)
+        QObject.connect(self.prevButton, SIGNAL("clicked()"), self.prevBtnClicked)
+        QObject.connect(self.nextButton, SIGNAL("clicked()"), self.nextBtnClicked)
     
 
     def slider_moved(self, sliderNewPos):
@@ -564,6 +576,16 @@ class MainWindow(QMainWindow):
                 self.next_()
                 self.worker.process(self.loader.this())
         sliderCurrentPos = sliderNewPos
+
+    def prevBtnClicked(self):
+        self.worker = Worker(self.scene.items(), self.current_energy, parent=self)
+        self.previous()
+        self.worker.process(self.loader.this())
+
+    def nextBtnClicked(self):
+        self.worker = Worker(self.scene.items(), self.current_energy, parent=self)
+        self.next_()
+        self.worker.process(self.loader.this())
 
     def addActions(self, target, actions):
         """
@@ -651,6 +673,8 @@ class MainWindow(QMainWindow):
                 self.loader = filetype.loader(files, config.IO_energyRegex)
                 self.setImage(self.loader.next())
                 self.enableProcessActions(True)
+                self.prevButton.setEnabled(True)
+                self.nextButton.setEnabled(True)
                 self.slider.setEnabled(True)
                 self.fileSaveScreenAction.setEnabled(True)
             except IOError, err:
