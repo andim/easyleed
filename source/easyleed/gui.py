@@ -7,7 +7,8 @@ from PyQt4.QtGui import (QApplication, QMainWindow, QGraphicsView,
     QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
     QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsItem,
     QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
-    QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox, QComboBox, QLineEdit, QMessageBox)
+    QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox,
+    QComboBox, QLineEdit, QMessageBox, QPixmap)
 import numpy as np
 
 from . import config
@@ -487,6 +488,10 @@ class MainWindow(QMainWindow):
         self.fileSavePlotAction = self.createAction("&Save plot...", self.savePlot, QKeySequence("Ctrl+a"), None, "Save the plot to a pdf file.")
         # Will only enable plot saving after there is a plot to be saved
         self.fileSavePlotAction.setEnabled(False)
+        self.fileSaveScreenAction = self.createAction("&Save screenshot...", self.saveScreenShot,
+                QKeySequence("Ctrl+s"), None,
+                "Save image to a file.")
+        self.fileSaveScreenAction.setEnabled(False)
         self.fileQuitAction = self.createAction("&Quit", self.fileQuit,
                 QKeySequence("Ctrl+q"), None,
                 "Close the application.")
@@ -507,7 +512,8 @@ class MainWindow(QMainWindow):
         self.helpActions = [None, self.helpAction, None, self.aboutAction]
         
         
-        self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileQuitAction]
+        self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction,
+                self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileQuitAction]
 
         #### Create menu bar ####
         fileMenu = self.menuBar().addMenu("&File")
@@ -646,6 +652,7 @@ class MainWindow(QMainWindow):
                 self.setImage(self.loader.next())
                 self.enableProcessActions(True)
                 self.slider.setEnabled(True)
+                self.fileSaveScreenAction.setEnabled(True)
             except IOError, err:
                 self.statusBar().showMessage('IOError: ' + str(err), 5000)
         
@@ -868,11 +875,19 @@ class MainWindow(QMainWindow):
             print "Invalid file"
        
     def savePlot(self):
-	"""Saving the plot"""
+        """ Saving the plot """
         # savefile prompt
-	    filename = str(QFileDialog.getSaveFileName(self, "Save the plot to a file"))
-	    if filename:
+        filename = str(QFileDialog.getSaveFileName(self, "Save the plot to a file"))
+        if filename:
 		    self.plotwid.fig.savefig(filename)
+
+    def saveScreenShot(self):
+        """ Save Screenshot """
+        # savefile prompt
+        filename = str(QFileDialog.getSaveFileName(self, "Save the image to a file"))
+        if filename:
+            pixMap = QPixmap().grabWidget(self.view)
+            pixMap.save(filename + "_" + str(self.loader.energies[self.loader.index]) + "eV.png")
 
     def fileQuit(self):
         """Special quit-function as the normal window closing might leave something on the background """
