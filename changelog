@@ -24,4 +24,5 @@ Changelog since version 1.0.
 - Re-introduced toolbar in plotting window. (NF)
 - Running an acquisition without any spot selected is prevented. (NF)
 - Added ability to take screenshots from menu (including integration windows and energy in filename) (NF)
+- Moved buttons “next, previous” close to the slider. (NF)
 
