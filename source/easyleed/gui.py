@@ -7,7 +7,7 @@ from PyQt4.QtGui import (QApplication, QMainWindow, QGraphicsView,
     QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
     QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsItem,
     QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
-    QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox, QComboBox, QLineEdit, QMessageBox)
+    QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox, QComboBox, QLineEdit, QMessageBox, QPrinter, QPainter, QPixmap)
 import numpy as np
 
 from . import config
@@ -498,6 +498,7 @@ class MainWindow(QMainWindow):
         self.fileSavePlotAction = self.createAction("&Save plot...", self.savePlot, QKeySequence("Ctrl+a"), None, "Save the plot to a pdf file.")
         # Will only enable plot saving after there is a plot to be saved
         self.fileSavePlotAction.setEnabled(False)
+        self.fileSaveScreenAction = self.createAction("&Save screenshot...", self.saveScreenShot, QKeySequence("Ctrl+s"), None, "Save image to a file.")
         self.fileQuitAction = self.createAction("&Quit", self.fileQuit, QKeySequence("Ctrl+q"), None, "Close the application.")
         self.fileSaveSpotsAction = self.createAction("&Save spot locations...", self.saveSpots, QKeySequence("Ctrl+t"), None, "Save the spots to a file.")
         # Enables when data to be saved
@@ -509,7 +510,7 @@ class MainWindow(QMainWindow):
         self.helpActions = [None, self.helpAction, None, self.aboutAction]
         
         
-        self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileQuitAction]
+        self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction, self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileQuitAction]
 
         #### Create menu bar ####
         fileMenu = self.menuBar().addMenu("&File")
@@ -886,6 +887,26 @@ class MainWindow(QMainWindow):
 	    filename = str(QFileDialog.getSaveFileName(self, "Save the plot to a file"))
 	    if filename:
 		    self.plotwid.fig.savefig(filename)
+
+    ## Save Screenshot
+    def saveScreenShot(self):
+        # savefile prompt
+        filename = str(QFileDialog.getSaveFileName(self, "Save the image to a file"))
+        if filename:
+
+            # Optional: This saves into PDF
+            #printer = QPrinter (QPrinter.HighResolution)
+            #printer.setPageSize(QPrinter.A4)
+            #printer.setOrientation(QPrinter.Portrait)
+            #printer.setOutputFormat(QPrinter.PdfFormat)
+            #printer.setOutputFileName(filename)
+            #p = QPainter(printer)
+            #self.view.render(p)
+            #p.end()
+
+            # Saves as PNG
+            pixMap = QPixmap().grabWidget(self.view)
+            pixMap.save(filename + "_" + str(self.loader.energies[self.loader.index]) + "eV.png")
 
     ## Quitting the application
     # special quit-function as the normal window closing might leave something on the background
