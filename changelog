@@ -23,4 +23,5 @@ Changelog since version 1.0.
 - Reorganized position of windows/panels to avoid overlapping. (NF)
 - Re-introduced toolbar in plotting window. (NF)
 - Running an acquisition without any spot selected is prevented. (NF)
+- Added ability to take screenshots from menu (including integration windows and energy in filename) (NF)
 
