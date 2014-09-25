@@ -31,5 +31,4 @@ import kalman
 import io
 import base
 import test
-import my_flatten
 import gui

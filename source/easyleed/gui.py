@@ -23,7 +23,6 @@ from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.figure import Figure
 import pickle
-from . import my_flatten as flt
 #####
 
 
@@ -478,8 +477,6 @@ class MainWindow(QMainWindow):
         # actions to "Process" menu
         processPlotAction = self.createAction("&Plot", self.plotting, QKeySequence("Ctrl+d"), None, "Plot the energy/intensity.")
         processPlotAverageAction = self.createAction("&Plot average", self.plottingAverage, QKeySequence("Ctrl+g"), None, "Plot the energy/intensity average.")
-        #needs still work
-        #processSpotsAction = self.createAction("&Process Spots", self.processSpots, QKeySequence("Ctrl+"), None, "Process spots.")
         processPlotOptions = self.createAction("&Plot...", self.plottingOptions, None, None, "Plot Intensities.")
         processSetParameters = self.createAction("&Set Parameters", self.setParameters, None, None, "Set tracking parameters.")
 
@@ -727,11 +724,10 @@ class MainWindow(QMainWindow):
     def aboutBoxShow(self):
         self.aboutwid.show()
 
-##H #
 	## Plotting with matplotlib ##
 
     def plotting(self):
-        '''Basic Matplotlib plotting I(E)-curve'''
+        """ Basic Matplotlib plotting I(E)-curve """
         # do only if there's some data to draw the plot from, otherwise show an error message in the statusbar
         try:
             # getting intensities and energy from the worker class
@@ -766,7 +762,7 @@ class MainWindow(QMainWindow):
             number_of_pictures = len(intensities[0])
             number_of_points = len(intensities)
             energy = [model.m.energy for model, tracker in self.worker.spots_map.itervalues()]
-            intensities = flt.flatten(intensities)
+            intensities = flatten(intensities)
             for i in range(number_of_pictures):
                 for j in range(i, len(intensities), number_of_pictures):
                     sum_intensity = sum_intensity + intensities[j]
@@ -849,7 +845,7 @@ class MainWindow(QMainWindow):
 
     #Save given user values to a file
     def saveValues(self):
-        '''Basic saving of the set parameter values to a file '''
+        """ Basic saving of the set parameter values to a file """
         filename = str(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
         if filename:
             output = open(filename, 'w')
@@ -859,7 +855,7 @@ class MainWindow(QMainWindow):
 
     #Load user values from a file to the widget
     def loadValues(self):
-        '''Load a file of set parameter values that has been saved with the widget'''
+        """ Load a file of set parameter values that has been saved with the widget """
         namefile = str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         try:
             loadput = open(namefile, 'r')
@@ -879,10 +875,6 @@ class MainWindow(QMainWindow):
         except:
             print "Invalid file"
        
-#           
-#
-#
-	
 	## Saving the plot
 
     def savePlot(self):
@@ -952,32 +944,7 @@ class MainWindow(QMainWindow):
                 item.setSelected(True)
                 self.scene.setFocusItem(item)
             
-            
-            
-
-    ## Controlling the spots
-    # doesn't do much, only lists how many scene items (circles) there is in the gui, a test for trying to name the spots
-    def processSpots(self):
-        self.control = SpotControl(self.scene.items(), 0)
       
-
-##### H #
-# useless at the moment
-class SpotControl(QObject):
-    """Class that manages the spots. """
-
-    def __init__(self, spots, i):
-        self.names = []
-        for spot in spots:
-            self.names.append(i)
-            #text = "%s" % (self.names[i])
-            #textItem = QGraphicsSimpleTextItem(self, text, parent = None, scene = scene.GraphicsView)
-            i += 1
-        print self.names
-
-#######
-
-
 class Worker(QObject):
     """ Worker that manages the spots."""
 
@@ -1022,7 +989,6 @@ class Worker(QObject):
         zipped = zip(energy[0], *x)
         np.savetxt(filename + ".pos", zipped)
         
-##### H #####        
     def saveloc(self, filename):
         # model = QSpotModel object tracker = tracker
         # dict function .itervalues() = return an iterator over the mapping's values
