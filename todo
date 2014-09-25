@@ -3,5 +3,4 @@ Potential and ongoing features to be added…
 - Add ability to restart without removing points. This could be achieve by splitting the 
   function into restart vs start all over...
 
-- Move buttons “next, previous” close to the slider
-- Add restore integration points button
+

@@ -7,7 +7,7 @@ from PyQt4.QtGui import (QApplication, QMainWindow, QGraphicsView,
     QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
     QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsItem,
     QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
-    QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox, QComboBox, QLineEdit, QMessageBox, QPrinter, QPainter, QPixmap)
+    QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox, QComboBox, QLineEdit, QMessageBox)
 import numpy as np
 
 from . import config
@@ -16,14 +16,12 @@ from . import __author__
 from base import *
 from io import *
 
-##H #
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.figure import Figure
 import pickle
-#####
 
 
 
@@ -213,10 +211,8 @@ class FileDialog(QFileDialog):
         self.setFileMode(QFileDialog.ExistingFiles)
 
 
-############## H ###########
-
 class AboutWidget(QWidget):
-    '''PyQt widget for About Box Panel'''
+    """ PyQt widget for About Box Panel """
     
     def __init__(self):
         super(AboutWidget, self).__init__()
@@ -231,8 +227,7 @@ class AboutWidget(QWidget):
         self.setLayout(self.gridLayout)
         self.verticalLayout = QVBoxLayout()
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
-        #self.label = QLabel("EasyLEED %s" % __version__, self)
-        self.label=QLabel("<qt><b><big><a href = http://andim.github.io/easyleed/index.html>EasyLEED %s</a></b></big></qt>" % __version__, self);
+        self.label = QLabel("<qt><b><big><a href = http://andim.github.io/easyleed/index.html>EasyLEED %s</a></b></big></qt>" % __version__, self);
         self.label.setOpenExternalLinks(True);
         self.verticalLayout.addWidget(self.label)
         self.label = QLabel("by: %s" % __author__, self)
@@ -248,17 +243,15 @@ class AboutWidget(QWidget):
         self.verticalLayout.addWidget(self.label)
 
 class Plot(QWidget):
-    '''Custom PyQt widget canvas for plotting'''
+    """ Custom PyQt widget canvas for plotting """
 
     def __init__(self):
         super(Plot, self).__init__()
-        #QWidget.__init__(self, parent)
         self.setWindowTitle("I(E)-curve")
-        
         self.create_main_frame()
     
     def create_main_frame(self):       
-        # Create the mpl Figure and FigCanvas objects. 
+        """ Create the mpl Figure and FigCanvas objects. """
         # 5x4 inches, 100 dots-per-inch
         self.setGeometry(700, 450, 600, 400)
         self.dpi = 100
@@ -303,17 +296,15 @@ class Plot(QWidget):
     def setupPlot(self):
         self.axes.set_xlabel("Energy [eV]")
         self.axes.set_ylabel("Intensity")
-        #self.axes.set_title("I(E)-curve")
         # removes the ticks from y-axis
         self.axes.set_yticks([])
 
 class SetParameters(QWidget): 
-    '''PyQt widget for setting tracking parameters'''
+    """PyQt widget for setting tracking parameters"""
  
     
     def __init__(self):
         super(SetParameters, self).__init__()
-        
         self.initUI()
         
     def initUI(self):
@@ -435,8 +426,6 @@ class SetParameters(QWidget):
         self.gridLayout.addLayout(self.hLayout, 5, 0)
         self.gridLayout.addLayout(self.h2Layout, 5, 1)
 
-##############
-
 class MainWindow(QMainWindow):
     """ easyLeed's main window. """
     def __init__(self, parent=None):
@@ -472,15 +461,19 @@ class MainWindow(QMainWindow):
         processPreviousAction = self.createAction("&Previous Image", self.previous,
                 QKeySequence("Ctrl+p"), None,
                 "Open previous image.")
-                
-## H #
-        # actions to "Process" menu
-        processPlotAction = self.createAction("&Plot", self.plotting, QKeySequence("Ctrl+d"), None, "Plot the energy/intensity.")
-        processPlotAverageAction = self.createAction("&Plot average", self.plottingAverage, QKeySequence("Ctrl+g"), None, "Plot the energy/intensity average.")
-        processPlotOptions = self.createAction("&Plot...", self.plottingOptions, None, None, "Plot Intensities.")
-        processSetParameters = self.createAction("&Set Parameters", self.setParameters, None, None, "Set tracking parameters.")
+        processPlotAction = self.createAction("&Plot", self.plotting,
+                QKeySequence("Ctrl+d"), None,
+                "Plot the energy/intensity.")
+        processPlotAverageAction = self.createAction("&Plot average", self.plottingAverage,
+                QKeySequence("Ctrl+g"), None,
+                "Plot the energy/intensity average.")
+        processPlotOptions = self.createAction("&Plot...", self.plottingOptions,
+                None, None,
+                "Plot Intensities.")
+        processSetParameters = self.createAction("&Set Parameters", self.setParameters,
+                None, None,
+                "Set tracking parameters.")
 
-######
 
         self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotAction, None, processPlotAverageAction, None]
         fileOpenAction = self.createAction("&Open...", self.fileOpen,
@@ -490,25 +483,31 @@ class MainWindow(QMainWindow):
                 QKeySequence.Save, None,
                 "Save the calculated intensities to a text file.")
                 
-## H #
         # actions to "File" menu
         self.fileSavePlotAction = self.createAction("&Save plot...", self.savePlot, QKeySequence("Ctrl+a"), None, "Save the plot to a pdf file.")
         # Will only enable plot saving after there is a plot to be saved
         self.fileSavePlotAction.setEnabled(False)
-        self.fileSaveScreenAction = self.createAction("&Save screenshot...", self.saveScreenShot, QKeySequence("Ctrl+s"), None, "Save image to a file.")
-        self.fileSaveScreenAction.setEnabled(False)
-        self.fileQuitAction = self.createAction("&Quit", self.fileQuit, QKeySequence("Ctrl+q"), None, "Close the application.")
-        self.fileSaveSpotsAction = self.createAction("&Save spot locations...", self.saveSpots, QKeySequence("Ctrl+t"), None, "Save the spots to a file.")
+        self.fileQuitAction = self.createAction("&Quit", self.fileQuit,
+                QKeySequence("Ctrl+q"), None,
+                "Close the application.")
+        self.fileSaveSpotsAction = self.createAction("&Save spot locations...", self.saveSpots,
+                QKeySequence("Ctrl+t"), None,
+                "Save the spots to a file.")
         # Enables when data to be saved
         self.fileSaveSpotsAction.setEnabled(False)
-        self.fileLoadSpotsAction = self.createAction("&Load spot locations...", self.loadSpots, QKeySequence("Ctrl+l"), None, "Load spots from a file.")
-######
-        self.helpAction = self.createAction("&Help", self.helpBoxShow, None, None, "Show help")
-        self.aboutAction = self.createAction("&About", self.aboutBoxShow, None, None, "About Easyleed")
+        self.fileLoadSpotsAction = self.createAction("&Load spot locations...", self.loadSpots,
+                QKeySequence("Ctrl+l"), None,
+                "Load spots from a file.")
+        self.helpAction = self.createAction("&Help", self.helpBoxShow,
+                None, None,
+                "Show help")
+        self.aboutAction = self.createAction("&About", self.aboutBoxShow,
+                None, None,
+                "About Easyleed")
         self.helpActions = [None, self.helpAction, None, self.aboutAction]
         
         
-        self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction, self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileQuitAction]
+        self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileQuitAction]
 
         #### Create menu bar ####
         fileMenu = self.menuBar().addMenu("&File")
@@ -559,8 +558,6 @@ class MainWindow(QMainWindow):
                 self.next_()
                 self.worker.process(self.loader.this())
         sliderCurrentPos = sliderNewPos
-        #self.worker.process(self.loader.this())
-
 
     def addActions(self, target, actions):
         """
@@ -649,8 +646,6 @@ class MainWindow(QMainWindow):
                 self.setImage(self.loader.next())
                 self.enableProcessActions(True)
                 self.slider.setEnabled(True)
-                self.fileSaveScreenAction.setEnabled(True)
-
             except IOError, err:
                 self.statusBar().showMessage('IOError: ' + str(err), 5000)
         
@@ -753,7 +748,7 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("No plottable data.", 5000)
 
     def plottingAverage(self):
-        '''Mostly the same as normal plotting but plots the average of the calculated intensities '''
+        """ Mostly the same as normal plotting but plots the average of the calculated intensities """
         try:
             sum_intensity=0
             list_of_average_intensities = []
@@ -795,7 +790,7 @@ class MainWindow(QMainWindow):
         self.setparameterswid.show()
 
     def SetAllParameters(self):
-        '''Parameter setting control'''
+        """Parameter setting control"""
         config.Tracking_inputPrecision = self.setparameterswid.inputPrecision.value()
         config.Tracking_windowScalingOn = self.setparameterswid.integrationWindowScale.isChecked()
         config.Tracking_minWindowSize = self.setparameterswid.integrationWindowRadius.value()
@@ -807,8 +802,8 @@ class MainWindow(QMainWindow):
         config.Processing_backgroundSubstractionOn = self.setparameterswid.backgroundSubstraction.isChecked()
         config.GraphicsScene_livePlottingOn = self.setparameterswid.livePlotting.isChecked()
 
-    #Set user values to the parameters
     def acceptParameters(self):
+        """Set user values to the parameters"""
         self.SetAllParameters()
         try:
             self.noiseList = [float(self.setparameterswid.value1.text()), float(self.setparameterswid.value2.text()), float(self.setparameterswid.value3.text()), float(self.setparameterswid.value4.text())]
@@ -817,8 +812,8 @@ class MainWindow(QMainWindow):
         except ValueError:
             self.setparameterswid.setText.wrongLabel("Invalid process noise value")
 
-    #Set user values to the parameters
     def applyParameters(self):
+        """Set user values to the parameters"""
         self.SetAllParameters()
         try:
             self.noiseList = [float(self.setparameterswid.value1.text()), float(self.setparameterswid.value2.text()), float(self.setparameterswid.value3.text()), float(self.setparameterswid.value4.text())]
@@ -826,9 +821,8 @@ class MainWindow(QMainWindow):
         except ValueError:
             self.setparameterswid.setText.wrongLabel("Invalid process noise value")
 
-    #Reload config-module and get the default values
     def defaultValues(self):
-        '''Loading deault parameter valued from config file'''
+        """Reload config-module and get the default values"""
         reload(config)
         self.setparameterswid.inputPrecision.setValue(config.Tracking_inputPrecision)
         self.setparameterswid.integrationWindowRadiusNew.setValue(config.GraphicsScene_defaultRadius)
@@ -843,7 +837,6 @@ class MainWindow(QMainWindow):
         self.setparameterswid.value4.setText(str(config.Tracking_processNoise.diagonal()[3]))
         self.setparameterswid.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
 
-    #Save given user values to a file
     def saveValues(self):
         """ Basic saving of the set parameter values to a file """
         filename = str(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
@@ -853,7 +846,6 @@ class MainWindow(QMainWindow):
             writelist = [self.setparameterswid.inputPrecision.value(), self.setparameterswid.integrationWindowScale.isChecked(), self.setparameterswid.integrationWindowRadius.value(), self.setparameterswid.spotIdentification.currentText(), self.setparameterswid.validationRegionSize.value(), self.setparameterswid.determinationCoefficient.value(), self.setparameterswid.backgroundSubstraction.isChecked(), backgroundsublist,self.setparameterswid.livePlotting.isChecked()]
             pickle.dump(writelist, output)
 
-    #Load user values from a file to the widget
     def loadValues(self):
         """ Load a file of set parameter values that has been saved with the widget """
         namefile = str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
@@ -875,52 +867,28 @@ class MainWindow(QMainWindow):
         except:
             print "Invalid file"
        
-	## Saving the plot
-
     def savePlot(self):
+	"""Saving the plot"""
         # savefile prompt
 	    filename = str(QFileDialog.getSaveFileName(self, "Save the plot to a file"))
 	    if filename:
 		    self.plotwid.fig.savefig(filename)
 
-    ## Save Screenshot
-    def saveScreenShot(self):
-        # savefile prompt
-        filename = str(QFileDialog.getSaveFileName(self, "Save the image to a file"))
-        if filename:
-
-            # Optional: This saves into PDF
-            #printer = QPrinter (QPrinter.HighResolution)
-            #printer.setPageSize(QPrinter.A4)
-            #printer.setOrientation(QPrinter.Portrait)
-            #printer.setOutputFormat(QPrinter.PdfFormat)
-            #printer.setOutputFileName(filename)
-            #p = QPainter(printer)
-            #self.view.render(p)
-            #p.end()
-
-            # Saves as PNG
-            pixMap = QPixmap().grabWidget(self.view)
-            pixMap.save(filename + "_" + str(self.loader.energies[self.loader.index]) + "eV.png")
-
-    ## Quitting the application
-    # special quit-function as the normal window closing might leave something on the background
     def fileQuit(self):
-        '''Special quit-function as the normal window closing might leave something on the background '''
+        """Special quit-function as the normal window closing might leave something on the background """
         self.stopProcessing()
         QApplication.closeAllWindows()
         self.plotwid.canvas.close()
 
-    ## Some spot controlling
-    # saves the spot locations to a file, uses workers saveloc-function
     def saveSpots(self):
+        """saves the spot locations to a file, uses workers saveloc-function"""
         filename = str(QFileDialog.getSaveFileName(self, "Save the spot locations to a file"))
         if filename:
             self.worker.saveloc(filename)
 
-    # loads the spots from a file
     def loadSpots(self):
-        '''Load saved spot positions, incomplete'''
+        """Load saved spot positions"""
+        # FIXME: this does not work yet
         # This can probably be done in a better way
         filename = QFileDialog.getOpenFileName(self, 'Open spot location file')
         if filename:
