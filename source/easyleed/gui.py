@@ -499,6 +499,7 @@ class MainWindow(QMainWindow):
         # Will only enable plot saving after there is a plot to be saved
         self.fileSavePlotAction.setEnabled(False)
         self.fileSaveScreenAction = self.createAction("&Save screenshot...", self.saveScreenShot, QKeySequence("Ctrl+s"), None, "Save image to a file.")
+        self.fileSaveScreenAction.setEnabled(False)
         self.fileQuitAction = self.createAction("&Quit", self.fileQuit, QKeySequence("Ctrl+q"), None, "Close the application.")
         self.fileSaveSpotsAction = self.createAction("&Save spot locations...", self.saveSpots, QKeySequence("Ctrl+t"), None, "Save the spots to a file.")
         # Enables when data to be saved
@@ -651,6 +652,8 @@ class MainWindow(QMainWindow):
                 self.setImage(self.loader.next())
                 self.enableProcessActions(True)
                 self.slider.setEnabled(True)
+                self.fileSaveScreenAction.setEnabled(True)
+
             except IOError, err:
                 self.statusBar().showMessage('IOError: ' + str(err), 5000)
         
