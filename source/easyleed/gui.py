@@ -291,8 +291,6 @@ class Plot(QWidget):
             config.GraphicsScene_plotAverage = True
         else:
             config.GraphicsScene_plotAverage = False
-            self.axes.cla()
-            self.setupPlot()
 
     def setupPlot(self):
         self.axes.set_xlabel("Energy [eV]")
@@ -691,6 +689,16 @@ class MainWindow(QMainWindow):
     def run(self):
         global sliderCurrentPos
         
+        # Added for live plotting
+        global xs
+        global ys
+        global lin
+        xs=[]
+        ys=[]
+        lin = [len(self.scene.items())]
+        
+        #
+        
         if len(self.scene.items()) == 0:
             self.statusBar().showMessage("No integration window selected.", 5000)
         else:
@@ -716,6 +724,15 @@ class MainWindow(QMainWindow):
        
             self.fileSaveAction.setEnabled(True)
             self.fileSaveSpotsAction.setEnabled(True)
+            
+            # Added for liveplotting
+            
+            for plts in range(len(self.scene.items())):
+                lin.append(plts)
+                lin[plts], = self.plotwid.axes.plot([],[])
+
+            #
+            
             for image in self.loader:
                 if self.stopped:
                     break
@@ -725,7 +742,7 @@ class MainWindow(QMainWindow):
                 self.worker.process(image)
                 QApplication.processEvents()
                 if config.GraphicsScene_livePlottingOn == True:
-                    self.plotting()
+                    self.livePlotting()
                     if config.GraphicsScene_plotAverage == True:
                         self.plottingAverage()
                 sliderCurrentPos = sliderCurrentPos + 1
@@ -750,8 +767,48 @@ class MainWindow(QMainWindow):
 
 	## Plotting with matplotlib ##
 
+    def livePlotting(self):
+        """ Basic Matplotlib plotting I(E)-curve """
+
+        global xs
+        global ys
+        global lin
+        
+        # do only if there's some data to draw the plot from, otherwise show an error message in the statusbar
+        try:
+            # getting intensities and energy from the worker class
+            intensities = [model.m.intensity for model, tracker \
+                                in self.worker.spots_map.itervalues()]
+            energy = [model.m.energy for model, tracker in self.worker.spots_map.itervalues()]
+                           
+            # do the plot
+            for x in energy:
+                for y in intensities:
+                    xs.append(x)
+                    ys.append(y)
+            for plts in range(len(self.scene.items())):
+                lin[plts].set_data(xs[:][plts],ys[:][plts])
+
+            self.plotwid.axes.relim()
+            self.plotwid.axes.autoscale_view(True,True,True)
+            # and show it
+            self.plotwid.canvas.draw()
+            # try to auto-adjust plot margins (might not be available in all matplotlib versions"
+            try:
+                self.plotwid.fig.tight_layout()
+            except:
+                pass
+            self.plotwid.show()
+            # can save the plot now
+            self.fileSavePlotAction.setEnabled(True)
+        except AttributeError:
+            self.statusBar().showMessage("No plottable data.", 5000)
+
+
     def plotting(self):
         """ Basic Matplotlib plotting I(E)-curve """
+        self.plotwid.axes.cla()
+        self.plotwid.setupPlot()
         # do only if there's some data to draw the plot from, otherwise show an error message in the statusbar
         try:
             # getting intensities and energy from the worker class
@@ -795,6 +852,10 @@ class MainWindow(QMainWindow):
                 sum_intensity = 0
 
             self.plotwid.axes.plot(energy[0], list_of_average_intensities,'k-', linewidth=3, label = 'Average')
+            
+            self.plotwid.axes.relim()
+            self.plotwid.axes.autoscale_view(True,True,True)
+            
             self.plotwid.canvas.draw()
             self.plotwid.show()
             self.fileSavePlotAction.setEnabled(True)
