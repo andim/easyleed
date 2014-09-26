@@ -725,10 +725,8 @@ class MainWindow(QMainWindow):
                 self.worker.process(image)
                 QApplication.processEvents()
                 if config.GraphicsScene_livePlottingOn == True:
-                    if config.GraphicsScene_plotAverage == False:
-                        self.plotting()
-                    else :
-                        self.plotting()
+                    self.plotting()
+                    if config.GraphicsScene_plotAverage == True:
                         self.plottingAverage()
                 sliderCurrentPos = sliderCurrentPos + 1
                 self.slider.setValue(sliderCurrentPos)
