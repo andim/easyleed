@@ -272,20 +272,31 @@ class Plot(QWidget):
         # Create the navigation toolbar, tied to the canvas
         self.mpl_toolbar = NavigationToolbar2QT(self.canvas, self)
 
+        #base grid
+        self.gridLayout = QGridLayout()
+        self.setLayout(self.gridLayout)
+
         # Layout
         vbox = QVBoxLayout()
         vbox.addWidget(self.mpl_toolbar)
         vbox.addWidget(self.canvas)
         
-        # Add checkbox for average.
-        self.averageCheck = QCheckBox("Show Average")
+        # Add checkbox for average and relative Re-plot button
+        hbox = QHBoxLayout()
+        self.averageCheck = QCheckBox("Average")
         self.averageCheck.setChecked(config.GraphicsScene_plotAverage)
-        vbox.addWidget(self.averageCheck)
-        self.setLayout(vbox)
+        self.rePlotButton = QPushButton('&Replot', self)
+        hbox.addWidget(self.averageCheck)
+        hbox.addWidget(self.rePlotButton)
         
-        # Define event for checkbox
+        #adding layouts to the grid
+        self.gridLayout.addLayout(vbox, 0, 0)
+        self.gridLayout.addLayout(hbox, 1, 0)
+        
+        # Define events for checkbox
         QObject.connect(self.averageCheck, SIGNAL("clicked()"), self.AvCheck)
     
+    # Define behavior for checkbox
     def AvCheck(self):
         if self.averageCheck.isChecked() == True:
             config.GraphicsScene_plotAverage = True
@@ -348,7 +359,6 @@ class SetParameters(QWidget):
         self.spotIdentification.addItem("guess_from_Gaussian")
         self.siLabel = QLabel("Spot identification algorithm", self)
 
-
         self.fnLabel = QLabel("Kalman tracker process noise Q", self)
         self.text = QLabel("Sets diagonal values of covariance matrix", self)
         self.value1 = QLineEdit(self)
@@ -359,7 +369,6 @@ class SetParameters(QWidget):
         self.value3.setText(str(config.Tracking_processNoise.diagonal()[2]))
         self.value4 = QLineEdit(self)
         self.value4.setText(str(config.Tracking_processNoise.diagonal()[3]))
-
 
         self.saveButton = QPushButton('&Save', self)
         self.loadButton = QPushButton('&Load', self)
@@ -534,7 +543,7 @@ class MainWindow(QMainWindow):
         self.energyLabel = QLabel()
         self.energyLabel.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
 
-
+        ### Create previous and next buttons
         self.prevButton = QPushButton('&<', self)
         self.nextButton = QPushButton('&>', self)
         self.prevButton.setEnabled(False)
@@ -554,6 +563,9 @@ class MainWindow(QMainWindow):
         QObject.connect(self.slider, SIGNAL("sliderMoved(int)"), self.slider_moved)
         QObject.connect(self.prevButton, SIGNAL("clicked()"), self.prevBtnClicked)
         QObject.connect(self.nextButton, SIGNAL("clicked()"), self.nextBtnClicked)
+    
+        ### Create event connector for replot button in Plot.
+        QObject.connect(self.plotwid.rePlotButton, SIGNAL("clicked()"), self.plottingOptions)
     
 
     def slider_moved(self, sliderNewPos):
