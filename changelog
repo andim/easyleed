@@ -1,28 +1,29 @@
-Changelog since version 1.0.
+Changelog since version 1.0
 =============================
 
-- New energy slider for fast scrolling over open frames. (NF)
-- Integration windows (when present) are tracked with the energy slider. (NF)
-- New entry in Set Parameters panel for size of integration circle. (NF)
-- API: New self.loader.this() method to identify the current image. (NF)
+(NF): 
+- New energy slider for fast scrolling over opened frames.
+- Integration windows (when present) are tracked with the energy slider.
+- New entry in Set Parameters panel for size of integration circle.
+- API: New self.loader.this() method to identify the current image.
 - Size of default intensity integration circle can now be restored with Default button in 
-  Set Parameters (NF)
-- Set Preference panel is always visible (i.e. can be accessed with no images loaded). (NF)
+  Set Parameters
+- Set Preference panel is always visible (i.e. can be accessed with no images loaded).
 - Added "Apply" button in Set Preference, so that settings can be applied without closing 
-  the Set Preference panel. (NF)
-- Intensity files now have an extra tag in the filename (NF)
+  the Set Preference panel. 
+- Intensity files now have an extra tag in the filename
   * _bs.int: if the intensities were extracted with background subtraction.
   * _no-bs.int: if the intensities were not extracted with background subtraction.
-- Added option to display I(E) spectra during acquisition (live plotting). (NF)
-- Removed Plotting option panel. 
-- Average intensities can be now plotted “on the fly” using a checkbox in the Plot. (NF)
-- Added “Stop” button to stop acquisition (somehow missing). (NF)
-- Restructured order in Set Parameters (and cleanup). (NF)
-- New About Box (NF)
-- Restored working Help (redirects to main website - User Manual). (NF)
-- Reorganized position of windows/panels to avoid overlapping. (NF)
-- Re-introduced toolbar in plotting window. (NF)
-- Running an acquisition without any spot selected is prevented. (NF)
-- Added ability to take screenshots from menu (including integration windows and energy in filename) (NF)
-- Moved buttons “next, previous” close to the slider. (NF)
-
+- Added option to display I(E) spectra during acquisition (live plotting).
+- Removed Plotting option panel (no longer needed). 
+- Average intensities can be now plotted “on the fly” using a checkbox in the Plot.
+- Added “Stop” button to stop acquisition (somehow missing). 
+- Restructured order in Set Parameters (and cleanup).
+- New About Box.
+- Restored working Help (redirects to main website - User Manual).
+- Reorganized position of windows/panels to avoid overlapping.
+- Re-introduced toolbar in plotting window. 
+- Running an acquisition without any spot selected is prevented. 
+- Added ability to take screenshots from menu (including integration windows and energy in 
+filename).
+- Moved buttons “next, previous” close to the slider.
