@@ -643,6 +643,7 @@ class MainWindow(QMainWindow):
         self.plotwid.axes.cla()
         self.plotwid.canvas.draw()
         self.plotwid.close()
+        self.plotwid.setupPlot()
         sliderCurrentPos = self.slider.setValue(1)
 
     def setImage(self, image):
