@@ -460,21 +460,21 @@ class MainWindow(QMainWindow):
         processPreviousAction = self.createAction("&Previous Image", self.previous,
                 QKeySequence("Ctrl+p"), None,
                 "Open previous image.")
-        processPlotAction = self.createAction("&Plot", self.plotting,
-                QKeySequence("Ctrl+d"), None,
-                "Plot the energy/intensity.")
-        processPlotAverageAction = self.createAction("&Plot average", self.plottingAverage,
-                QKeySequence("Ctrl+g"), None,
-                "Plot the energy/intensity average.")
+        #processPlotAction = self.createAction("&Plot", self.plotting,
+        #       QKeySequence("Ctrl+d"), None,
+        #     "Plot the energy/intensity.")
+        #processPlotAverageAction = self.createAction("&Plot average", self.plottingAverage,
+        #    QKeySequence("Ctrl+g"), None,
+        #   "Plot the energy/intensity average.")
         processPlotOptions = self.createAction("&Plot...", self.plottingOptions,
-                None, None,
+                QKeySequence("Ctrl+d"), None,
                 "Plot Intensities.")
         processSetParameters = self.createAction("&Set Parameters", self.setParameters,
                 None, None,
                 "Set tracking parameters.")
 
 
-        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotAction, None, processPlotAverageAction, None]
+        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotOptions, None]
         fileOpenAction = self.createAction("&Open...", self.fileOpen,
                 QKeySequence.Open, None,
                 "Open a directory containing the image files.")
@@ -694,6 +694,7 @@ class MainWindow(QMainWindow):
         global xs
         global ys
         global lin
+        global avCheckTest
         xs=[]
         ys=[]
         lin = [len(self.scene.items())]
@@ -751,6 +752,7 @@ class MainWindow(QMainWindow):
 
             self.view.setInteractive(True)
             self.slider.setEnabled(True)
+            avCheckTest = True
             print "Total time acquisition:", time.time() - time_before, "s"
             self.statusBar().removeWidget(statusWidget)
 
@@ -805,35 +807,6 @@ class MainWindow(QMainWindow):
         except AttributeError:
             self.statusBar().showMessage("No plottable data.", 5000)
 
-
-    def plotting(self):
-        """ Basic Matplotlib plotting I(E)-curve """
-        self.plotwid.axes.cla()
-        self.plotwid.setupPlot()
-        # do only if there's some data to draw the plot from, otherwise show an error message in the statusbar
-        try:
-            # getting intensities and energy from the worker class
-            intensities = [model.m.intensity for model, tracker \
-                                in self.worker.spots_map.itervalues()]
-            energy = [model.m.energy for model, tracker in self.worker.spots_map.itervalues()]
-
-            # do the plot
-            for x in energy:
-                for y in intensities:
-                    self.plotwid.axes.plot(x, y)
-            # and show it
-            self.plotwid.canvas.draw()
-            # try to auto-adjust plot margins (might not be available in all matplotlib versions"
-            try:
-                self.plotwid.fig.tight_layout()
-            except:
-                pass
-            self.plotwid.show()
-            # can save the plot now
-            self.fileSavePlotAction.setEnabled(True)
-        except AttributeError:
-            self.statusBar().showMessage("No plottable data.", 5000)
-
     def plottingAverage(self):
         """ Mostly the same as normal plotting but plots the average of the calculated intensities """
         try:
@@ -864,11 +837,16 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("No plottable data.", 5000)
 
     def plottingOptions(self):
+        global avCheckTest
         self.plotwid.setupPlot()
         if config.GraphicsScene_plotAverage == True:
             self.plottingAverage()
+            avCheckTest = False
         else:
-            self.plotting()
+            if avCheckTest == False:
+                del(self.plotwid.axes.lines[-1])
+            self.livePlotting()
+            avCheckTest = True
 
     def setParameters(self):
 
