@@ -492,7 +492,9 @@ class MainWindow(QMainWindow):
                 "Save the calculated intensities to a text file.")
                 
         # actions to "File" menu
-        self.fileSavePlotAction = self.createAction("&Save plot...", self.savePlot, QKeySequence("Ctrl+a"), None, "Save the plot to a pdf file.")
+        self.fileSavePlotAction = self.createAction("&Save plot...", self.savePlot,
+                QKeySequence("Ctrl+a"), None,
+                "Save the plot to a pdf file.")
         # Will only enable plot saving after there is a plot to be saved
         self.fileSavePlotAction.setEnabled(False)
         self.fileSaveScreenAction = self.createAction("&Save screenshot...", self.saveScreenShot,
@@ -735,17 +737,12 @@ class MainWindow(QMainWindow):
             self.slider.setEnabled(False)
             self.scene.clearSelection()
             self.worker = Worker(self.scene.items(), self.current_energy, parent=self)
-       
             self.fileSaveAction.setEnabled(True)
             self.fileSaveSpotsAction.setEnabled(True)
-            
-            # Added for liveplotting
-            
+
             for plts in range(len(self.scene.items())):
                 lin.append(plts)
                 lin[plts], = self.plotwid.axes.plot([],[])
-
-            #
             
             for image in self.loader:
                 if self.stopped:
@@ -784,11 +781,9 @@ class MainWindow(QMainWindow):
 
     def plotting(self):
         """ Basic Matplotlib plotting I(E)-curve """
-
         global xs
         global ys
-        global lin
-        
+        global lin     
         # do only if there's some data to draw the plot from, otherwise show an error message in the statusbar
         try:
             # getting intensities and energy from the worker class
