@@ -756,7 +756,7 @@ class MainWindow(QMainWindow):
                 self.worker.process(image)
                 QApplication.processEvents()
                 if config.GraphicsScene_livePlottingOn == True:
-                    self.livePlotting()
+                    self.plotting()
                     if config.GraphicsScene_plotAverage == True:
                         self.plottingAverage()
                 sliderCurrentPos = sliderCurrentPos + 1
@@ -782,7 +782,7 @@ class MainWindow(QMainWindow):
 
 	## Plotting with matplotlib ##
 
-    def livePlotting(self):
+    def plotting(self):
         """ Basic Matplotlib plotting I(E)-curve """
 
         global xs
@@ -857,7 +857,7 @@ class MainWindow(QMainWindow):
         else:
             if avCheckTest == False:
                 del(self.plotwid.axes.lines[-1])
-            self.livePlotting()
+            self.plotting()
             avCheckTest = True
 
     def setParameters(self):
