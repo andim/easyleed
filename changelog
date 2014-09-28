@@ -28,3 +28,4 @@ Changelog since version 1.0
 filename).
 - Moved buttons “next, previous” close to the slider.
 - Increased default size of integration window from 10 to a more realistic 20
+- Added ability to acquire I(time) - fix energy acquisitions.
