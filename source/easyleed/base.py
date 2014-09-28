@@ -48,11 +48,13 @@ class Tracker:
 
     def feed_image(self, image):
         npimage, energy = image
-        if self.window_scaling:
-            self.radius = self.c_size / energy**0.5
+        if config.GraphicsScene_intensTimeOn == False:
+            if self.window_scaling:
+                self.radius = self.c_size / energy**0.5
         if self.radius < config.Tracking_minWindowSize:
             self.radius = config.Tracking_minWindowSize
-        self.kalman.predict(energy, config.Tracking_processNoise)
+        if config.GraphicsScene_intensTimeOn == False:
+            self.kalman.predict(energy, config.Tracking_processNoise)
         x_p, y_p = self.kalman.get_position()
         guess = guesser(npimage, x_p, y_p, self.radius, kalman = self.kalman)
         if guess is not None:
