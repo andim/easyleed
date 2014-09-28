@@ -708,7 +708,7 @@ class MainWindow(QMainWindow):
         global xs
         global ys
         global lin
-        global avCheckTest
+
         xs=[]
         ys=[]
         lin = [len(self.scene.items())]
@@ -761,7 +761,6 @@ class MainWindow(QMainWindow):
 
             self.view.setInteractive(True)
             self.slider.setEnabled(True)
-            avCheckTest = True
             print "Total time acquisition:", time.time() - time_before, "s"
             self.statusBar().removeWidget(statusWidget)
 
@@ -844,16 +843,16 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("No plottable data.", 5000)
 
     def plottingOptions(self):
-        global avCheckTest
+        intensities = [model.m.intensity for model, tracker \
+                       in self.worker.spots_map.itervalues()]
+        print len(self.plotwid.axes.lines) - len(intensities)
         self.plotwid.setupPlot()
         if config.GraphicsScene_plotAverage == True:
             self.plottingAverage()
-            avCheckTest = False
         else:
-            if avCheckTest == False:
+            for i in range(len(self.plotwid.axes.lines) - len(intensities)):
                 del(self.plotwid.axes.lines[-1])
             self.plotting()
-            avCheckTest = True
 
     def setParameters(self):
 
