@@ -272,36 +272,16 @@ class Plot(QWidget):
         # Create the navigation toolbar, tied to the canvas
         self.mpl_toolbar = NavigationToolbar2QT(self.canvas, self)
 
-        #base grid
-        self.gridLayout = QGridLayout()
-        self.setLayout(self.gridLayout)
-
         # Layout
         vbox = QVBoxLayout()
         vbox.addWidget(self.mpl_toolbar)
         vbox.addWidget(self.canvas)
         
-        # Add checkbox for average and relative Re-plot button
-        hbox = QHBoxLayout()
+        # Add checkbox for average
         self.averageCheck = QCheckBox("Average")
         self.averageCheck.setChecked(config.GraphicsScene_plotAverage)
-        self.rePlotButton = QPushButton('&Replot', self)
-        hbox.addWidget(self.averageCheck)
-        hbox.addWidget(self.rePlotButton)
-        
-        #adding layouts to the grid
-        self.gridLayout.addLayout(vbox, 0, 0)
-        self.gridLayout.addLayout(hbox, 1, 0)
-        
-        # Define events for checkbox
-        QObject.connect(self.averageCheck, SIGNAL("clicked()"), self.AvCheck)
-    
-    # Define behavior for checkbox
-    def AvCheck(self):
-        if self.averageCheck.isChecked() == True:
-            config.GraphicsScene_plotAverage = True
-        else:
-            config.GraphicsScene_plotAverage = False
+        vbox.addWidget(self.averageCheck)
+        self.setLayout(vbox)
 
     def setupPlot(self):
         self.axes.set_xlabel("Energy [eV]")
@@ -566,9 +546,17 @@ class MainWindow(QMainWindow):
         QObject.connect(self.prevButton, SIGNAL("clicked()"), self.prevBtnClicked)
         QObject.connect(self.nextButton, SIGNAL("clicked()"), self.nextBtnClicked)
     
-        ### Create event connector for replot button in Plot.
-        QObject.connect(self.plotwid.rePlotButton, SIGNAL("clicked()"), self.plottingOptions)
+        # Define events for checkbox
+        QObject.connect(self.plotwid.averageCheck, SIGNAL("clicked()"), self.AvCheck)
     
+    # Define behavior for average checkbox
+    def AvCheck(self):
+        if self.plotwid.averageCheck.isChecked() == True:
+            config.GraphicsScene_plotAverage = True
+        else:
+            config.GraphicsScene_plotAverage = False
+        self.plottingOptions()
+
 
     def slider_moved(self, sliderNewPos):
         """
@@ -703,8 +691,6 @@ class MainWindow(QMainWindow):
 
     def run(self):
         global sliderCurrentPos
-        
-        # Added for live plotting
         global xs
         global ys
         global lin
@@ -712,9 +698,7 @@ class MainWindow(QMainWindow):
         xs=[]
         ys=[]
         lin = [len(self.scene.items())]
-        
-        #
-        
+ 
         if len(self.scene.items()) == 0:
             self.statusBar().showMessage("No integration window selected.", 5000)
         else:
@@ -845,7 +829,6 @@ class MainWindow(QMainWindow):
     def plottingOptions(self):
         intensities = [model.m.intensity for model, tracker \
                        in self.worker.spots_map.itervalues()]
-        print len(self.plotwid.axes.lines) - len(intensities)
         self.plotwid.setupPlot()
         if config.GraphicsScene_plotAverage == True:
             self.plottingAverage()
