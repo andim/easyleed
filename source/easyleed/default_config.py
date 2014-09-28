@@ -20,7 +20,7 @@ IO_energyRegex = "[0-9]*\.?[0-9]+(?=\.)"
 
 ## GraphicsScene ##
 # default radius of a new spot
-GraphicsScene_defaultRadius = 10
+GraphicsScene_defaultRadius = 20
 
 ## QGraphicsSpotView ##
 # change in radius of the spot per key press (+/-) in pixel
