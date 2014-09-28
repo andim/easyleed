@@ -11,6 +11,7 @@ logger = logging.getLogger("leedbase")
 
 import numpy as np
 from scipy import optimize
+import math
 
 from . import config
 from . import kalman
@@ -146,6 +147,10 @@ def moments(data):
     X, Y = np.indices(data.shape)
     x = (X*data).sum()/total
     y = (Y*data).sum()/total
+    if math.isnan(x) == True:
+        x = 0
+    if math.isnan(y) == True:
+        y = 0
     col = data[:, int(y)]
     width_x = np.sqrt(abs((np.arange(col.size)-y)**2*col).sum()/col.sum())
     row = data[int(x), :]
