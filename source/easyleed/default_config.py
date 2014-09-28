@@ -33,6 +33,9 @@ QGraphicsSpotView_smallMove = 0.1
 # Live IV plotting during acquisition
 GraphicsScene_livePlottingOn = True
 
+# Acquire I(time) at fixed energy
+GraphicsScene_intensTimeOn = False
+
 # Plot averages
 GraphicsScene_plotAverage = False
 

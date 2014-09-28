@@ -334,6 +334,9 @@ class SetParameters(QWidget):
         
         self.livePlotting = QCheckBox("Plot I(E) intensities during acquisition")
         self.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
+        
+        self.intensTime = QCheckBox("Extract I(time) - fixed energy")
+        self.intensTime.setChecked(config.GraphicsScene_intensTimeOn)
 
         self.spotIdentification = QComboBox(self)
         self.spotIdentification.addItem("guess_from_Gaussian")
@@ -384,6 +387,7 @@ class SetParameters(QWidget):
         self.rvLayout.addWidget(self.integrationWindowScale)
         self.rvLayout.addWidget(self.backgroundSubstraction)
         self.rvLayout.addWidget(self.livePlotting)
+        self.rvLayout.addWidget(self.intensTime)
         self.rvLayout.addWidget(self.siLabel)
         self.rvLayout.addWidget(self.spotIdentification)
         self.rvLayout.addWidget(self.fnLabel)
@@ -857,6 +861,7 @@ class MainWindow(QMainWindow):
         config.Tracking_minRsq = self.setparameterswid.determinationCoefficient.value()
         config.Processing_backgroundSubstractionOn = self.setparameterswid.backgroundSubstraction.isChecked()
         config.GraphicsScene_livePlottingOn = self.setparameterswid.livePlotting.isChecked()
+        config.GraphicsScene_intensTimeOn = self.setparameterswid.intensTime.isChecked()
 
     def acceptParameters(self):
         """Set user values to the parameters"""
