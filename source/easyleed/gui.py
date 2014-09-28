@@ -670,6 +670,8 @@ class MainWindow(QMainWindow):
             files = dialog.selectedFiles();
             filetype = IMAGE_FORMATS[str(dialog.selectedNameFilter())]
             files = [str(file_) for file_ in files]
+            # Set Slider boundaries.
+            self.slider.setRange(1, len(files)+1)
             try:
                 self.loader = filetype.loader(files, config.IO_energyRegex)
                 self.setImage(self.loader.next())
@@ -678,13 +680,9 @@ class MainWindow(QMainWindow):
                 self.nextButton.setEnabled(True)
                 self.slider.setEnabled(True)
                 self.fileSaveScreenAction.setEnabled(True)
+                sliderCurrentPos = self.slider.setValue(1)
             except IOError, err:
                 self.statusBar().showMessage('IOError: ' + str(err), 5000)
-        
-        # Set Slider boundaries.
-        self.slider.setRange(1, len(files)+1)
-        sliderCurrentPos = self.slider.setValue(1)
-                
 
     def stopProcessing(self):
         self.stopped = True
