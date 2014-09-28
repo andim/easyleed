@@ -284,7 +284,10 @@ class Plot(QWidget):
         self.setLayout(vbox)
 
     def setupPlot(self):
-        self.axes.set_xlabel("Energy [eV]")
+        if config.GraphicsScene_intensTimeOn == False:
+            self.axes.set_xlabel("Energy [eV]")
+        else:
+            self.axes.set_xlabel("Frame")
         self.axes.set_ylabel("Intensity")
         # removes the ticks from y-axis
         self.axes.set_yticks([])
@@ -658,7 +661,10 @@ class MainWindow(QMainWindow):
         self.view.setSceneRect(QRectF(qimage.rect()))
         self.scene.setBackground(qimage)
         self.current_energy = energy
-        self.energyLabel.setText("Energy: %s eV" % self.current_energy)
+        if config.GraphicsScene_intensTimeOn == False:
+            self.energyLabel.setText("Energy: %s eV" % self.current_energy)
+        else:
+            self.energyLabel.setText("Frame: %s" % self.current_energy)
 
     def saveIntensity(self):
         filename = str(QFileDialog.getSaveFileName(self, "Save intensities to a file"))
@@ -706,6 +712,7 @@ class MainWindow(QMainWindow):
         else:
             import time
             time_before = time.time()
+            self.plotwid.setupPlot()
         
             self.stopped = False
             progress = QProgressBar()
