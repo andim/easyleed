@@ -467,19 +467,13 @@ class MainWindow(QMainWindow):
         processPreviousAction = self.createAction("&Previous Image", self.previous,
                 QKeySequence("Ctrl+p"), None,
                 "Open previous image.")
-        #processPlotAction = self.createAction("&Plot", self.plotting,
-        #       QKeySequence("Ctrl+d"), None,
-        #     "Plot the energy/intensity.")
-        #processPlotAverageAction = self.createAction("&Plot average", self.plottingAverage,
-        #    QKeySequence("Ctrl+g"), None,
-        #   "Plot the energy/intensity average.")
+
         processPlotOptions = self.createAction("&Plot...", self.plottingOptions,
                 QKeySequence("Ctrl+d"), None,
                 "Plot Intensities.")
         processSetParameters = self.createAction("&Set Parameters", self.setParameters,
                 None, None,
                 "Set tracking parameters.")
-
 
         self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotOptions, None]
         fileOpenAction = self.createAction("&Open...", self.fileOpen,
