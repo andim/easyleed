@@ -364,13 +364,22 @@ class SetParameters(QWidget):
         self.applyButton = QPushButton('&Apply', self)
         self.cancelButton = QPushButton('&Cancel', self)
 
+        self.vertLine = QFrame()
+        self.vertLine.setFrameStyle(QFrame.HLine)
+        self.horLine = QFrame()
+        self.horLine.setFrameStyle(QFrame.HLine)
+
         #Layouts
         self.setGeometry(700, 0, 300, 150)
-        self.setWindowTitle('Set tracking parameters')
+        self.setWindowTitle('Set acquisition parameters')
      
         #base grid
         self.gridLayout = QGridLayout()
         self.setLayout(self.gridLayout)
+
+        #vertical line layout
+        self.vlineLayout = QVBoxLayout()
+        self.vlineLayout.addWidget(self.vertLine)
 
         #1st (left) vertical layout
         self.lvLayout = QVBoxLayout()
@@ -391,6 +400,7 @@ class SetParameters(QWidget):
         self.rvLayout.addWidget(self.backgroundSubstraction)
         self.rvLayout.addWidget(self.livePlotting)
         self.rvLayout.addWidget(self.intensTime)
+        self.rvLayout.addWidget(self.horLine)
         self.rvLayout.addWidget(self.siLabel)
         self.rvLayout.addWidget(self.spotIdentification)
         self.rvLayout.addWidget(self.fnLabel)
@@ -416,10 +426,11 @@ class SetParameters(QWidget):
 
         #adding layouts to the grid
         self.gridLayout.addLayout(self.lvLayout, 0, 0)
-        self.gridLayout.addLayout(self.rvLayout, 0, 1)
-        self.gridLayout.addLayout(self.hpLayout, 4, 1)
-        self.gridLayout.addLayout(self.hLayout, 5, 0)
-        self.gridLayout.addLayout(self.h2Layout, 5, 1)
+        self.gridLayout.addLayout(self.rvLayout, 0, 2)
+        self.gridLayout.addLayout(self.hpLayout, 3, 1)
+        self.gridLayout.addLayout(self.hLayout, 3, 0)
+        self.gridLayout.addLayout(self.h2Layout, 3, 2)
+        self.gridLayout.addLayout(self.vlineLayout, 0,1,3,1)
 
 class MainWindow(QMainWindow):
     """ easyLeed's main window. """
