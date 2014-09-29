@@ -233,7 +233,7 @@ class AboutWidget(QWidget):
         self.verticalLayout.addWidget(self.label)
         self.label = QLabel("by: %s" % __author__, self)
         self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("<qt>Contact: <a href = mailto:andisspam@gmail.com>andisspam@gmail.com</a></qt>", self)
+        self.label = QLabel("<qt>Contacts: <a href = mailto:andisspam@gmail.com>andisspam@gmail.com</a>, <a href = mailto:andisspam@gmail.com> feranick@hotmail.com</a></qt>", self)
         self.label.setOpenExternalLinks(True);
         self.verticalLayout.addWidget(self.label)
         self.label = QLabel("More details: ", self)
