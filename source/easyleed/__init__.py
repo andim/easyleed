@@ -1,5 +1,5 @@
 """ 
-The Easyleed package is divided into several subpackages:
+The EasyLEED package is divided into several subpackages:
 
 - base: Core functionality (fitting procedures, Tracker class, etc.)
 - kalman: Implementation of Kalman filter classes
