@@ -3,7 +3,8 @@ The EasyLEED package is divided into several subpackages:
 
 - base: Core functionality (fitting procedures, Tracker class, etc.)
 - kalman: Implementation of Kalman filter classes
-- io: Input/Output functionality (reading FITS and IMG files)
+- io: Input/Output functionality (reading FITS, PIL, and IMG files)
+- gui: Graphical User Interface
 
 .. automodule:: easyleed.base
     :members:
@@ -12,6 +13,9 @@ The EasyLEED package is divided into several subpackages:
     :members:
 
 .. automodule:: easyleed.io
+    :members:
+
+.. automodule:: easyleed.gui
     :members:
 
 """

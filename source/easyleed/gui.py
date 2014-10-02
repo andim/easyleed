@@ -1,3 +1,11 @@
+"""
+easyleed.gui
+-------------
+
+Various classes for providing a graphical user interface.
+"""
+
+
 import sys
 import logging
 import webbrowser
@@ -27,7 +35,9 @@ import pickle
 logging.basicConfig(filename = config.loggingFilename, level=config.loggingLevel)
 
 class QGraphicsMovableItem(QGraphicsItem):
-    """ Provides an QGraphicsItem that can be moved with the arrow keys. """
+    """ Provides an QGraphicsItem that can be moved with the arrow keys.
+
+        Pressing Shift at the same time allows fine adjustments. """
 
     def __init__(self, parent=None):
         super(QGraphicsMovableItem, self).__init__(parent)
@@ -81,11 +91,7 @@ class QGraphicsMovableItem(QGraphicsItem):
         self.setPos(point)
 
 class QGraphicsSpotItem(QGraphicsEllipseItem, QGraphicsMovableItem):
-    """ Provides an QGraphicsItem to display a Spot on a QGraphicsScene.
-    
-        Circle class providing a circle that can be moved by mouse and keys.
-        
-    """
+    """ Provides an QGraphicsItem to display a Spot on a QGraphicsScene. """
 
     def __init__(self, point, radius, parent=None):
         super(QGraphicsSpotItem, self).__init__(parent)
@@ -100,8 +106,6 @@ class QGraphicsSpotItem(QGraphicsEllipseItem, QGraphicsMovableItem):
     def keyPressEvent(self, event):
         """ Handles keyPressEvents.
 
-            The circle can be moved using the arrow keys. Applying Shift
-            at the same time allows fine adjustments.
 
             The circles radius can be changed using the plus and minus keys.
         """
@@ -146,8 +150,7 @@ class QGraphicsCenterItem(QGraphicsRectItem, QGraphicsMovableItem):
                       QGraphicsItem.ItemIsFocusable)
 
 class QSpotModel(QObject):
-    """
-    Wraps a SpotModel to offer signals.
+    """ Wraps a SpotModel to offer signals.
 
     Provides the following signals:
     - intensityChanged
@@ -248,10 +251,6 @@ class GraphicsView(QGraphicsView):
     def __init__(self, parent=None):
         super(GraphicsView, self).__init__(parent)
         self.setRenderHints(QPainter.Antialiasing)
-    
-#    def wheelEvent(self, event):
-#        factor = 1.41 ** (-event.delta() / 240.0)
-#        self.scale(factor, factor)
     
     def resizeEvent(self, event):
         self.fitInView(self.sceneRect(), Qt.KeepAspectRatio)
@@ -1047,7 +1046,6 @@ class MainWindow(QMainWindow):
                 item.setSelected(True)
                 self.scene.setFocusItem(item)
             
-      
 class Worker(QObject):
     """ Worker that manages the spots."""
 
