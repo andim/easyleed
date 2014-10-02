@@ -233,12 +233,12 @@ class AboutWidget(QWidget):
         self.verticalLayout.addWidget(self.label)
         self.label = QLabel("by: %s" % __author__, self)
         self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("<qt>Contacts: <a href = mailto:andisspam@gmail.com>andisspam@gmail.com</a>, <a href = mailto:andisspam@gmail.com> feranick@hotmail.com</a></qt>", self)
+        self.label = QLabel("<qt>Contacts: <a href = mailto:andisspam@gmail.com>andisspam@gmail.com</a>, <a href = mailto:feranick@hotmail.com> feranick@hotmail.com</a></qt>", self)
         self.label.setOpenExternalLinks(True);
         self.verticalLayout.addWidget(self.label)
         self.label = QLabel("More details: ", self)
         self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("<qt><a href = http://dx.doi.org/10.1016/j.cpc.2012.02.019>Mayer, H. Salopaasi, K. Pussi, R.D. Diehl. Comput. Phys. Commun. 183, 1443-1447 (2012)</a>",self)
+        self.label = QLabel("<qt><a href = http://dx.doi.org/10.1016/j.cpc.2012.02.019>A Mayer, H Salopaasi, K Pussi, RD Diehl. Comput. Phys. Commun. 183, 1443-1447 (2012)</a>", self)
         self.label.setWordWrap(True)
         self.label.setOpenExternalLinks(True);
         self.verticalLayout.addWidget(self.label)
