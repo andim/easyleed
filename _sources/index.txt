@@ -53,7 +53,7 @@ Documentation
 Outro
 =====
 
-Development of Easyleed was started by Andreas Mayer while working in Renee Diehl's lab (Penn State). Hanna Salopaasi has contributed to the user interface of Easyleed while working in Katariina Pussi's lab (Lappeenranta University of Technology). We continue to work on facilitating LEED pattern analysis and therefore appreciate any form of user feedback! 
+Development of Easyleed was started by Andreas Mayer while working in Renee Diehl's lab (Penn State). Hanna Salopaasi has contributed to the user interface of Easyleed while working in Katariina Pussi's lab (Lappeenranta University of Technology). Independent UI and core improvements are currently contributed by Nicola Ferralis (Massachusetts Institute of Technology). We continue to work on facilitating LEED pattern analysis and therefore appreciate any form of user feedback! 
 
 Citing Easyleed
 ---------------
