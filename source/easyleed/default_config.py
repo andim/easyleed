@@ -22,13 +22,13 @@ IO_energyRegex = "[0-9]*\.?[0-9]+(?=\.)"
 # default radius of a new spot
 GraphicsScene_defaultRadius = 20
 
-## QGraphicsSpotView ##
+## QGraphicsItem ##
 # change in radius of the spot per key press (+/-) in pixel
-QGraphicsSpotView_spotSizeChange = 1
+QGraphicsItem_spotSizeChange = 1
 # change in position per key press (Arrow keys)
-QGraphicsSpotView_bigMove = 1
+QGraphicsItem_bigMove = 1
 # change in position per key press if Ctrl pressed
-QGraphicsSpotView_smallMove = 0.1
+QGraphicsItem_smallMove = 0.1
 
 # Live IV plotting during acquisition
 GraphicsScene_livePlottingOn = True

@@ -41,24 +41,24 @@ class QGraphicsMovableItem(QGraphicsItem):
         """
         if event.key() == Qt.Key_Right:
             if event.modifiers() & Qt.ShiftModifier:
-                self.moveRight(config.QGraphicsSpotView_smallMove)
+                self.moveRight(config.QGraphicsItem_smallMove)
             else:
-                self.moveRight(config.QGraphicsSpotView_bigMove)
+                self.moveRight(config.QGraphicsItem_bigMove)
         elif event.key() == Qt.Key_Left:
             if event.modifiers() & Qt.ShiftModifier:
-                self.moveLeft(config.QGraphicsSpotView_smallMove)
+                self.moveLeft(config.QGraphicsItem_smallMove)
             else:
-                self.moveLeft(config.QGraphicsSpotView_bigMove)
+                self.moveLeft(config.QGraphicsItem_bigMove)
         elif event.key() == Qt.Key_Up:
             if event.modifiers() & Qt.ShiftModifier:
-                self.moveUp(config.QGraphicsSpotView_smallMove)
+                self.moveUp(config.QGraphicsItem_smallMove)
             else:
-                self.moveUp(config.QGraphicsSpotView_bigMove)
+                self.moveUp(config.QGraphicsItem_bigMove)
         elif event.key() == Qt.Key_Down:
             if event.modifiers() & Qt.ShiftModifier:
-                self.moveDown(config.QGraphicsSpotView_smallMove)
+                self.moveDown(config.QGraphicsItem_smallMove)
             else:
-                self.moveDown(config.QGraphicsSpotView_bigMove)
+                self.moveDown(config.QGraphicsItem_bigMove)
 
     def moveRight(self, distance):
         """ Moves the circle distance to the right."""
@@ -80,8 +80,7 @@ class QGraphicsMovableItem(QGraphicsItem):
         """ Handles incoming position change request."""
         self.setPos(point)
 
-
-class QGraphicsSpotView(QGraphicsEllipseItem, QGraphicsMovableItem):
+class QGraphicsSpotItem(QGraphicsEllipseItem, QGraphicsMovableItem):
     """ Provides an QGraphicsItem to display a Spot on a QGraphicsScene.
     
         Circle class providing a circle that can be moved by mouse and keys.
@@ -89,7 +88,7 @@ class QGraphicsSpotView(QGraphicsEllipseItem, QGraphicsMovableItem):
     """
 
     def __init__(self, point, radius, parent=None):
-        super(QGraphicsSpotView, self).__init__(parent)
+        super(QGraphicsSpotItem, self).__init__(parent)
         offset = QPointF(radius, radius)
         self.setRect(QRectF(-offset, offset))
         self.setPen(QPen(Qt.blue))
@@ -107,11 +106,11 @@ class QGraphicsSpotView(QGraphicsEllipseItem, QGraphicsMovableItem):
         """
 
         if event.key() == Qt.Key_Plus:
-            self.changeSize(config.QGraphicsSpotView_spotSizeChange)
+            self.changeSize(config.QGraphicsSpotItem_spotSizeChange)
         elif event.key() == Qt.Key_Minus:
-            self.changeSize(-config.QGraphicsSpotView_spotSizeChange)
+            self.changeSize(-config.QGraphicsSpotItem_spotSizeChange)
         else:
-            super(QGraphicsSpotView, self).keyPressEvent(event)
+            super(QGraphicsSpotItem, self).keyPressEvent(event)
 
     def onRadiusChange(self, radius):
         """ Handles incoming radius change request."""
@@ -132,13 +131,13 @@ class QGraphicsSpotView(QGraphicsEllipseItem, QGraphicsMovableItem):
         inc /= 2**0.5 
         self.setRect(self.rect().adjusted(-inc, -inc, +inc, +inc))
 
-class QGraphicsCenterView(QGraphicsRectItem, QGraphicsMovableItem):
+class QGraphicsCenterItem(QGraphicsRectItem, QGraphicsMovableItem):
     """ Provides an QGraphicsItem to display the center position on a QGraphicsScene.
         
         """
     
     def __init__(self, point, size, parent=None):
-        super(QGraphicsCenterView, self).__init__(parent)
+        super(QGraphicsCenterItem, self).__init__(parent)
         offset = QPointF(size, size)
         self.setRect(QRectF(-offset, offset))
         self.setPen(QPen(Qt.red))
@@ -186,7 +185,7 @@ class GraphicsScene(QGraphicsScene):
         if self.itemAt(event.scenePos()):
             super(GraphicsScene, self).mousePressEvent(event)
         elif event.button() == Qt.LeftButton:
-            item = QGraphicsSpotView(event.scenePos(),
+            item = QGraphicsSpotItem(event.scenePos(),
                          config.GraphicsScene_defaultRadius)
             self.clearSelection()
             self.addItem(item)
@@ -196,7 +195,7 @@ class GraphicsScene(QGraphicsScene):
             self.spots.append(item)
         elif event.button() == Qt.RightButton:
             if self.center is None:
-                item = QGraphicsCenterView(event.scenePos(),
+                item = QGraphicsCenterItem(event.scenePos(),
                         config.GraphicsScene_defaultRadius)
                 self.clearSelection()
                 self.addItem(item)
@@ -219,7 +218,7 @@ class GraphicsScene(QGraphicsScene):
         item = self.focusItem()
         if item:
             if event.key() == Qt.Key_Delete:
-                if type(item) is QGraphicsSpotView:
+                if type(item) is QGraphicsSpotItem:
                     self.spots.remove(item)
                 else:
                     self.center = None
@@ -1042,7 +1041,7 @@ class MainWindow(QMainWindow):
                 #for j in range(len(energy[i])):
                 # only taking the first energy location, [0] -> [j] for all, but now puts every spot to the first energy
                 point = QPointF(locationx[i][0], locationy[i][0])
-                item = QGraphicsSpotView(point, radius[i][0])
+                item = QGraphicsSpotItem(point, radius[i][0])
                 # adding the item to the gui
                 self.scene.clearSelection()
                 self.scene.addItem(item)
@@ -1069,7 +1068,7 @@ class Worker(QObject):
             self.spots_map[spot] = (QSpotModel(self), tracker)
 
         for view, tup in self.spots_map.iteritems():
-            # view = QGraphicsSpotView, tup = (QSpotModel, tracker) -> tup[0] = QSpotModel
+            # view = QGraphicsSpotItem, tup = (QSpotModel, tracker) -> tup[0] = QSpotModel
             self.connect(tup[0], SIGNAL("positionChanged"), view.onPositionChange)
             self.connect(tup[0], SIGNAL("radiusChanged"), view.onRadiusChange)
 
