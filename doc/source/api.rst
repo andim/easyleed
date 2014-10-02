@@ -1,4 +1,4 @@
-The Easyleed API
+The EasyLEED API
 ==================
 
 .. automodule:: easyleed

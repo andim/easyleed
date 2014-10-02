@@ -14,7 +14,7 @@
    height="85"
    id="svg2"
    version="1.1"
-   inkscape:version="0.48.3.1 r9886"
+   inkscape:version="0.48.4 r9939"
    sodipodi:docname="logo.svg"
    inkscape:export-filename="logo.png"
    inkscape:export-xdpi="89.989113"
@@ -435,14 +435,14 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4"
-     inkscape:cx="362.09329"
+     inkscape:cx="277.09329"
      inkscape:cy="37.157287"
      inkscape:document-units="px"
-     inkscape:current-layer="layer1"
+     inkscape:current-layer="g17075"
      showgrid="false"
-     inkscape:window-width="1440"
+     inkscape:window-width="1383"
      inkscape:window-height="876"
-     inkscape:window-x="0"
+     inkscape:window-x="57"
      inkscape:window-y="24"
      inkscape:window-maximized="1" />
   <metadata
@@ -453,7 +453,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -550,32 +550,34 @@
        id="g17075"
        transform="translate(-34,6.481382)">
       <flowRoot
-         transform="translate(-39.78541,792.91281)"
+         transform="translate(-37.78541,795.15868)"
          style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Verdana;-inkscape-font-specification:Verdana"
          id="flowRoot2985"
          xml:space="preserve"><flowRegion
            id="flowRegion2987"><rect
              y="175.21933"
              x="162.85715"
-             height="69.720062"
-             width="242.87665"
+             height="69.005775"
+             width="271.44809"
              id="rect2989" /></flowRegion><flowPara
-           style="font-size:48px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#214478;font-family:DejaVu Serif;-inkscape-font-specification:DejaVu Serif Bold"
-           id="flowPara2991">Easyleed</flowPara></flowRoot>      <text
+           style="font-size:48px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;fill:#214478;font-family:Aller;-inkscape-font-specification:Aller Bold"
+           id="flowPara2991">EasyLEED</flowPara></flowRoot>      <text
          sodipodi:linespacing="125%"
          id="text2994"
-         y="997.69214"
-         x="374.54324"
+         y="997.13635"
+         x="383.54324"
          style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;text-align:start;line-height:125%;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;font-family:Verdana;-inkscape-font-specification:Verdana"
          xml:space="preserve"><tspan
-           y="997.69214"
-           x="374.54324"
+           y="997.13635"
+           x="383.54324"
            id="tspan2996"
-           sodipodi:role="line">Low Energy Electron Diffraction</tspan><tspan
+           sodipodi:role="line"
+           style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Aller;-inkscape-font-specification:Aller">Low Energy Electron Diffraction</tspan><tspan
            id="tspan2998"
-           y="1017.6921"
-           x="374.54324"
-           sodipodi:role="line">I(E)-spectra analysis</tspan></text>
+           y="1017.1364"
+           x="383.54324"
+           sodipodi:role="line"
+           style="font-size:16px;font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-family:Aller;-inkscape-font-specification:Aller">I(E)-spectra analysis</tspan></text>
     </g>
     <image
        style="stroke-linecap:square;stroke-linejoin:round"
