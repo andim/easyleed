@@ -6,9 +6,9 @@ Various classes for providing a graphical user interface.
 """
 
 
-import sys
 import logging
 import webbrowser
+import pickle
 
 from PyQt4.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
 from PyQt4.QtGui import (QApplication, QMainWindow, QGraphicsView,
@@ -25,12 +25,9 @@ from . import __author__
 from base import *
 from io import *
 
-import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
-from matplotlib.figure import Figure
-import pickle
 
 logging.basicConfig(filename = config.loggingFilename, level=config.loggingLevel)
 
@@ -309,7 +306,7 @@ class Plot(QWidget):
         # 5x4 inches, 100 dots-per-inch
         self.setGeometry(700, 450, 600, 400)
         self.dpi = 100
-        self.fig = Figure((5.0, 4.0), dpi=self.dpi)
+        self.fig = plt.Figure((5.0, 4.0), dpi=self.dpi)
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setParent(self)
         
