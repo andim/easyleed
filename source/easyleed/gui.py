@@ -14,6 +14,7 @@ from PyQt4.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
 from PyQt4.QtGui import (QApplication, QMainWindow, QGraphicsView,
     QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
     QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsRectItem, QGraphicsItem,
+    QGraphicsTextItem,
     QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
     QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox,
     QComboBox, QLineEdit, QMessageBox, QPixmap)
@@ -231,8 +232,12 @@ class GraphicsScene(QGraphicsScene):
         if hasattr(self, "image"):
             painter.drawImage(QPoint(0, 0), self.image)
 
-    def setBackground(self, image):
+    def setBackground(self, image, labeltext):
         """ Sets the background image. """
+        if not hasattr(self, 'imlabel'):
+            self.imlabel = QGraphicsTextItem(labeltext)
+            self.addItem(self.imlabel)
+        self.imlabel.setPlainText(labeltext)
         self.image = image
         self.update()
     
@@ -584,8 +589,6 @@ class MainWindow(QMainWindow):
         
         #### Create status bar ####
         self.statusBar().showMessage("Ready", 5000)
-        self.energyLabel = QLabel()
-        self.energyLabel.setFrameStyle(QFrame.StyledPanel | QFrame.Sunken)
 
         ### Create previous and next buttons
         self.prevButton = QPushButton('&<', self)
@@ -601,7 +604,6 @@ class MainWindow(QMainWindow):
         self.statusBar().addPermanentWidget(self.prevButton)
         self.statusBar().addPermanentWidget(self.nextButton)
         self.statusBar().addPermanentWidget(self.slider)
-        self.statusBar().addPermanentWidget(self.energyLabel)
     
         ### Create event connector for slider
         QObject.connect(self.slider, SIGNAL("sliderMoved(int)"), self.slider_moved)
@@ -714,12 +716,12 @@ class MainWindow(QMainWindow):
         npimage, energy = image
         qimage = npimage2qimage(npimage)
         self.view.setSceneRect(QRectF(qimage.rect()))
-        self.scene.setBackground(qimage)
-        self.current_energy = energy
         if config.GraphicsScene_intensTimeOn == False:
-            self.energyLabel.setText("Energy: %s eV" % self.current_energy)
+            labeltext = "Energy: %s eV" % energy
         else:
-            self.energyLabel.setText("Frame: %s" % self.current_energy)
+            labeltext = "Frame: %s" % energy
+        self.scene.setBackground(qimage, labeltext)
+        self.current_energy = energy
 
     def saveIntensity(self):
         filename = str(QFileDialog.getSaveFileName(self, "Save intensities to a file"))
