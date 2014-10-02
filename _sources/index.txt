@@ -1,7 +1,7 @@
 Intro
 =====
 
-The intensity of diffraction maxima in low energy electron diffraction patterns changes with the energy of the incident beam. By varying the beam energy and recording the intensity of the maxima at each step, structural information about the analyzed surface can be obtained. The purpose of the Easyleed program is to facilitate the extraction of intensity-energy spectra from the experimental images. 
+The intensity of diffraction maxima in low energy electron diffraction patterns changes with the energy of the incident beam. By varying the beam energy and recording the intensity of the maxima at each step, structural information about the analyzed surface can be obtained. The purpose of the EasyLEED program is to facilitate the extraction of intensity-energy spectra from the experimental images. 
 
 The user selects the spots he wants to track and the software then tries to automatically track the spots throughout all beam energies. An algorithm to determine the position of a spot in an image from the intensity information is combined with a dynamical model of the spot movement between successive beam energies to yield superior tracking performance.
 
@@ -15,12 +15,12 @@ Installation
 Download 
 --------
 
-Easyleed is open-source software licensed under the GPL v2. The software can be downloaded as a zip-file (:download:`Download ZIP-File <_static/source.zip>`, last update |today|). Alternatively the developer version of the code can be obtained by cloning the git repository: `<https://github.com/andim/easyleed/>`_
+EasyLEED is open-source software licensed under the GPL v2. The software can be downloaded as a zip-file (:download:`Download ZIP-File <_static/source.zip>`, last update |today|). Alternatively the developer version of the code can be obtained by cloning the git repository: `<https://github.com/andim/easyleed/>`_
 
 Dependencies
 ------------
 
-Easyleed is written in `Python <http://www.python.org/>`_ and relies on the following libraries:
+EasyLEED is written in `Python <http://www.python.org/>`_ and relies on the following libraries:
 
 - Python 2.6 or 2.7 `<http://www.python.org/>`_
 - Qt 4.6 `<http://qt.nokia.com/>`_ and PyQt 4.7 `<http://www.riverbankcomputing.co.uk/>`_
@@ -53,12 +53,12 @@ Documentation
 Outro
 =====
 
-Development of Easyleed was started by Andreas Mayer while working in Renee Diehl's lab (Penn State). Hanna Salopaasi has contributed to the user interface of Easyleed while working in Katariina Pussi's lab (Lappeenranta University of Technology). Independent UI and core improvements are currently contributed by Nicola Ferralis (Massachusetts Institute of Technology). We continue to work on facilitating LEED pattern analysis and therefore appreciate any form of user feedback! 
+Development of EasyLEED was started by Andreas Mayer while working in Renee Diehl's lab (Penn State). Hanna Salopaasi has contributed to the user interface while working in Katariina Pussi's lab (Lappeenranta University of Technology). Further UI and core improvements are currently contributed by Nicola Ferralis (Massachusetts Institute of Technology). We continue to work on facilitating LEED pattern analysis and therefore appreciate any form of user feedback! 
 
-Citing Easyleed
+Citing EasyLEED
 ---------------
 
-We have described the algorithm, which is implemented in Easyleed in the following article (:download:`Download Bibtex-File<easyleed.bib>`):
+We have described the algorithm, which is implemented in EasyLEED in the following article (:download:`Download Bibtex-File<easyleed.bib>`):
 
 A. Mayer, H. Salopaasi, K. Pussi, R.D. Diehl. A novel method for the extraction of intensity-energy spectra from low-energy electron diffraction patterns. Comput. Phys. Commun. 183, 1443-1447 (2012)
 
