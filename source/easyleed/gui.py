@@ -5,7 +5,7 @@ import webbrowser
 from PyQt4.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
 from PyQt4.QtGui import (QApplication, QMainWindow, QGraphicsView,
     QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
-    QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsItem,
+    QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsRectItem, QGraphicsItem,
     QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
     QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox,
     QComboBox, QLineEdit, QMessageBox, QPixmap)
@@ -24,70 +24,41 @@ from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 from matplotlib.figure import Figure
 import pickle
 
-
-
 logging.basicConfig(filename = config.loggingFilename, level=config.loggingLevel)
 
-class QGraphicsSpotView(QGraphicsEllipseItem):
-    """ Provides an QGraphicsItem to display a Spot on a QGraphicsScene.
-    
-        Circle class providing a circle that can be moved by mouse and keys.
-        
-    """
+class QGraphicsMovableItem(QGraphicsItem):
+    """ Provides an QGraphicsItem that can be moved with the arrow keys. """
 
-    def __init__(self, point, radius, parent=None):
-        offset = QPointF(radius, radius)
-        super(QGraphicsSpotView, self).__init__(QRectF(-offset, offset),  parent)
-        self.setPen(QPen(Qt.blue))
-        self.setPos(point)
-        self.setFlags(QGraphicsItem.ItemIsSelectable|
-                      QGraphicsItem.ItemIsMovable|
-                      QGraphicsItem.ItemIsFocusable)
+    def __init__(self, parent=None):
+        super(QGraphicsMovableItem, self).__init__(parent)
+        self.setFlags(QGraphicsItem.ItemIsMovable)
 
     def keyPressEvent(self, event):
         """ Handles keyPressEvents.
 
-            The circle can be moved using the arrow keys. Applying Shift
+            The item can be moved using the arrow keys. Applying Shift
             at the same time allows fine adjustments.
-
-            The circles radius can be changed using the plus and minus keys.
         """
-
-        if event.key() == Qt.Key_Plus:
-            self.changeSize(config.QGraphicsSpotView_spotSizeChange)
-        elif event.key() == Qt.Key_Minus:
-            self.changeSize(-config.QGraphicsSpotView_spotSizeChange)
-        elif event.key() == Qt.Key_Right:
+        if event.key() == Qt.Key_Right:
             if event.modifiers() & Qt.ShiftModifier:
-                self.moveRight(config.QGraphicsSpotView_smallMove)
+                self.moveRight(config.QGraphicsMovableItem_smallMove)
             else:
-                self.moveRight(config.QGraphicsSpotView_bigMove)
+                self.moveRight(config.QGraphicsMovableItem_bigMove)
         elif event.key() == Qt.Key_Left:
             if event.modifiers() & Qt.ShiftModifier:
-                self.moveLeft(config.QGraphicsSpotView_smallMove)
+                self.moveLeft(config.QGraphicsMovableItem_smallMove)
             else:
-                self.moveLeft(config.QGraphicsSpotView_bigMove)
+                self.moveLeft(config.QGraphicsMovableItem_bigMove)
         elif event.key() == Qt.Key_Up:
             if event.modifiers() & Qt.ShiftModifier:
-                self.moveUp(config.QGraphicsSpotView_smallMove)
+                self.moveUp(config.QGraphicsMovableItem_smallMove)
             else:
-                self.moveUp(config.QGraphicsSpotView_bigMove)
+                self.moveUp(config.QGraphicsMovableItem_bigMove)
         elif event.key() == Qt.Key_Down:
             if event.modifiers() & Qt.ShiftModifier:
-                self.moveDown(config.QGraphicsSpotView_smallMove)
+                self.moveDown(config.QGraphicsMovableItem_smallMove)
             else:
-                self.moveDown(config.QGraphicsSpotView_bigMove)
-
-    def onPositionChange(self, point):
-        """ Handles incoming position change request."""
-        self.setPos(point)
-
-    def radius(self):
-        return self.rect().width() / 2.0
-
-    def onRadiusChange(self, radius):
-        """ Handles incoming radius change request."""
-        self.changeSize(radius - self.radius())
+                self.moveDown(config.QGraphicsMovableItem_bigMove)
 
     def moveRight(self, distance):
         """ Moves the circle distance to the right."""
@@ -105,6 +76,52 @@ class QGraphicsSpotView(QGraphicsEllipseItem):
         """ Moves the circle distance down."""
         self.setPos(self.pos() + QPointF(0.0, distance))
 
+    def onPositionChange(self, point):
+        """ Handles incoming position change request."""
+        self.setPos(point)
+
+class QGraphicsSpotItem(QGraphicsEllipseItem, QGraphicsMovableItem):
+    """ Provides an QGraphicsItem to display a Spot on a QGraphicsScene.
+    
+        Circle class providing a circle that can be moved by mouse and keys.
+        
+    """
+
+    def __init__(self, point, radius, parent=None):
+        super(QGraphicsSpotItem, self).__init__(parent)
+        offset = QPointF(radius, radius)
+        self.setRect(QRectF(-offset, offset))
+        self.setPen(QPen(Qt.blue))
+        self.setPos(point)
+        self.setFlags(self.flags() |
+                      QGraphicsItem.ItemIsSelectable|
+                      QGraphicsItem.ItemIsFocusable)
+
+    def keyPressEvent(self, event):
+        """ Handles keyPressEvents.
+
+            The circle can be moved using the arrow keys. Applying Shift
+            at the same time allows fine adjustments.
+
+            The circles radius can be changed using the plus and minus keys.
+        """
+
+        if event.key() == Qt.Key_Plus:
+            self.changeSize(config.QGraphicsSpotItem_spotSizeChange)
+        elif event.key() == Qt.Key_Minus:
+            self.changeSize(-config.QGraphicsSpotItem_spotSizeChange)
+        else:
+            super(QGraphicsSpotItem, self).keyPressEvent(event)
+
+    def onRadiusChange(self, radius):
+        """ Handles incoming radius change request."""
+        self.changeSize(radius - self.radius())
+
+
+    def radius(self):
+        return self.rect().width() / 2.0
+
+
     def changeSize(self, inc):
         """ Change radius by inc.
         
@@ -114,6 +131,19 @@ class QGraphicsSpotView(QGraphicsEllipseItem):
 
         inc /= 2**0.5 
         self.setRect(self.rect().adjusted(-inc, -inc, +inc, +inc))
+
+class QGraphicsCenterItem(QGraphicsRectItem, QGraphicsMovableItem):
+    """ Provides an QGraphicsItem to display the center position on a QGraphicsScene. """
+    
+    def __init__(self, point, size, parent=None):
+        super(QGraphicsCenterItem, self).__init__(parent)
+        offset = QPointF(size, size)
+        self.setRect(QRectF(-offset, offset))
+        self.setPen(QPen(Qt.red))
+        self.setPos(point)
+        self.setFlags(self.flags() |
+                      QGraphicsItem.ItemIsSelectable|
+                      QGraphicsItem.ItemIsFocusable)
 
 class QSpotModel(QObject):
     """
@@ -140,23 +170,41 @@ class GraphicsScene(QGraphicsScene):
 
     def __init__(self, parent=None):
         super(GraphicsScene, self).__init__(parent)
+        self.spots = []
+        self.center = None
     
     def mousePressEvent(self, event):
         """ Processes mouse events through either            
               - propagating the event
             or 
               - instantiating a new Circle (on left-click)
+              - instantiating a new Center (on right-click)
         """
        
         if self.itemAt(event.scenePos()):
             super(GraphicsScene, self).mousePressEvent(event)
         elif event.button() == Qt.LeftButton:
-            item = QGraphicsSpotView(event.scenePos(),
+            item = QGraphicsSpotItem(event.scenePos(),
                          config.GraphicsScene_defaultRadius)
             self.clearSelection()
             self.addItem(item)
             item.setSelected(True)
             self.setFocusItem(item)
+            print item.scenePos()
+            self.spots.append(item)
+        elif event.button() == Qt.RightButton:
+            if self.center is None:
+                item = QGraphicsCenterItem(event.scenePos(),
+                        config.QGraphicsCenterItem_size)
+                self.clearSelection()
+                self.addItem(item)
+                item.setSelected(True)
+                self.setFocusItem(item)
+                print item.scenePos()
+                self.center = item
+            else:
+                print "failure: center already defined"
+
 
     def keyPressEvent(self, event):
         """ Processes key events through either            
@@ -169,6 +217,10 @@ class GraphicsScene(QGraphicsScene):
         item = self.focusItem()
         if item:
             if event.key() == Qt.Key_Delete:
+                if type(item) is QGraphicsSpotItem:
+                    self.spots.remove(item)
+                else:
+                    self.center = None
                 self.removeItem(item)
                 del item
             else:
@@ -188,6 +240,8 @@ class GraphicsScene(QGraphicsScene):
         """ Remove all items from the scene (leaves background unchanged). """
         for item in self.items():
             self.removeItem(item)
+        self.spots = []
+        self.center = None
 
 class GraphicsView(QGraphicsView):
     """ Custom GraphicsView to display the scene. """
@@ -576,7 +630,7 @@ class MainWindow(QMainWindow):
             
         """
         global sliderCurrentPos
-        self.worker = Worker(self.scene.items(), self.current_energy, parent=self)
+        self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
 
         diff = sliderCurrentPos - sliderNewPos
         if diff > 0:
@@ -590,12 +644,12 @@ class MainWindow(QMainWindow):
         sliderCurrentPos = sliderNewPos
 
     def prevBtnClicked(self):
-        self.worker = Worker(self.scene.items(), self.current_energy, parent=self)
+        self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
         self.previous()
         self.worker.process(self.loader.this())
 
     def nextBtnClicked(self):
-        self.worker = Worker(self.scene.items(), self.current_energy, parent=self)
+        self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
         self.next_()
         self.worker.process(self.loader.this())
 
@@ -710,9 +764,9 @@ class MainWindow(QMainWindow):
 
         xs=[]
         ys=[]
-        lin = [len(self.scene.items())]
+        lin = [len(self.scene.spots)]
  
-        if len(self.scene.items()) == 0:
+        if len(self.scene.spots) == 0:
             self.statusBar().showMessage("No integration window selected.", 5000)
         else:
             import time
@@ -734,11 +788,11 @@ class MainWindow(QMainWindow):
             self.view.setInteractive(False)
             self.slider.setEnabled(False)
             self.scene.clearSelection()
-            self.worker = Worker(self.scene.items(), self.current_energy, parent=self)
+            self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
             self.fileSaveAction.setEnabled(True)
             self.fileSaveSpotsAction.setEnabled(True)
 
-            for plts in range(len(self.scene.items())):
+            for plts in range(len(self.scene.spots)):
                 lin.append(plts)
                 lin[plts], = self.plotwid.axes.plot([],[])
             
@@ -763,7 +817,7 @@ class MainWindow(QMainWindow):
             self.statusBar().removeWidget(statusWidget)
 
     def disableInput(self):
-        for item in self.scene.items():
+        for item in self.scene.spots:
             item.setFlag(QGraphicsItem.ItemIsSelectable, False)
             item.setFlag(QGraphicsItem.ItemIsFocusable, False)
             item.setFlag(QGraphicsItem.ItemIsMovable, False)
@@ -793,7 +847,7 @@ class MainWindow(QMainWindow):
                 for y in intensities:
                     xs.append(x)
                     ys.append(y)
-            for plts in range(len(self.scene.items())):
+            for plts in range(len(self.scene.spots)):
                 lin[plts].set_data(xs[:][plts],ys[:][plts])
 
             self.plotwid.axes.relim()
@@ -986,7 +1040,7 @@ class MainWindow(QMainWindow):
                 #for j in range(len(energy[i])):
                 # only taking the first energy location, [0] -> [j] for all, but now puts every spot to the first energy
                 point = QPointF(locationx[i][0], locationy[i][0])
-                item = QGraphicsSpotView(point, radius[i][0])
+                item = QGraphicsSpotItem(point, radius[i][0])
                 # adding the item to the gui
                 self.scene.clearSelection()
                 self.scene.addItem(item)
@@ -997,19 +1051,23 @@ class MainWindow(QMainWindow):
 class Worker(QObject):
     """ Worker that manages the spots."""
 
-    def __init__(self, spots, energy, parent=None):
+    def __init__(self, spots, center, energy, parent=None):
         super(Worker, self).__init__(parent)
         self.spots_map = {}
         for spot in spots:
             pos = spot.scenePos()
-            tracker = Tracker(pos.x(), pos.y(), spot.radius(), energy,
-                        input_precision = config.Tracking_inputPrecision,
-                        window_scaling = config.Tracking_windowScalingOn)
-#            tracker = TrackerPhysics(pos.x(), pos.y(), 217, 218, spot.radius(), energy)
+            if center:
+                tracker = Tracker(pos.x(), pos.y(), spot.radius(), energy, center.x(), center.y(),
+                            input_precision = config.Tracking_inputPrecision,
+                            window_scaling = config.Tracking_windowScalingOn)
+            else:
+                tracker = Tracker(pos.x(), pos.y(), spot.radius(), energy,
+                            input_precision = config.Tracking_inputPrecision,
+                            window_scaling = config.Tracking_windowScalingOn)
             self.spots_map[spot] = (QSpotModel(self), tracker)
 
         for view, tup in self.spots_map.iteritems():
-            # view = QGraphicsSpotView, tup = (QSpotModel, tracker) -> tup[0] = QSpotModel
+            # view = QGraphicsSpotItem, tup = (QSpotModel, tracker) -> tup[0] = QSpotModel
             self.connect(tup[0], SIGNAL("positionChanged"), view.onPositionChange)
             self.connect(tup[0], SIGNAL("radiusChanged"), view.onRadiusChange)
 
