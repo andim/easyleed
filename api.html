@@ -47,11 +47,12 @@
                 
   <div class="section" id="module-easyleed">
 <span id="the-easyleed-api"></span><h1>The EasyLEED API<a class="headerlink" href="#module-easyleed" title="Permalink to this headline">¶</a></h1>
-<p>The Easyleed package is divided into several subpackages:</p>
+<p>The EasyLEED package is divided into several subpackages:</p>
 <ul class="simple">
 <li>base: Core functionality (fitting procedures, Tracker class, etc.)</li>
 <li>kalman: Implementation of Kalman filter classes</li>
-<li>io: Input/Output functionality (reading FITS and IMG files)</li>
+<li>io: Input/Output functionality (reading FITS, PIL, and IMG files)</li>
+<li>gui: Graphical User Interface</li>
 </ul>
 <span class="target" id="module-easyleed.base"></span><div class="section" id="easyleed-base">
 <h2>easyleed.base<a class="headerlink" href="#easyleed-base" title="Permalink to this headline">¶</a></h2>
@@ -64,7 +65,7 @@
 
 <dl class="class">
 <dt id="easyleed.base.Tracker">
-<em class="property">class </em><tt class="descclassname">easyleed.base.</tt><tt class="descname">Tracker</tt><big>(</big><em>x_in</em>, <em>y_in</em>, <em>radius</em>, <em>energy</em>, <em>input_precision=1</em>, <em>window_scaling=False</em><big>)</big><a class="reference internal" href="_modules/easyleed/base.html#Tracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.base.Tracker" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><tt class="descclassname">easyleed.base.</tt><tt class="descname">Tracker</tt><big>(</big><em>x_in</em>, <em>y_in</em>, <em>radius</em>, <em>energy</em>, <em>x_c=None</em>, <em>y_c=None</em>, <em>input_precision=1</em>, <em>window_scaling=False</em><big>)</big><a class="reference internal" href="_modules/easyleed/base.html#Tracker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.base.Tracker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Tracks spots through intensity information and velocity prediction.</p>
 </dd></dl>
 
@@ -279,6 +280,308 @@ R: measurement covariance matrix</p>
 <dt id="easyleed.io.npimage2qimage">
 <tt class="descclassname">easyleed.io.</tt><tt class="descname">npimage2qimage</tt><big>(</big><em>npimage</em><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#npimage2qimage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.npimage2qimage" title="Permalink to this definition">¶</a></dt>
 <dd><p>Converts numpy grayscale image to qimage.</p>
+</dd></dl>
+
+</div>
+<span class="target" id="module-easyleed.gui"></span><div class="section" id="easyleed-gui">
+<h2>easyleed.gui<a class="headerlink" href="#easyleed-gui" title="Permalink to this headline">¶</a></h2>
+<p>Various classes for providing a graphical user interface.</p>
+<dl class="class">
+<dt id="easyleed.gui.AboutWidget">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">AboutWidget</tt><a class="reference internal" href="_modules/easyleed/gui.html#AboutWidget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.AboutWidget" title="Permalink to this definition">¶</a></dt>
+<dd><p>PyQt widget for About Box Panel</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.gui.GraphicsScene">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">GraphicsScene</tt><big>(</big><em>parent=None</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#GraphicsScene"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.GraphicsScene" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom GraphicScene having all the main content.</p>
+<dl class="method">
+<dt id="easyleed.gui.GraphicsScene.drawBackground">
+<tt class="descname">drawBackground</tt><big>(</big><em>painter</em>, <em>rect</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#GraphicsScene.drawBackground"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.GraphicsScene.drawBackground" title="Permalink to this definition">¶</a></dt>
+<dd><p>Draws image in background if it exists.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.GraphicsScene.keyPressEvent">
+<tt class="descname">keyPressEvent</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#GraphicsScene.keyPressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.GraphicsScene.keyPressEvent" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Processes key events through either            </dt>
+<dd><ul class="first last simple">
+<li>deleting the focus item</li>
+</ul>
+</dd>
+<dt>or   </dt>
+<dd><ul class="first last simple">
+<li>propagating the event</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.GraphicsScene.mousePressEvent">
+<tt class="descname">mousePressEvent</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#GraphicsScene.mousePressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.GraphicsScene.mousePressEvent" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="docutils">
+<dt>Processes mouse events through either            </dt>
+<dd><ul class="first last simple">
+<li>propagating the event</li>
+</ul>
+</dd>
+<dt>or </dt>
+<dd><ul class="first last simple">
+<li>instantiating a new Circle (on left-click)</li>
+<li>instantiating a new Center (on right-click)</li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.GraphicsScene.removeAll">
+<tt class="descname">removeAll</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#GraphicsScene.removeAll"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.GraphicsScene.removeAll" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all items from the scene (leaves background unchanged).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.GraphicsScene.setBackground">
+<tt class="descname">setBackground</tt><big>(</big><em>image</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#GraphicsScene.setBackground"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.GraphicsScene.setBackground" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the background image.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.gui.GraphicsView">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">GraphicsView</tt><big>(</big><em>parent=None</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#GraphicsView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.GraphicsView" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom GraphicsView to display the scene.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.gui.MainWindow">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">MainWindow</tt><big>(</big><em>parent=None</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow" title="Permalink to this definition">¶</a></dt>
+<dd><p>EasyLEED&#8217;s main window.</p>
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.SetAllParameters">
+<tt class="descname">SetAllParameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.SetAllParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.SetAllParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter setting control</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.acceptParameters">
+<tt class="descname">acceptParameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.acceptParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.acceptParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set user values to the parameters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.addActions">
+<tt class="descname">addActions</tt><big>(</big><em>target</em>, <em>actions</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.addActions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.addActions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience function that adds the actions to the target.
+If an action is None a separator will be added.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.applyParameters">
+<tt class="descname">applyParameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.applyParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.applyParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set user values to the parameters</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.createAction">
+<tt class="descname">createAction</tt><big>(</big><em>text</em>, <em>slot=None</em>, <em>shortcut=None</em>, <em>icon=None</em>, <em>tip=None</em>, <em>checkable=False</em>, <em>signal='triggered()'</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.createAction"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.createAction" title="Permalink to this definition">¶</a></dt>
+<dd><p>Convenience function that creates an action with the specified attributes.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.defaultValues">
+<tt class="descname">defaultValues</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.defaultValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.defaultValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload config-module and get the default values</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.fileOpen">
+<tt class="descname">fileOpen</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.fileOpen"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.fileOpen" title="Permalink to this definition">¶</a></dt>
+<dd><p>Prompts the user to select input image files.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.fileQuit">
+<tt class="descname">fileQuit</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.fileQuit"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.fileQuit" title="Permalink to this definition">¶</a></dt>
+<dd><p>Special quit-function as the normal window closing might leave something on the background</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.loadSpots">
+<tt class="descname">loadSpots</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.loadSpots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.loadSpots" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load saved spot positions</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.loadValues">
+<tt class="descname">loadValues</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.loadValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.loadValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a file of set parameter values that has been saved with the widget</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.plotting">
+<tt class="descname">plotting</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.plotting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.plotting" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic Matplotlib plotting I(E)-curve</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.plottingAverage">
+<tt class="descname">plottingAverage</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.plottingAverage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.plottingAverage" title="Permalink to this definition">¶</a></dt>
+<dd><p>Mostly the same as normal plotting but plots the average of the calculated intensities</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.restart">
+<tt class="descname">restart</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.restart" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete stored plot information and start fresh</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.savePlot">
+<tt class="descname">savePlot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.savePlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.savePlot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saving the plot</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.saveScreenShot">
+<tt class="descname">saveScreenShot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.saveScreenShot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.saveScreenShot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save Screenshot</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.saveSpots">
+<tt class="descname">saveSpots</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.saveSpots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.saveSpots" title="Permalink to this definition">¶</a></dt>
+<dd><p>saves the spot locations to a file, uses workers saveloc-function</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.saveValues">
+<tt class="descname">saveValues</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.saveValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.saveValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic saving of the set parameter values to a file</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.slider_moved">
+<tt class="descname">slider_moved</tt><big>(</big><em>sliderNewPos</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.slider_moved"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.slider_moved" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function tracks what to do with a slider movement.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.gui.Plot">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">Plot</tt><a class="reference internal" href="_modules/easyleed/gui.html#Plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Custom PyQt widget canvas for plotting</p>
+<dl class="method">
+<dt id="easyleed.gui.Plot.create_main_frame">
+<tt class="descname">create_main_frame</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#Plot.create_main_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Plot.create_main_frame" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create the mpl Figure and FigCanvas objects.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.gui.QGraphicsCenterItem">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">QGraphicsCenterItem</tt><big>(</big><em>point</em>, <em>size</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QGraphicsCenterItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QGraphicsCenterItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides an QGraphicsItem to display the center position on a QGraphicsScene.</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.gui.QGraphicsMovableItem">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">QGraphicsMovableItem</tt><big>(</big><em>parent=None</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QGraphicsMovableItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QGraphicsMovableItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides an QGraphicsItem that can be moved with the arrow keys.</p>
+<p>Pressing Shift at the same time allows fine adjustments.</p>
+<dl class="method">
+<dt id="easyleed.gui.QGraphicsMovableItem.keyPressEvent">
+<tt class="descname">keyPressEvent</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QGraphicsMovableItem.keyPressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QGraphicsMovableItem.keyPressEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles keyPressEvents.</p>
+<p>The item can be moved using the arrow keys. Applying Shift
+at the same time allows fine adjustments.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.QGraphicsMovableItem.moveDown">
+<tt class="descname">moveDown</tt><big>(</big><em>distance</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QGraphicsMovableItem.moveDown"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QGraphicsMovableItem.moveDown" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the circle distance down.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.QGraphicsMovableItem.moveLeft">
+<tt class="descname">moveLeft</tt><big>(</big><em>distance</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QGraphicsMovableItem.moveLeft"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QGraphicsMovableItem.moveLeft" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the circle distance to the left.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.QGraphicsMovableItem.moveRight">
+<tt class="descname">moveRight</tt><big>(</big><em>distance</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QGraphicsMovableItem.moveRight"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QGraphicsMovableItem.moveRight" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the circle distance to the right.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.QGraphicsMovableItem.moveUp">
+<tt class="descname">moveUp</tt><big>(</big><em>distance</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QGraphicsMovableItem.moveUp"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QGraphicsMovableItem.moveUp" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves the circle distance up.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.QGraphicsMovableItem.onPositionChange">
+<tt class="descname">onPositionChange</tt><big>(</big><em>point</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QGraphicsMovableItem.onPositionChange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QGraphicsMovableItem.onPositionChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles incoming position change request.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.gui.QGraphicsSpotItem">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">QGraphicsSpotItem</tt><big>(</big><em>point</em>, <em>radius</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QGraphicsSpotItem"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QGraphicsSpotItem" title="Permalink to this definition">¶</a></dt>
+<dd><p>Provides an QGraphicsItem to display a Spot on a QGraphicsScene.</p>
+<dl class="method">
+<dt id="easyleed.gui.QGraphicsSpotItem.changeSize">
+<tt class="descname">changeSize</tt><big>(</big><em>inc</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QGraphicsSpotItem.changeSize"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QGraphicsSpotItem.changeSize" title="Permalink to this definition">¶</a></dt>
+<dd><p>Change radius by inc.</p>
+<p>inc &gt; 0: increase
+inc &lt; 0: decrease</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.QGraphicsSpotItem.keyPressEvent">
+<tt class="descname">keyPressEvent</tt><big>(</big><em>event</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QGraphicsSpotItem.keyPressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QGraphicsSpotItem.keyPressEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles keyPressEvents.</p>
+<p>The circles radius can be changed using the plus and minus keys.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.QGraphicsSpotItem.onRadiusChange">
+<tt class="descname">onRadiusChange</tt><big>(</big><em>radius</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QGraphicsSpotItem.onRadiusChange"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QGraphicsSpotItem.onRadiusChange" title="Permalink to this definition">¶</a></dt>
+<dd><p>Handles incoming radius change request.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.gui.QSpotModel">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">QSpotModel</tt><big>(</big><em>parent=None</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#QSpotModel"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.QSpotModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wraps a SpotModel to offer signals.</p>
+<p>Provides the following signals:
+- intensityChanged
+- positionChanged
+- radiusChanged</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.gui.SetParameters">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">SetParameters</tt><a class="reference internal" href="_modules/easyleed/gui.html#SetParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.SetParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>PyQt widget for setting tracking parameters</p>
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.gui.Worker">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">Worker</tt><big>(</big><em>spots</em>, <em>center</em>, <em>energy</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#Worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Worker that manages the spots.</p>
 </dd></dl>
 
 </div>
