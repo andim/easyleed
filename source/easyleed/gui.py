@@ -25,7 +25,7 @@ from . import __author__
 from base import *
 from io import *
 
-import matplotlib.pyplot as plt
+from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
@@ -306,7 +306,7 @@ class Plot(QWidget):
         # 5x4 inches, 100 dots-per-inch
         self.setGeometry(700, 450, 600, 400)
         self.dpi = 100
-        self.fig = plt.Figure((5.0, 4.0), dpi=self.dpi)
+        self.fig = Figure((5.0, 4.0), dpi=self.dpi)
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setParent(self)
         
@@ -322,14 +322,14 @@ class Plot(QWidget):
         # Create the navigation toolbar, tied to the canvas
         self.mpl_toolbar = NavigationToolbar2QT(self.canvas, self)
 
+        # Add checkbox for average
+        self.averageCheck = QCheckBox("Average")
+        self.averageCheck.setChecked(config.GraphicsScene_plotAverage)
+
         # Layout
         vbox = QVBoxLayout()
         vbox.addWidget(self.mpl_toolbar)
         vbox.addWidget(self.canvas)
-        
-        # Add checkbox for average
-        self.averageCheck = QCheckBox("Average")
-        self.averageCheck.setChecked(config.GraphicsScene_plotAverage)
         vbox.addWidget(self.averageCheck)
         self.setLayout(vbox)
 
@@ -700,7 +700,7 @@ class MainWindow(QMainWindow):
             self.setImage(image)
 
     def restart(self):
-        '''Delete stored plot information and start fresh'''
+        """ Delete stored plot information and start fresh """
         self.scene.removeAll()
         self.loader.restart()
         self.setImage(self.loader.next())
@@ -911,7 +911,7 @@ class MainWindow(QMainWindow):
 
         self.setparameterswid.show()
 
-    def SetAllParameters(self):
+    def setAllParameters(self):
         """Parameter setting control"""
         config.Tracking_inputPrecision = self.setparameterswid.inputPrecision.value()
         config.Tracking_windowScalingOn = self.setparameterswid.integrationWindowScale.isChecked()
@@ -927,7 +927,7 @@ class MainWindow(QMainWindow):
 
     def acceptParameters(self):
         """Set user values to the parameters"""
-        self.SetAllParameters()
+        self.setAllParameters()
         try:
             self.noiseList = [float(self.setparameterswid.value1.text()), float(self.setparameterswid.value2.text()), float(self.setparameterswid.value3.text()), float(self.setparameterswid.value4.text())]
             config.Tracking_processNoise = np.diag(self.noiseList)
@@ -937,7 +937,7 @@ class MainWindow(QMainWindow):
 
     def applyParameters(self):
         """Set user values to the parameters"""
-        self.SetAllParameters()
+        self.setAllParameters()
         try:
             self.noiseList = [float(self.setparameterswid.value1.text()), float(self.setparameterswid.value2.text()), float(self.setparameterswid.value3.text()), float(self.setparameterswid.value4.text())]
             config.Tracking_processNoise = np.diag(self.noiseList)
@@ -1012,7 +1012,7 @@ class MainWindow(QMainWindow):
         self.plotwid.canvas.close()
 
     def saveSpots(self):
-        """saves the spot locations to a file, uses workers saveloc-function"""
+        """Saves the spot locations to a file, uses workers saveloc-function"""
         filename = str(QFileDialog.getSaveFileName(self, "Save the spot locations to a file"))
         if filename:
             self.worker.saveloc(filename)
