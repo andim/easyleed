@@ -24,5 +24,12 @@ Changelog since version 1.0
 - Running an acquisition without any spot selected is prevented. 
 - Added ability to take screenshots from menu (including integration windows and energy in filename).
 - Moved buttons “next, previous” close to the slider.
-- Increased default size of integration window from 10 to a more realistic 20
 - Added ability to acquire I(time) - fix energy acquisitions.
+
+(AM):
+- added ability to set center by user
+
+Changes in  defaults:
+- default size of integration window 10 --> 20
+- Tracking input precision 5 --> 2
+- Tracking process noise in position 0.04 --> 0.1
