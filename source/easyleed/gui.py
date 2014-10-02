@@ -433,10 +433,10 @@ class SetParameters(QWidget):
         self.gridLayout.addLayout(self.vlineLayout, 0,1,3,1)
 
 class MainWindow(QMainWindow):
-    """ easyLeed's main window. """
+    """ EasyLEED's main window. """
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
-        self.setWindowTitle("easyLeed %s" % __version__)
+        self.setWindowTitle("EasyLEED %s" % __version__)
 
         #### setup central widget ####
         self.aboutwid = AboutWidget()
@@ -509,7 +509,7 @@ class MainWindow(QMainWindow):
                 "Show help")
         self.aboutAction = self.createAction("&About", self.aboutBoxShow,
                 None, None,
-                "About Easyleed")
+                "About EasyLEED")
         self.helpActions = [None, self.helpAction, None, self.aboutAction]
         
         
