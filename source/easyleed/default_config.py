@@ -48,7 +48,7 @@ QGraphicsCenterItem_size = 5
 ##########################
 
 # precision of the user input (standard deviation in pixel)
-Tracking_inputPrecision = 5
+Tracking_inputPrecision = 2
 # scale the integration window with changing energy
 Tracking_windowScalingOn = True
 # minimal radius of the integration window (in pixel)
@@ -56,7 +56,7 @@ Tracking_minWindowSize = 0
 # function for spot identification
 Tracking_guessFunc = "guess_from_Gaussian"
 # Kalman tracker process noise
-Tracking_processNoise = np.diag([4e-2, 4e-2, 0, 0])
+Tracking_processNoise = np.diag([1e-1, 1e-1, 0, 0])
 # size of validation region
 # Ideal assumptions D_M^2 ~ Chi^2 with two degrees of freedom
 # cdf Chi^2 with two degrees of freedom is 1 - exp(-x/2)
