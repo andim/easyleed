@@ -43,10 +43,12 @@ class Tracker:
         if x_c and y_c:
             x, y = x_in - x_c, y_in - y_c 
             r = (x**2 + y**2)**.5
-            v = -0.5 * r / energy
+            v = - 0.5 * r / energy
+            # calculate std. dev. of velocity guess
+            # by propagation of uncertainty from the input precision
+            v_precision = 2**.5 * 0.5 * input_precision / energy
             phi = np.arctan2(y, x)
-            #cov_input = np.diag([0.1, 0.1, 0.01*v, 0.01*v])
-            cov_input = np.diag([0.0, 0.0, 0.0, 0.0])
+            cov_input = np.diag([input_precision, input_precision, v_precision, v_precision])**2
             self.kalman = kalman.PVKalmanFilter2(x_in, y_in, cov_input, energy, vx_in = v * np.cos(phi), vy_in = v * np.sin(phi))
         else:
             cov_input = np.diag([input_precision, input_precision, 1000, 1000])
