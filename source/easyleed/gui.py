@@ -41,24 +41,24 @@ class QGraphicsMovableItem(QGraphicsItem):
         """
         if event.key() == Qt.Key_Right:
             if event.modifiers() & Qt.ShiftModifier:
-                self.moveRight(config.QGraphicsItem_smallMove)
+                self.moveRight(config.QGraphicsMovableItem_smallMove)
             else:
-                self.moveRight(config.QGraphicsItem_bigMove)
+                self.moveRight(config.QGraphicsMovableItem_bigMove)
         elif event.key() == Qt.Key_Left:
             if event.modifiers() & Qt.ShiftModifier:
-                self.moveLeft(config.QGraphicsItem_smallMove)
+                self.moveLeft(config.QGraphicsMovableItem_smallMove)
             else:
-                self.moveLeft(config.QGraphicsItem_bigMove)
+                self.moveLeft(config.QGraphicsMovableItem_bigMove)
         elif event.key() == Qt.Key_Up:
             if event.modifiers() & Qt.ShiftModifier:
-                self.moveUp(config.QGraphicsItem_smallMove)
+                self.moveUp(config.QGraphicsMovableItem_smallMove)
             else:
-                self.moveUp(config.QGraphicsItem_bigMove)
+                self.moveUp(config.QGraphicsMovableItem_bigMove)
         elif event.key() == Qt.Key_Down:
             if event.modifiers() & Qt.ShiftModifier:
-                self.moveDown(config.QGraphicsItem_smallMove)
+                self.moveDown(config.QGraphicsMovableItem_smallMove)
             else:
-                self.moveDown(config.QGraphicsItem_bigMove)
+                self.moveDown(config.QGraphicsMovableItem_bigMove)
 
     def moveRight(self, distance):
         """ Moves the circle distance to the right."""
@@ -133,9 +133,7 @@ class QGraphicsSpotItem(QGraphicsEllipseItem, QGraphicsMovableItem):
         self.setRect(self.rect().adjusted(-inc, -inc, +inc, +inc))
 
 class QGraphicsCenterItem(QGraphicsRectItem, QGraphicsMovableItem):
-    """ Provides an QGraphicsItem to display the center position on a QGraphicsScene.
-        
-        """
+    """ Provides an QGraphicsItem to display the center position on a QGraphicsScene. """
     
     def __init__(self, point, size, parent=None):
         super(QGraphicsCenterItem, self).__init__(parent)
@@ -197,7 +195,7 @@ class GraphicsScene(QGraphicsScene):
         elif event.button() == Qt.RightButton:
             if self.center is None:
                 item = QGraphicsCenterItem(event.scenePos(),
-                        config.GraphicsScene_defaultRadius)
+                        config.QGraphicsCenterItem_size)
                 self.clearSelection()
                 self.addItem(item)
                 item.setSelected(True)
