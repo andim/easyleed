@@ -93,7 +93,8 @@ class QGraphicsSpotItem(QGraphicsEllipseItem, QGraphicsMovableItem):
         self.setRect(QRectF(-offset, offset))
         self.setPen(QPen(Qt.blue))
         self.setPos(point)
-        self.setFlags(QGraphicsItem.ItemIsSelectable|
+        self.setFlags(self.flags() |
+                      QGraphicsItem.ItemIsSelectable|
                       QGraphicsItem.ItemIsFocusable)
 
     def keyPressEvent(self, event):
@@ -142,8 +143,8 @@ class QGraphicsCenterItem(QGraphicsRectItem, QGraphicsMovableItem):
         self.setRect(QRectF(-offset, offset))
         self.setPen(QPen(Qt.red))
         self.setPos(point)
-        self.setFlags(QGraphicsItem.ItemIsSelectable|
-                      QGraphicsItem.ItemIsMovable|
+        self.setFlags(self.flags() |
+                      QGraphicsItem.ItemIsSelectable|
                       QGraphicsItem.ItemIsFocusable)
 
 class QSpotModel(QObject):
