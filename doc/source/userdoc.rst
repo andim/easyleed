@@ -22,7 +22,7 @@ Here is a short step-by-step guide:
 File naming policy
 ------------------
 
-Easyleed tries to infer the beam energy from the filename. 
+EasyLEED tries to infer the beam energy from the filename. 
 
 Examples of valid file names in the default configuration:
 
