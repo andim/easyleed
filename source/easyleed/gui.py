@@ -312,14 +312,10 @@ class Plot(QWidget):
         self.setGeometry(700, 450, 600, 400)
         self.dpi = 100
         self.fig = Figure((5.0, 4.0), dpi=self.dpi)
+        self.axes = self.fig.add_subplot(111)
+
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setParent(self)
-        
-        # Since we have only one plot, we can use add_axes 
-        # instead of add_subplot, but then the subplot
-        # configuration tool in the navigation toolbar wouldn't
-        # work.
-        self.axes = self.fig.add_subplot(111)
         
         # Create the navigation toolbar, tied to the canvas
         self.mpl_toolbar = NavigationToolbar2QT(self.canvas, self)
@@ -351,12 +347,14 @@ class Plot(QWidget):
         self.lines_map = {}
         for spot in self.worker.spots_map:
             self.lines_map[spot], = self.axes.plot([], [])
+        # show line at y = 0
         self.axes.axhline(0.0)
         # try to auto-adjust plot margins (might not be available in all matplotlib versions)
         try:
             self.fig.tight_layout()
         except:
             pass
+        self.updatePlot()
         self.show()
 
     def updatePlot(self):
@@ -377,6 +375,10 @@ class Plot(QWidget):
         self.axes.autoscale_view(True,True,True)
         # and show the new plot
         self.canvas.draw()
+
+    def close(self):
+        self.axes.cla()
+        super(Plot, self).close()
 
 class SetParameters(QWidget): 
     """PyQt widget for setting tracking parameters"""
@@ -554,15 +556,14 @@ class MainWindow(QMainWindow):
                 QKeySequence("Ctrl+p"), None,
                 "Open previous image.")
 
-#        processPlotOptions = self.createAction("&Plot...", self.plottingOptions,
-#                QKeySequence("Ctrl+d"), None,
-#                "Plot Intensities.")
+        processPlotOptions = self.createAction("&Plot...", self.plot,
+                QKeySequence("Ctrl+d"), None,
+                "Plot Intensities.")
         processSetParameters = self.createAction("&Set Parameters", self.setParameters,
                 None, None,
                 "Set tracking parameters.")
 
-        #self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotOptions, None]
-        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None]
+        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotOptions, None]
         fileOpenAction = self.createAction("&Open...", self.fileOpen,
                 QKeySequence.Open, None,
                 "Open a directory containing the image files.")
@@ -616,8 +617,7 @@ class MainWindow(QMainWindow):
         #### Create tool bar ####
         toolBar = self.addToolBar("&Toolbar")
         # adding actions to the toolbar, addActions-function creates a separator with "None"
-        #self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processPlotOptions, None, processSetParameters, None, processRestartAction]
-        self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processSetParameters, None, processRestartAction]
+        self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processPlotOptions, None, processSetParameters, None, processRestartAction]
         self.addActions(toolBar, self.toolBarActions)
         
         #### Create status bar ####
@@ -728,10 +728,7 @@ class MainWindow(QMainWindow):
         self.scene.removeAll()
         self.loader.restart()
         self.setImage(self.loader.next())
-        self.plotwid.axes.cla()
-        self.plotwid.canvas.draw()
         self.plotwid.close()
-        #self.plotwid.setupPlot()
         sliderCurrentPos = self.slider.setValue(1)
 
     def setImage(self, image):
@@ -776,6 +773,11 @@ class MainWindow(QMainWindow):
     def stopProcessing(self):
         self.stopped = True
 
+    def plot(self): 
+        self.plotwid.setupPlot(self.worker)
+        # can save the plot now
+        self.fileSavePlotAction.setEnabled(True)
+
     def run(self):
         global sliderCurrentPos
 
@@ -804,9 +806,8 @@ class MainWindow(QMainWindow):
             self.fileSaveAction.setEnabled(True)
             self.fileSaveSpotsAction.setEnabled(True)
 
-            self.plotwid.setupPlot(self.worker)
-            # can save the plot now
-            self.fileSavePlotAction.setEnabled(True)
+            if config.GraphicsScene_livePlottingOn == True:
+                self.plot()
             
             for image in self.loader:
                 if self.stopped:
@@ -818,8 +819,6 @@ class MainWindow(QMainWindow):
                 QApplication.processEvents()
                 if config.GraphicsScene_livePlottingOn == True:
                     self.plotwid.updatePlot()
-                    if config.GraphicsScene_plotAverage == True:
-                        self.plotwid.plottingAverage()
                 sliderCurrentPos = sliderCurrentPos + 1
                 self.slider.setValue(sliderCurrentPos)
 
