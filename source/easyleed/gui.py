@@ -780,9 +780,9 @@ class MainWindow(QMainWindow):
                 self.statusBar().showMessage('IOError: ' + str(err), 5000)
 
     def removeLastSpot(self):
-        if len(self.scene.items(1)) != 0:
+        if len(self.scene.items(0)) > 1:
             self.scene.spots.remove(self.scene.spots[-1])
-            self.scene.removeItem(self.scene.items(1)[-1])
+            self.scene.removeItem(self.scene.items(0)[-1])
 
     def stopProcessing(self):
         self.stopped = True
