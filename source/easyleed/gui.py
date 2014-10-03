@@ -14,7 +14,7 @@ from PyQt4.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
 from PyQt4.QtGui import (QApplication, QMainWindow, QGraphicsView,
     QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
     QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsRectItem, QGraphicsItem,
-    QGraphicsSimpleTextItem,
+    QGraphicsSimpleTextItem, QToolButton,
     QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
     QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox,
     QComboBox, QLineEdit, QMessageBox, QPixmap)
@@ -631,8 +631,10 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("Ready", 5000)
 
         ### Create previous and next buttons
-        self.prevButton = QPushButton('&<', self)
-        self.nextButton = QPushButton('&>', self)
+        self.prevButton = QToolButton(self)
+        self.prevButton.setArrowType(Qt.LeftArrow)
+        self.nextButton = QToolButton(self)
+        self.nextButton.setArrowType(Qt.RightArrow)
         self.prevButton.setEnabled(False)
         self.nextButton.setEnabled(False)
         
