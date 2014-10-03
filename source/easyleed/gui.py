@@ -544,8 +544,8 @@ class ParameterSettingWidget(QWidget):
         config.Processing_backgroundSubstractionOn = self.backgroundSubstraction.isChecked()
         config.GraphicsScene_livePlottingOn = self.livePlotting.isChecked()
         config.GraphicsScene_intensTimeOn = self.intensTime.isChecked()
-        config.Tracking_processNoisePosition = self.processNoisePosition
-        config.Tracking_processNoiseVelocity = self.processNoiseVelocity
+        config.Tracking_processNoisePosition = self.processNoisePosition.value()
+        config.Tracking_processNoiseVelocity = self.processNoiseVelocity.value()
 
     def defaultValues(self):
         """Reload config-module and get the default values"""
