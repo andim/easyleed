@@ -64,6 +64,8 @@ Tracking_processNoiseVelocity = 0.0
 Tracking_gamma = 8
 # Minimal coefficient of determination R^2 for fit
 Tracking_minRsq = 0.8
+# factor by which the fitted region is bigger than the radius
+Tracking_fitRegionFactor = 1.5
 
 ##########################
 ##########################

@@ -122,15 +122,15 @@ def guess_from_Gaussian(image, *args, **kwargs):
     y_res = p_opt[2]
     return (x_res, y_res), p_cov
 
-def guesser(npimage, x_in, y_in, radius, func = eval(config.Tracking_guessFunc)):
+def guesser(npimage, x_in, y_in, radius, func = eval(config.Tracking_guessFunc), fit_region_factor = config.Tracking_fitRegionFactor):
     def failure(reason):
         logger.info("no guess, because " + reason)
         print reason
         return None
     try:
-        factor = 1.0
-        x_min, x_max, y_min, y_max = adjust_slice(npimage, x_in - factor * radius, x_in + factor * radius + 1,
-                                     y_in - factor * radius, y_in + factor * radius + 1)
+        fit_region_factor = 1.0
+        x_min, x_max, y_min, y_max = adjust_slice(npimage, x_in - fit_region_factor * radius, x_in + fit_region_factor * radius + 1,
+                                     y_in - fit_region_factor * radius, y_in + fit_region_factor * radius + 1)
     except IndexError:
        return failure("position outside image")
    
