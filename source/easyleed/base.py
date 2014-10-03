@@ -66,7 +66,9 @@ class Tracker:
         if self.radius < config.Tracking_minWindowSize:
             self.radius = config.Tracking_minWindowSize
         if config.GraphicsScene_intensTimeOn == False:
-            self.kalman.predict(energy, config.Tracking_processNoise)
+            processNoise = np.diag([config.Tracking_processNoisePosition, config.Tracking_processNoisePosition,
+                    config.Tracking_processNoiseVelocity, config.Tracking_processNoiseVelocity])
+            self.kalman.predict(energy, processNoise)
         x_p, y_p = self.kalman.get_position()
         guess = guesser(npimage, x_p, y_p, self.radius, kalman = self.kalman)
         if guess is not None:
