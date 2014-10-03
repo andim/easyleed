@@ -541,7 +541,6 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.view)
         global sliderCurrentPos
         sliderCurrentPos = 1
-        global processRemoveSpot
         
         #### define actions ####
         processRunAction = self.createAction("&Run", self.run,
