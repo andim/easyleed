@@ -28,6 +28,9 @@ Changelog since version 1.0
 
 (AM):
 - added ability to set center by user
+- energy label now displayed atop of the image
+- plotting refactored (now faster)
+- new config parameter fitRegionFactor to set size of search region
 
 Changes in  defaults:
 - default size of integration window 10 --> 20
