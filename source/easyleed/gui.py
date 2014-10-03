@@ -565,11 +565,11 @@ class MainWindow(QMainWindow):
         processSetParameters = self.createAction("&Set Parameters", self.setParameters,
                 None, None,
                 "Set tracking parameters.")
-        processRemoveSpot = self.createAction("&Remove Spot", self.removeLastSpot,
+        self.processRemoveSpot = self.createAction("&Remove Spot", self.removeLastSpot,
                 None, None,
                 "Remove Last Spot.")
 
-        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotOptions, None, processRemoveSpot]
+        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotOptions, None, self.processRemoveSpot]
         fileOpenAction = self.createAction("&Open...", self.fileOpen,
                 QKeySequence.Open, None,
                 "Open a directory containing the image files.")
@@ -623,7 +623,7 @@ class MainWindow(QMainWindow):
         #### Create tool bar ####
         toolBar = self.addToolBar("&Toolbar")
         # adding actions to the toolbar, addActions-function creates a separator with "None"
-        self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processPlotOptions, None, processSetParameters, None, processRemoveSpot, None, processRestartAction]
+        self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processPlotOptions, None, processSetParameters, None, self.processRemoveSpot, None, processRestartAction]
         self.addActions(toolBar, self.toolBarActions)
         
         #### Create status bar ####
@@ -814,7 +814,7 @@ class MainWindow(QMainWindow):
             self.statusBar().addWidget(statusWidget)
             self.view.setInteractive(False)
             self.slider.setEnabled(False)
-            processRemoveSpot.setEnabled(False)
+            self.processRemoveSpot.setEnabled(False)
             self.scene.clearSelection()
             self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
             self.fileSaveAction.setEnabled(True)
@@ -838,7 +838,7 @@ class MainWindow(QMainWindow):
 
             self.view.setInteractive(True)
             self.slider.setEnabled(True)
-            processRemoveSpot.setEnabled(True)
+            self.processRemoveSpot.setEnabled(True)
             print "Total time acquisition:", time.time() - time_before, "s"
             self.statusBar().removeWidget(statusWidget)
 
