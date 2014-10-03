@@ -181,31 +181,33 @@ class GraphicsScene(QGraphicsScene):
               - instantiating a new Circle (on left-click)
               - instantiating a new Center (on right-click)
         """
-       
-        if self.itemAt(event.scenePos()):
-            super(GraphicsScene, self).mousePressEvent(event)
-        elif event.button() == Qt.LeftButton:
-            item = QGraphicsSpotItem(event.scenePos(),
-                         config.GraphicsScene_defaultRadius)
-            self.clearSelection()
-            self.addItem(item)
-            item.setSelected(True)
-            self.setFocusItem(item)
-            #print item.scenePos()
-            self.spots.append(item)
-        elif event.button() == Qt.RightButton:
-            if self.center is None:
-                item = QGraphicsCenterItem(event.scenePos(),
-                        config.QGraphicsCenterItem_size)
+    
+        if hasattr(self,"image"):
+        
+            if self.itemAt(event.scenePos()):
+                super(GraphicsScene, self).mousePressEvent(event)
+            elif event.button() == Qt.LeftButton:
+                item = QGraphicsSpotItem(event.scenePos(),
+                        config.GraphicsScene_defaultRadius)
                 self.clearSelection()
                 self.addItem(item)
                 item.setSelected(True)
                 self.setFocusItem(item)
-                #print item.scenePos()
-                self.center = item
-            else:
-                print "failure: center already defined"
-
+                self.spots.append(item)
+            elif event.button() == Qt.RightButton:
+                if self.center is None:
+                    item = QGraphicsCenterItem(event.scenePos(),
+                        config.QGraphicsCenterItem_size)
+                    self.clearSelection()
+                    self.addItem(item)
+                    item.setSelected(True)
+                    self.setFocusItem(item)
+                    self.center = item
+                else:
+                    print "failure: center already defined"
+        else:
+            self.parent().statusBar().showMessage("Spots require a loaded image", 5000)
+            #print "Spots require a loaded image"
 
     def keyPressEvent(self, event):
         """ Processes key events through either            
