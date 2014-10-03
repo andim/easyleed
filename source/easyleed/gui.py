@@ -14,7 +14,7 @@ from PyQt4.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
 from PyQt4.QtGui import (QApplication, QMainWindow, QGraphicsView,
     QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
     QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsRectItem, QGraphicsItem,
-    QGraphicsTextItem,
+    QGraphicsSimpleTextItem,
     QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
     QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox,
     QComboBox, QLineEdit, QMessageBox, QPixmap)
@@ -235,9 +235,12 @@ class GraphicsScene(QGraphicsScene):
     def setBackground(self, image, labeltext):
         """ Sets the background image. """
         if not hasattr(self, 'imlabel'):
-            self.imlabel = QGraphicsTextItem(labeltext)
+            self.imlabel = QGraphicsSimpleTextItem(labeltext)
+            self.imlabel.setBrush(QBrush(Qt.white))
+            #self.imlabel.setPen(QPen(Qt.white))
+            self.imlabel.setPos(5, 5)
             self.addItem(self.imlabel)
-        self.imlabel.setPlainText(labeltext)
+        self.imlabel.setText(labeltext)
         self.image = image
         self.update()
     
