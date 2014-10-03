@@ -70,7 +70,7 @@ class Tracker:
                     config.Tracking_processNoiseVelocity, config.Tracking_processNoiseVelocity])
             self.kalman.predict(energy, processNoise)
         x_p, y_p = self.kalman.get_position()
-        guess = guesser(npimage, x_p, y_p, self.radius, kalman = self.kalman)
+        guess = guesser(npimage, x_p, y_p, self.radius)
         if guess is not None:
             x_th, y_th, guess_cov = guess
             # spot in validation region?  (based on residual covariance)
@@ -122,7 +122,7 @@ def guess_from_Gaussian(image, *args, **kwargs):
     y_res = p_opt[2]
     return (x_res, y_res), p_cov
 
-def guesser(npimage, x_in, y_in, radius, func = eval(config.Tracking_guessFunc), max_radius = 20, kalman = None, default_cov=np.diag([2, 2])):
+def guesser(npimage, x_in, y_in, radius, func = eval(config.Tracking_guessFunc)):
     def failure(reason):
         logger.info("no guess, because " + reason)
         print reason
