@@ -321,9 +321,6 @@ class Plot(QWidget):
         # work.
         self.axes = self.fig.add_subplot(111)
         
-        # Setup axis, labels...
-        self.setupPlot()
-        
         # Create the navigation toolbar, tied to the canvas
         self.mpl_toolbar = NavigationToolbar2QT(self.canvas, self)
 
@@ -338,7 +335,11 @@ class Plot(QWidget):
         vbox.addWidget(self.averageCheck)
         self.setLayout(vbox)
 
-    def setupPlot(self):
+        # Define events for checkbox
+        QObject.connect(self.averageCheck, SIGNAL("clicked()"), self.updatePlot)
+
+    def setupPlot(self, worker):
+        # Setup axis, labels, lines, ...
         if config.GraphicsScene_intensTimeOn == False:
             self.axes.set_xlabel("Energy [eV]")
         else:
@@ -346,6 +347,36 @@ class Plot(QWidget):
         self.axes.set_ylabel("Intensity")
         # removes the ticks from y-axis
         self.axes.set_yticks([])
+        self.worker = worker
+        self.lines_map = {}
+        for spot in self.worker.spots_map:
+            self.lines_map[spot], = self.axes.plot([], [])
+        self.axes.axhline(0.0)
+        # try to auto-adjust plot margins (might not be available in all matplotlib versions)
+        try:
+            self.fig.tight_layout()
+        except:
+            pass
+        self.show()
+
+    def updatePlot(self):
+        """ Basic Matplotlib plotting I(E)-curve """
+        # update data
+        for spot, line in self.lines_map.iteritems():
+            line.set_data(self.worker.spots_map[spot][0].m.energy, self.worker.spots_map[spot][0].m.intensity)
+        if self.averageCheck.isChecked():
+            if not hasattr(self, 'averageLine'):
+                self.averageLine, = self.axes.plot([], [], 'k', lw = 2, label = 'Average')
+            intensity = np.zeros(self.worker.numProcessed())
+            for model, tracker in self.worker.spots_map.itervalues():
+                intensity += model.m.intensity
+            intensity /= len(self.worker.spots_map)
+            self.averageLine.set_data(model.m.energy, intensity)
+        # ... axes limits
+        self.axes.relim()
+        self.axes.autoscale_view(True,True,True)
+        # and show the new plot
+        self.canvas.draw()
 
 class SetParameters(QWidget): 
     """PyQt widget for setting tracking parameters"""
@@ -523,14 +554,15 @@ class MainWindow(QMainWindow):
                 QKeySequence("Ctrl+p"), None,
                 "Open previous image.")
 
-        processPlotOptions = self.createAction("&Plot...", self.plottingOptions,
-                QKeySequence("Ctrl+d"), None,
-                "Plot Intensities.")
+#        processPlotOptions = self.createAction("&Plot...", self.plottingOptions,
+#                QKeySequence("Ctrl+d"), None,
+#                "Plot Intensities.")
         processSetParameters = self.createAction("&Set Parameters", self.setParameters,
                 None, None,
                 "Set tracking parameters.")
 
-        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotOptions, None]
+        #self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotOptions, None]
+        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None]
         fileOpenAction = self.createAction("&Open...", self.fileOpen,
                 QKeySequence.Open, None,
                 "Open a directory containing the image files.")
@@ -584,7 +616,8 @@ class MainWindow(QMainWindow):
         #### Create tool bar ####
         toolBar = self.addToolBar("&Toolbar")
         # adding actions to the toolbar, addActions-function creates a separator with "None"
-        self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processPlotOptions, None, processSetParameters, None, processRestartAction]
+        #self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processPlotOptions, None, processSetParameters, None, processRestartAction]
+        self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processSetParameters, None, processRestartAction]
         self.addActions(toolBar, self.toolBarActions)
         
         #### Create status bar ####
@@ -610,17 +643,6 @@ class MainWindow(QMainWindow):
         QObject.connect(self.prevButton, SIGNAL("clicked()"), self.prevBtnClicked)
         QObject.connect(self.nextButton, SIGNAL("clicked()"), self.nextBtnClicked)
     
-        # Define events for checkbox
-        QObject.connect(self.plotwid.averageCheck, SIGNAL("clicked()"), self.AvCheck)
-    
-    # Define behavior for average checkbox
-    def AvCheck(self):
-        if self.plotwid.averageCheck.isChecked() == True:
-            config.GraphicsScene_plotAverage = True
-        else:
-            config.GraphicsScene_plotAverage = False
-        self.plottingOptions()
-
 
     def slider_moved(self, sliderNewPos):
         """
@@ -709,7 +731,7 @@ class MainWindow(QMainWindow):
         self.plotwid.axes.cla()
         self.plotwid.canvas.draw()
         self.plotwid.close()
-        self.plotwid.setupPlot()
+        #self.plotwid.setupPlot()
         sliderCurrentPos = self.slider.setValue(1)
 
     def setImage(self, image):
@@ -756,21 +778,13 @@ class MainWindow(QMainWindow):
 
     def run(self):
         global sliderCurrentPos
-        global xs
-        global ys
-        global lin
 
-        xs=[]
-        ys=[]
-        lin = [len(self.scene.spots)]
- 
         if len(self.scene.spots) == 0:
             self.statusBar().showMessage("No integration window selected.", 5000)
         else:
             import time
             time_before = time.time()
-            self.plotwid.setupPlot()
-        
+
             self.stopped = False
             progress = QProgressBar()
             stop = QPushButton("Stop", self)
@@ -790,9 +804,9 @@ class MainWindow(QMainWindow):
             self.fileSaveAction.setEnabled(True)
             self.fileSaveSpotsAction.setEnabled(True)
 
-            for plts in range(len(self.scene.spots)):
-                lin.append(plts)
-                lin[plts], = self.plotwid.axes.plot([],[])
+            self.plotwid.setupPlot(self.worker)
+            # can save the plot now
+            self.fileSavePlotAction.setEnabled(True)
             
             for image in self.loader:
                 if self.stopped:
@@ -803,9 +817,9 @@ class MainWindow(QMainWindow):
                 self.worker.process(image)
                 QApplication.processEvents()
                 if config.GraphicsScene_livePlottingOn == True:
-                    self.plotting()
+                    self.plotwid.updatePlot()
                     if config.GraphicsScene_plotAverage == True:
-                        self.plottingAverage()
+                        self.plotwid.plottingAverage()
                 sliderCurrentPos = sliderCurrentPos + 1
                 self.slider.setValue(sliderCurrentPos)
 
@@ -825,83 +839,6 @@ class MainWindow(QMainWindow):
 
     def aboutBoxShow(self):
         self.aboutwid.show()
-
-	## Plotting with matplotlib ##
-
-    def plotting(self):
-        """ Basic Matplotlib plotting I(E)-curve """
-        global xs
-        global ys
-        global lin     
-        # do only if there's some data to draw the plot from, otherwise show an error message in the statusbar
-        try:
-            # getting intensities and energy from the worker class
-            intensities = [model.m.intensity for model, tracker \
-                                in self.worker.spots_map.itervalues()]
-            energy = [model.m.energy for model, tracker in self.worker.spots_map.itervalues()]
-                           
-            # do the plot
-            for x in energy:
-                for y in intensities:
-                    xs.append(x)
-                    ys.append(y)
-            for plts in range(len(self.scene.spots)):
-                lin[plts].set_data(xs[:][plts],ys[:][plts])
-
-            self.plotwid.axes.relim()
-            self.plotwid.axes.autoscale_view(True,True,True)
-            # and show it
-            self.plotwid.canvas.draw()
-            # try to auto-adjust plot margins (might not be available in all matplotlib versions"
-            try:
-                self.plotwid.fig.tight_layout()
-            except:
-                pass
-            self.plotwid.show()
-            # can save the plot now
-            self.fileSavePlotAction.setEnabled(True)
-        except AttributeError:
-            self.statusBar().showMessage("No plottable data.", 5000)
-
-    def plottingAverage(self):
-        """ Mostly the same as normal plotting but plots the average of the calculated intensities """
-        try:
-            sum_intensity=0
-            list_of_average_intensities = []
-            intensities = [model.m.intensity for model, tracker \
-                                in self.worker.spots_map.itervalues()]
-            number_of_pictures = len(intensities[0])
-            number_of_points = len(intensities)
-            energy = [model.m.energy for model, tracker in self.worker.spots_map.itervalues()]
-            intensities = flatten(intensities)
-            for i in range(number_of_pictures):
-                for j in range(i, len(intensities), number_of_pictures):
-                    sum_intensity = sum_intensity + intensities[j]
-                average_intensity = sum_intensity/number_of_points
-                list_of_average_intensities.append(average_intensity)
-                sum_intensity = 0
-
-            self.plotwid.axes.plot(energy[0], list_of_average_intensities,'k-', linewidth=3, label = 'Average')
-            
-            self.plotwid.axes.relim()
-            self.plotwid.axes.autoscale_view(True,True,True)
-            
-            self.plotwid.canvas.draw()
-            self.plotwid.show()
-            self.fileSavePlotAction.setEnabled(True)
-        except AttributeError:
-            self.statusBar().showMessage("No plottable data.", 5000)
-
-    def plottingOptions(self):
-        intensities = [model.m.intensity for model, tracker \
-                       in self.worker.spots_map.itervalues()]
-        self.plotwid.setupPlot()
-        if config.GraphicsScene_plotAverage == True:
-            self.plottingAverage()
-        else:
-            for i in range(len(self.plotwid.axes.lines) - len(intensities)):
-                del(self.plotwid.axes.lines[-1])
-            self.plotting()
 
     def setParameters(self):
 
@@ -1050,6 +987,9 @@ class Worker(QObject):
 
     def __init__(self, spots, center, energy, parent=None):
         super(Worker, self).__init__(parent)
+        # spots_map:
+        # - key: spot
+        # - value: SpotModel, Tracker
         self.spots_map = {}
         for spot in spots:
             pos = spot.scenePos()
@@ -1073,6 +1013,10 @@ class Worker(QObject):
             tracker_result = tracker.feed_image(image)
             # feed_image returns x, y, intensity, energy and radius
             model.update(*tracker_result)
+
+    def numProcessed(self):
+        """ Return the number of processed images. """
+        return len(self.spots_map.itervalues().next()[0].m.energy)
 
     def save(self, filename):
         intensities = [model.m.intensity for model, tracker \
