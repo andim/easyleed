@@ -79,7 +79,7 @@ class Tracker:
             else:
                 self.kalman.update([x_th, y_th], guess_cov)
         x, y = self.kalman.get_position()
-        intensity = calc_intensity(npimage, x, y, self.radius)
+        intensity = calc_intensity(npimage, x, y, self.radius, background_substraction = config.Processing_backgroundSubstractionOn)
         return x, y, intensity, energy, self.radius
 
 def guess_from_Gaussian(image, *args, **kwargs):
