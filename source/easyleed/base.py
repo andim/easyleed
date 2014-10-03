@@ -66,9 +66,11 @@ class Tracker:
         if self.radius < config.Tracking_minWindowSize:
             self.radius = config.Tracking_minWindowSize
         if config.GraphicsScene_intensTimeOn == False:
-            self.kalman.predict(energy, config.Tracking_processNoise)
+            processNoise = np.diag([config.Tracking_processNoisePosition, config.Tracking_processNoisePosition,
+                    config.Tracking_processNoiseVelocity, config.Tracking_processNoiseVelocity])
+            self.kalman.predict(energy, processNoise)
         x_p, y_p = self.kalman.get_position()
-        guess = guesser(npimage, x_p, y_p, self.radius, kalman = self.kalman)
+        guess = guesser(npimage, x_p, y_p, self.radius)
         if guess is not None:
             x_th, y_th, guess_cov = guess
             # spot in validation region?  (based on residual covariance)
@@ -77,7 +79,7 @@ class Tracker:
             else:
                 self.kalman.update([x_th, y_th], guess_cov)
         x, y = self.kalman.get_position()
-        intensity = calc_intensity(npimage, x, y, self.radius)
+        intensity = calc_intensity(npimage, x, y, self.radius, background_substraction = config.Processing_backgroundSubstractionOn)
         return x, y, intensity, energy, self.radius
 
 def guess_from_Gaussian(image, *args, **kwargs):
@@ -120,19 +122,20 @@ def guess_from_Gaussian(image, *args, **kwargs):
     y_res = p_opt[2]
     return (x_res, y_res), p_cov
 
-def guesser(npimage, x_in, y_in, radius, func = eval(config.Tracking_guessFunc), max_radius = 20, kalman = None, default_cov=np.diag([2, 2])):
+def guesser(npimage, x_in, y_in, radius, func = eval(config.Tracking_guessFunc), fit_region_factor = config.Tracking_fitRegionFactor):
     def failure(reason):
         logger.info("no guess, because " + reason)
         print reason
         return None
+
+    # try to get patch from image around estimated position
     try:
-        factor = 1.0
-        x_min, x_max, y_min, y_max = adjust_slice(npimage, x_in - factor * radius, x_in + factor * radius + 1,
-                                     y_in - factor * radius, y_in + factor * radius + 1)
+        x_min, x_max, y_min, y_max = adjust_slice(npimage, x_in - fit_region_factor * radius, x_in + fit_region_factor * radius + 1,
+                                     y_in - fit_region_factor * radius, y_in + fit_region_factor * radius + 1)
     except IndexError:
        return failure("position outside image")
-   
     image = npimage[y_min : y_max, x_min : x_max]
+
     result = func(image, x_mid = x_in - x_min, y_mid = y_in - y_min, size = radius)
     if result is None:
         return failure("fit failed")
@@ -140,7 +143,7 @@ def guesser(npimage, x_in, y_in, radius, func = eval(config.Tracking_guessFunc),
     y_res, x_res = pos
     x_res += x_min
     y_res += y_min
-    
+
     return x_res, y_res, cov
     
 def gaussian2d(height, center_x, center_y, width_x, width_y = None,
@@ -213,16 +216,16 @@ def calc_distances(shape, x, y, squared = True):
     squared: return the squared distance (default: True)
     """
     yind, xind = np.indices(shape)
-    distances = ((yind - y)**2 + (xind - x)**2)
+    distSquare = ((yind - y)**2 + (xind - x)**2)
     if not squared:
-        distances = distances**.5
-    return distances
+        return distSquare**.5
+    return distSquare
 
 def signal_to_background(npimage, x, y, radius):
-    distances = calc_distances(npimage.shape, x, y)
-    signal = np.mean(npimage[distances <= radius**2])
+    distSquare = calc_distances(npimage.shape, x, y)
+    signal = np.mean(npimage[distSquare <= radius**2])
     # average background intensity over annulus with equal area
-    background = np.mean(npimage[np.logical_and(distances >= radius**2, distances <= 2 * radius**2)])
+    background = np.mean(npimage[np.logical_and(distSquare >= radius**2, distSquare <= 2 * radius**2)])
     return signal/background
   
 def calc_intensity(npimage, x, y, radius, background_substraction=config.Processing_backgroundSubstractionOn):
@@ -233,32 +236,12 @@ def calc_intensity(npimage, x, y, radius, background_substraction=config.Process
         radius: radius of the spot
         background_substraction: boolean to turn substraction on/off
     """
-    yind, xind = np.indices(npimage.shape)
-    distances = ((yind - y)**2 + (xind - x)**2)
-    intensities = npimage[distances <= radius**2]
-    intensity, area = np.sum(intensities), len(intensities)
+    distSquare = calc_distances(npimage.shape, x, y, squared = True)
+    intensities = npimage[distSquare <= radius**2]
+    intensity = np.sum(intensities)
     if background_substraction:
         # average background intensity over annulus with approximately equal area
-        background_intensities = npimage[np.logical_and(distances >= radius**2, distances <= 2 * radius**2)]
+        background_intensities = npimage[np.logical_and(distSquare >= radius**2, distSquare <= 2 * radius**2)]
+        area = len(intensities)
         intensity -= np.mean(background_intensities) * area
     return intensity
-
-def flatten(l, ltypes=(list, tuple)):
-    """ Flatten a nested array.
-
-    This is from Mike C. Fletcher's BasicTypes library altered by MonkeeSage
-    http://rightfootin.blogspot.com/2006/09/more-on-python-flatten.html
-    """
-    ltype = type(l)
-    l = list(l)
-    i = 0
-    while i < len(l):
-        while isinstance(l[i], ltypes):
-            if not l[i]:
-                l.pop(i)
-                i -= 1
-                break
-            else:
-                l[i:i + 1] = l[i]
-        i += 1
-    return ltype(l)

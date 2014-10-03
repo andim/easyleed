@@ -14,7 +14,7 @@ from PyQt4.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
 from PyQt4.QtGui import (QApplication, QMainWindow, QGraphicsView,
     QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
     QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsRectItem, QGraphicsItem,
-    QGraphicsSimpleTextItem,
+    QGraphicsSimpleTextItem, QToolButton,
     QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
     QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox,
     QComboBox, QLineEdit, QMessageBox, QPixmap)
@@ -301,11 +301,11 @@ class AboutWidget(QWidget):
         self.label.setOpenExternalLinks(True);
         self.verticalLayout.addWidget(self.label)
 
-class Plot(QWidget):
+class PlotWidget(QWidget):
     """ Custom PyQt widget canvas for plotting """
 
     def __init__(self):
-        super(Plot, self).__init__()
+        super(PlotWidget, self).__init__()
         self.setWindowTitle("I(E)-curve")
         self.create_main_frame()
     
@@ -381,14 +381,21 @@ class Plot(QWidget):
 
     def close(self):
         self.axes.cla()
-        super(Plot, self).close()
+        super(PlotWidget, self).close()
 
-class SetParameters(QWidget): 
+    def save(self):
+        """ Saving the plot """
+        # savefile prompt
+        filename = str(QFileDialog.getSaveFileName(self, "Save the plot to a file"))
+        if filename:
+            self.fig.savefig(filename)
+
+class ParameterSettingWidget(QWidget): 
     """PyQt widget for setting tracking parameters"""
  
     
     def __init__(self):
-        super(SetParameters, self).__init__()
+        super(ParameterSettingWidget, self).__init__()
         self.initUI()
         
     def initUI(self):
@@ -437,21 +444,19 @@ class SetParameters(QWidget):
         self.siLabel = QLabel("Spot identification algorithm", self)
 
         self.fnLabel = QLabel("Kalman tracker process noise Q", self)
-        self.text = QLabel("Sets diagonal values of covariance matrix", self)
-        self.value1 = QLineEdit(self)
-        self.value1.setText(str(config.Tracking_processNoise.diagonal()[0]))
-        self.value2 = QLineEdit(self)
-        self.value2.setText(str(config.Tracking_processNoise.diagonal()[1]))
-        self.value3 = QLineEdit(self)
-        self.value3.setText(str(config.Tracking_processNoise.diagonal()[2]))
-        self.value4 = QLineEdit(self)
-        self.value4.setText(str(config.Tracking_processNoise.diagonal()[3]))
+        self.processNoisePosition = QDoubleSpinBox(self)
+        self.processNoisePosition.setSingleStep(0.1)
+        self.processNoisePosition.setValue(config.Tracking_processNoisePosition)
+        self.processNoisePositionLabel = QLabel("Position", self)
+        self.processNoiseVelocity = QDoubleSpinBox(self)
+        self.processNoiseVelocity.setSingleStep(0.1)
+        self.processNoiseVelocity.setValue(config.Tracking_processNoiseVelocity)
+        self.processNoiseVelocityLabel = QLabel("Velocity", self)
 
         self.saveButton = QPushButton('&Save', self)
         self.loadButton = QPushButton('&Load', self)
         self.defaultButton = QPushButton('&Default', self)
         self.wrongLabel = QLabel(" ", self)
-        self.acceptButton = QPushButton('&Accept', self)
         self.applyButton = QPushButton('&Apply', self)
         self.cancelButton = QPushButton('&Cancel', self)
 
@@ -495,12 +500,11 @@ class SetParameters(QWidget):
         self.rvLayout.addWidget(self.siLabel)
         self.rvLayout.addWidget(self.spotIdentification)
         self.rvLayout.addWidget(self.fnLabel)
-        self.rvLayout.addWidget(self.text)
         self.hpLayout = QHBoxLayout()
-        self.rvLayout.addWidget(self.value1)
-        self.rvLayout.addWidget(self.value2)
-        self.rvLayout.addWidget(self.value3)
-        self.rvLayout.addWidget(self.value4)
+        self.rvLayout.addWidget(self.processNoisePositionLabel)
+        self.rvLayout.addWidget(self.processNoisePosition)
+        self.rvLayout.addWidget(self.processNoiseVelocityLabel)
+        self.rvLayout.addWidget(self.processNoiseVelocity)
 
         #horizontal layout left
         self.hLayout = QHBoxLayout()
@@ -512,7 +516,6 @@ class SetParameters(QWidget):
         #horizontal layout right
         self.h2Layout = QHBoxLayout()
         self.h2Layout.addWidget(self.applyButton)
-        self.h2Layout.addWidget(self.acceptButton)
         self.h2Layout.addWidget(self.cancelButton)
 
         #adding layouts to the grid
@@ -523,6 +526,72 @@ class SetParameters(QWidget):
         self.gridLayout.addLayout(self.h2Layout, 3, 2)
         self.gridLayout.addLayout(self.vlineLayout, 0,1,3,1)
 
+        QObject.connect(self.applyButton, SIGNAL("clicked()"), self.applyParameters)
+        QObject.connect(self.defaultButton, SIGNAL("clicked()"), self.defaultValues)
+        QObject.connect(self.saveButton, SIGNAL("clicked()"), self.saveValues)
+        QObject.connect(self.loadButton, SIGNAL("clicked()"), self.loadValues)
+
+    def applyParameters(self):
+        """Parameter setting control"""
+        config.Tracking_inputPrecision = self.inputPrecision.value()
+        config.Tracking_windowScalingOn = self.integrationWindowScale.isChecked()
+        config.Tracking_minWindowSize = self.integrationWindowRadius.value()
+        config.GraphicsScene_defaultRadius = self.integrationWindowRadiusNew.value()
+        config.Tracking_minWindowSize = self.integrationWindowRadius.value()
+        config.Tracking_guessFunc = self.spotIdentification.currentText()
+        config.Tracking_gamma = self.validationRegionSize.value()
+        config.Tracking_minRsq = self.determinationCoefficient.value()
+        config.Processing_backgroundSubstractionOn = self.backgroundSubstraction.isChecked()
+        config.GraphicsScene_livePlottingOn = self.livePlotting.isChecked()
+        config.GraphicsScene_intensTimeOn = self.intensTime.isChecked()
+        config.Tracking_processNoisePosition = self.processNoisePosition.value()
+        config.Tracking_processNoiseVelocity = self.processNoiseVelocity.value()
+
+    def defaultValues(self):
+        """Reload config-module and get the default values"""
+        reload(config)
+        self.inputPrecision.setValue(config.Tracking_inputPrecision)
+        self.integrationWindowRadiusNew.setValue(config.GraphicsScene_defaultRadius)
+        self.integrationWindowRadius.setValue(config.Tracking_minWindowSize)
+        self.validationRegionSize.setValue(config.Tracking_gamma)
+        self.determinationCoefficient.setValue(config.Tracking_minRsq)
+        self.integrationWindowScale.setChecked(config.Tracking_windowScalingOn)
+        self.backgroundSubstraction.setChecked(config.Processing_backgroundSubstractionOn)
+        self.processNoisePosition.setValue(self.Tracking_processNoisePosition)
+        self.processNoiseVelocity.setValue(self.Tracking_processNoiseVelocity)
+        self.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
+
+    def saveValues(self):
+        """ Basic saving of the set parameter values to a file """
+        pass
+#        filename = str(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
+#        if filename:
+#            output = open(filename, 'w')
+#            writelist = [self.inputPrecision.value(), self.integrationWindowScale.isChecked(), self.integrationWindowRadius.value(), self.spotIdentification.currentText(), self.validationRegionSize.value(), self.determinationCoefficient.value(), self.backgroundSubstraction.isChecked(), backgroundsublist,self.livePlotting.isChecked()]
+#            pickle.dump(writelist, output)
+
+    def loadValues(self):
+        """ Load a file of set parameter values that has been saved with the widget """
+        pass
+        #namefile = str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
+        #try:
+        #    loadput = open(namefile, 'r')
+        #    loadlist = pickle.load(loadput)
+        #    self.inputPrecision.setValue(loadlist[0])
+        #    self.integrationWindowScale.setChecked(loadlist[1])
+        #    self.integrationWindowRadius.setValue(loadlist[2])
+        #    self.spotIdentification.setCurrentIndex(self.spotIdentification.findText(loadlist[3]))
+        #    self.validationRegionSize.setValue(loadlist[4])
+        #    self.determinationCoefficient.setValue(loadlist[5])
+        #    self.backgroundSubstraction.setChecked(loadlist[6])
+        #    self.value1.setText(str(loadlist[7][0]))
+        #    self.value2.setText(str(loadlist[7][1]))
+        #    self.value3.setText(str(loadlist[7][2]))
+        #    self.value4.setText(str(loadlist[7][3]))
+        #    self.livePlotting.setChecked(loadlist[8])
+        #except:
+        #    print "Invalid file"
+
 class MainWindow(QMainWindow):
     """ EasyLEED's main window. """
     def __init__(self, parent=None):
@@ -531,8 +600,8 @@ class MainWindow(QMainWindow):
 
         #### setup central widget ####
         self.aboutwid = AboutWidget()
-        self.plotwid = Plot()
-        self.setparameterswid = SetParameters()
+        self.plotwid = PlotWidget()
+        self.parametersettingwid = ParameterSettingWidget()
         self.scene = GraphicsScene(self)
         self.view = GraphicsView()
         self.view.setScene(self.scene)
@@ -562,7 +631,7 @@ class MainWindow(QMainWindow):
         processPlotOptions = self.createAction("&Plot...", self.plot,
                 QKeySequence("Ctrl+d"), None,
                 "Plot Intensities.")
-        processSetParameters = self.createAction("&Set Parameters", self.setParameters,
+        processSetParameters = self.createAction("&Set Parameters", self.parametersettingwid.show,
                 None, None,
                 "Set tracking parameters.")
         self.processRemoveSpot = self.createAction("&Remove Spot", self.removeLastSpot,
@@ -578,7 +647,7 @@ class MainWindow(QMainWindow):
                 "Save the calculated intensities to a text file.")
                 
         # actions to "File" menu
-        self.fileSavePlotAction = self.createAction("&Save plot...", self.savePlot,
+        self.fileSavePlotAction = self.createAction("&Save plot...", self.plotwid.save,
                 QKeySequence("Ctrl+a"), None,
                 "Save the plot to a pdf file.")
         # Will only enable plot saving after there is a plot to be saved
@@ -601,7 +670,7 @@ class MainWindow(QMainWindow):
         self.helpAction = self.createAction("&Help", self.helpBoxShow,
                 None, None,
                 "Show help")
-        self.aboutAction = self.createAction("&About", self.aboutBoxShow,
+        self.aboutAction = self.createAction("&About", self.aboutwid.show,
                 None, None,
                 "About EasyLEED")
         self.helpActions = [None, self.helpAction, None, self.aboutAction]
@@ -630,8 +699,10 @@ class MainWindow(QMainWindow):
         self.statusBar().showMessage("Ready", 5000)
 
         ### Create previous and next buttons
-        self.prevButton = QPushButton('&<', self)
-        self.nextButton = QPushButton('&>', self)
+        self.prevButton = QToolButton(self)
+        self.prevButton.setArrowType(Qt.LeftArrow)
+        self.nextButton = QToolButton(self)
+        self.nextButton.setArrowType(Qt.RightArrow)
         self.prevButton.setEnabled(False)
         self.nextButton.setEnabled(False)
         
@@ -849,104 +920,6 @@ class MainWindow(QMainWindow):
     def helpBoxShow(self):
         webbrowser.open("http://andim.github.io/easyleed/userdoc.html")
 
-    def aboutBoxShow(self):
-        self.aboutwid.show()
-
-    def setParameters(self):
-
-        QObject.connect(self.setparameterswid.acceptButton, SIGNAL("clicked()"), self.acceptParameters)
-        QObject.connect(self.setparameterswid.applyButton, SIGNAL("clicked()"), self.applyParameters)
-        QObject.connect(self.setparameterswid.defaultButton, SIGNAL("clicked()"), self.defaultValues)
-        QObject.connect(self.setparameterswid.saveButton, SIGNAL("clicked()"), self.saveValues)
-        QObject.connect(self.setparameterswid.loadButton, SIGNAL("clicked()"), self.loadValues)
-
-        self.setparameterswid.show()
-
-    def setAllParameters(self):
-        """Parameter setting control"""
-        config.Tracking_inputPrecision = self.setparameterswid.inputPrecision.value()
-        config.Tracking_windowScalingOn = self.setparameterswid.integrationWindowScale.isChecked()
-        config.Tracking_minWindowSize = self.setparameterswid.integrationWindowRadius.value()
-        config.GraphicsScene_defaultRadius = self.setparameterswid.integrationWindowRadiusNew.value()
-        config.Tracking_minWindowSize = self.setparameterswid.integrationWindowRadius.value()
-        config.Tracking_guessFunc = self.setparameterswid.spotIdentification.currentText()
-        config.Tracking_gamma = self.setparameterswid.validationRegionSize.value()
-        config.Tracking_minRsq = self.setparameterswid.determinationCoefficient.value()
-        config.Processing_backgroundSubstractionOn = self.setparameterswid.backgroundSubstraction.isChecked()
-        config.GraphicsScene_livePlottingOn = self.setparameterswid.livePlotting.isChecked()
-        config.GraphicsScene_intensTimeOn = self.setparameterswid.intensTime.isChecked()
-
-    def acceptParameters(self):
-        """Set user values to the parameters"""
-        self.setAllParameters()
-        try:
-            self.noiseList = [float(self.setparameterswid.value1.text()), float(self.setparameterswid.value2.text()), float(self.setparameterswid.value3.text()), float(self.setparameterswid.value4.text())]
-            config.Tracking_processNoise = np.diag(self.noiseList)
-            self.setparameterswid.close()
-        except ValueError:
-            self.setparameterswid.setText.wrongLabel("Invalid process noise value")
-
-    def applyParameters(self):
-        """Set user values to the parameters"""
-        self.setAllParameters()
-        try:
-            self.noiseList = [float(self.setparameterswid.value1.text()), float(self.setparameterswid.value2.text()), float(self.setparameterswid.value3.text()), float(self.setparameterswid.value4.text())]
-            config.Tracking_processNoise = np.diag(self.noiseList)
-        except ValueError:
-            self.setparameterswid.setText.wrongLabel("Invalid process noise value")
-
-    def defaultValues(self):
-        """Reload config-module and get the default values"""
-        reload(config)
-        self.setparameterswid.inputPrecision.setValue(config.Tracking_inputPrecision)
-        self.setparameterswid.integrationWindowRadiusNew.setValue(config.GraphicsScene_defaultRadius)
-        self.setparameterswid.integrationWindowRadius.setValue(config.Tracking_minWindowSize)
-        self.setparameterswid.validationRegionSize.setValue(config.Tracking_gamma)
-        self.setparameterswid.determinationCoefficient.setValue(config.Tracking_minRsq)
-        self.setparameterswid.integrationWindowScale.setChecked(config.Tracking_windowScalingOn)
-        self.setparameterswid.backgroundSubstraction.setChecked(config.Processing_backgroundSubstractionOn)
-        self.setparameterswid.value1.setText(str(config.Tracking_processNoise.diagonal()[0]))
-        self.setparameterswid.value2.setText(str(config.Tracking_processNoise.diagonal()[1]))
-        self.setparameterswid.value3.setText(str(config.Tracking_processNoise.diagonal()[2]))
-        self.setparameterswid.value4.setText(str(config.Tracking_processNoise.diagonal()[3]))
-        self.setparameterswid.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
-
-    def saveValues(self):
-        """ Basic saving of the set parameter values to a file """
-        filename = str(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
-        if filename:
-            output = open(filename, 'w')
-            backgroundsublist = [float(self.setparameterswid.value1.text()), float(self.setparameterswid.value2.text()), float(self.setparameterswid.value3.text()), float(self.setparameterswid.value4.text())]
-            writelist = [self.setparameterswid.inputPrecision.value(), self.setparameterswid.integrationWindowScale.isChecked(), self.setparameterswid.integrationWindowRadius.value(), self.setparameterswid.spotIdentification.currentText(), self.setparameterswid.validationRegionSize.value(), self.setparameterswid.determinationCoefficient.value(), self.setparameterswid.backgroundSubstraction.isChecked(), backgroundsublist,self.setparameterswid.livePlotting.isChecked()]
-            pickle.dump(writelist, output)
-
-    def loadValues(self):
-        """ Load a file of set parameter values that has been saved with the widget """
-        namefile = str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
-        try:
-            loadput = open(namefile, 'r')
-            loadlist = pickle.load(loadput)
-            self.setparameterswid.inputPrecision.setValue(loadlist[0])
-            self.setparameterswid.integrationWindowScale.setChecked(loadlist[1])
-            self.setparameterswid.integrationWindowRadius.setValue(loadlist[2])
-            self.setparameterswid.spotIdentification.setCurrentIndex(self.setparameterswid.spotIdentification.findText(loadlist[3]))
-            self.setparameterswid.validationRegionSize.setValue(loadlist[4])
-            self.setparameterswid.determinationCoefficient.setValue(loadlist[5])
-            self.setparameterswid.backgroundSubstraction.setChecked(loadlist[6])
-            self.setparameterswid.value1.setText(str(loadlist[7][0]))
-            self.setparameterswid.value2.setText(str(loadlist[7][1]))
-            self.setparameterswid.value3.setText(str(loadlist[7][2]))
-            self.setparameterswid.value4.setText(str(loadlist[7][3]))
-            self.setparameterswid.livePlotting.setChecked(loadlist[8])
-        except:
-            print "Invalid file"
-       
-    def savePlot(self):
-        """ Saving the plot """
-        # savefile prompt
-        filename = str(QFileDialog.getSaveFileName(self, "Save the plot to a file"))
-        if filename:
-		    self.plotwid.fig.savefig(filename)
 
     def saveScreenShot(self):
         """ Save Screenshot """
