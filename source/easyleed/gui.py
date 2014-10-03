@@ -301,11 +301,11 @@ class AboutWidget(QWidget):
         self.label.setOpenExternalLinks(True);
         self.verticalLayout.addWidget(self.label)
 
-class Plot(QWidget):
+class PlotWidget(QWidget):
     """ Custom PyQt widget canvas for plotting """
 
     def __init__(self):
-        super(Plot, self).__init__()
+        super(PlotWidget, self).__init__()
         self.setWindowTitle("I(E)-curve")
         self.create_main_frame()
     
@@ -381,14 +381,14 @@ class Plot(QWidget):
 
     def close(self):
         self.axes.cla()
-        super(Plot, self).close()
+        super(PlotWidget, self).close()
 
-class SetParameters(QWidget): 
+class ParameterSettingWidget(QWidget): 
     """PyQt widget for setting tracking parameters"""
  
     
     def __init__(self):
-        super(SetParameters, self).__init__()
+        super(ParameterSettingWidget, self).__init__()
         self.initUI()
         
     def initUI(self):
@@ -531,8 +531,8 @@ class MainWindow(QMainWindow):
 
         #### setup central widget ####
         self.aboutwid = AboutWidget()
-        self.plotwid = Plot()
-        self.setparameterswid = SetParameters()
+        self.plotwid = PlotWidget()
+        self.setparameterswid = ParameterSettingWidget()
         self.scene = GraphicsScene(self)
         self.view = GraphicsView()
         self.view.setScene(self.scene)
