@@ -239,9 +239,8 @@ class GraphicsScene(QGraphicsScene):
         if not hasattr(self, 'imlabel'):
             self.imlabel = QGraphicsSimpleTextItem(labeltext)
             self.imlabel.setBrush(QBrush(Qt.white))
-            #self.imlabel.setPen(QPen(Qt.white))
             self.imlabel.setPos(5, 5)
-            self.addItem(self.imlabel)
+        self.addItem(self.imlabel)
         self.imlabel.setText(labeltext)
         self.image = image
         self.update()
