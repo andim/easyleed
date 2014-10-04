@@ -596,6 +596,8 @@ class ParameterSettingWidget(QWidget):
 
 class MainWindow(QMainWindow):
     """ EasyLEED's main window. """
+    
+    sliderCurrentPos = 1
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setWindowTitle("EasyLEED %s" % __version__)
@@ -610,8 +612,6 @@ class MainWindow(QMainWindow):
         self.view.setMinimumSize(660, 480)
         self.setGeometry(10, 10, 660, 480)
         self.setCentralWidget(self.view)
-        global sliderCurrentPos
-        sliderCurrentPos = 1
         
         #### define actions ####
         processRunAction = self.createAction("&Run", self.run,
@@ -728,10 +728,9 @@ class MainWindow(QMainWindow):
         This function tracks what to do with a slider movement.
             
         """
-        global sliderCurrentPos
         self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
 
-        diff = sliderCurrentPos - sliderNewPos
+        diff = self.sliderCurrentPos - sliderNewPos
         if diff > 0:
             for i in range(0, diff):
                 self.previous()
@@ -740,7 +739,7 @@ class MainWindow(QMainWindow):
             for i in range(diff, 0):
                 self.next_()
                 self.worker.process(self.loader.this())
-        sliderCurrentPos = sliderNewPos
+        self.sliderCurrentPos = sliderNewPos
 
     def prevBtnClicked(self):
         self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
@@ -808,7 +807,8 @@ class MainWindow(QMainWindow):
         self.loader.restart()
         self.setImage(self.loader.next())
         self.plotwid.close()
-        sliderCurrentPos = self.slider.setValue(1)
+        self.sliderCurrentPos = 1
+        self.slider.setValue(1)
 
     def setImage(self, image):
         npimage, energy = image
@@ -845,7 +845,7 @@ class MainWindow(QMainWindow):
                 self.nextButton.setEnabled(True)
                 self.slider.setEnabled(True)
                 self.fileSaveScreenAction.setEnabled(True)
-                sliderCurrentPos = self.slider.setValue(1)
+                selfsliderCurrentPos = self.slider.setValue(1)
             except IOError, err:
                 self.statusBar().showMessage('IOError: ' + str(err), 5000)
 
@@ -863,8 +863,6 @@ class MainWindow(QMainWindow):
         self.fileSavePlotAction.setEnabled(True)
 
     def run(self):
-        global sliderCurrentPos
-
         if len(self.scene.spots) == 0:
             self.statusBar().showMessage("No integration window selected.", 5000)
         else:
@@ -904,8 +902,8 @@ class MainWindow(QMainWindow):
                 QApplication.processEvents()
                 if config.GraphicsScene_livePlottingOn == True:
                     self.plotwid.updatePlot()
-                sliderCurrentPos = sliderCurrentPos + 1
-                self.slider.setValue(sliderCurrentPos)
+                self.sliderCurrentPos = self.sliderCurrentPos + 1
+                self.slider.setValue(self.sliderCurrentPos)
 
             self.view.setInteractive(True)
             self.slider.setEnabled(True)
