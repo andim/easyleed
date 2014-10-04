@@ -352,8 +352,8 @@ class PlotWidget(QWidget):
         self.lines_map = {}
         for spot in self.worker.spots_map:
             self.lines_map[spot], = self.axes.plot([], [])
-        # show line at y = 0
-        self.axes.axhline(0.0)
+        # show dashed line at y = 0
+        self.axes.axhline(0.0, color = 'k', ls = '--')
         # try to auto-adjust plot margins (might not be available in all matplotlib versions)
         try:
             self.fig.tight_layout()
