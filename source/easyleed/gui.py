@@ -25,6 +25,7 @@ from . import __version__
 from . import __author__
 from base import *
 from io import *
+from scipy import interpolate
 
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
@@ -313,7 +314,7 @@ class PlotWidget(QWidget):
     def create_main_frame(self):       
         """ Create the mpl Figure and FigCanvas objects. """
         # 5x4 inches, 100 dots-per-inch
-        self.setGeometry(700, 450, 600, 400)
+        self.setGeometry(700, 450, 600, 450)
         self.dpi = 100
         self.fig = Figure((5.0, 4.0), dpi=self.dpi)
         self.axes = self.fig.add_subplot(111)
@@ -327,16 +328,27 @@ class PlotWidget(QWidget):
         # Add checkbox for average
         self.averageCheck = QCheckBox("Average")
         self.averageCheck.setChecked(config.GraphicsScene_plotAverage)
-
+        # Add checkbox for smooth average
+        self.smoothCheck = QCheckBox("Smooth Average")
+        self.smoothCheck.setChecked(config.GraphicsScene_plotSmoothAverage)
+        
         # Layout
         vbox = QVBoxLayout()
         vbox.addWidget(self.mpl_toolbar)
         vbox.addWidget(self.canvas)
         vbox.addWidget(self.averageCheck)
+        vbox.addWidget(self.smoothCheck)
         self.setLayout(vbox)
 
         # Define events for checkbox
         QObject.connect(self.averageCheck, SIGNAL("clicked()"), self.updatePlot)
+        QObject.connect(self.smoothCheck, SIGNAL("clicked()"), self.updatePlot)
+    
+    def setAverageChecks(self):
+        if self.averageCheck.isChecked():
+            self.smoothCheck.setEnabled(True)
+        else:
+            self.smoothCheck.setEnabled(False)
 
     def setupPlot(self, worker):
         # Setup axis, labels, lines, ...
@@ -354,6 +366,8 @@ class PlotWidget(QWidget):
         # set up averageLine
         if not hasattr(self, 'averageLine'):
             self.averageLine = []
+        if not hasattr(self, 'averageSmoothLine'):
+            self.averageSmoothLine = []
         # show dashed line at y = 0
         self.axes.axhline(0.0, color = 'k', ls = '--')
         # try to auto-adjust plot margins (might not be available in all matplotlib versions)
@@ -367,19 +381,37 @@ class PlotWidget(QWidget):
     def updatePlot(self):
         """ Basic Matplotlib plotting I(E)-curve """
         # update data
+        self.setAverageChecks()
         for spot, line in self.lines_map.iteritems():
             line.set_data(self.worker.spots_map[spot][0].m.energy, self.worker.spots_map[spot][0].m.intensity)
         if self.averageCheck.isChecked():
             self.averageLine, = self.axes.plot([], [], 'k', lw = 2, label = 'Average')
             intensity = np.zeros(self.worker.numProcessed())
+            ynew = np.zeros(self.worker.numProcessed())
+            tck = np.zeros(self.worker.numProcessed())
+            
             for model, tracker in self.worker.spots_map.itervalues():
                 intensity += model.m.intensity
             intensity /= len(self.worker.spots_map)
-            self.averageLine.set_data(model.m.energy, intensity)
+            
+            if self.smoothCheck.isChecked():
+                self.averageSmoothLine, = self.axes.plot([], [], 'b', lw = 2, label = 'Smooth Average')
+
+                tck = interpolate.splrep(model.m.energy, intensity, s=self.parametersettingwid.smoothSpline)
+                xnew = np.arange(model.m.energy[0], model.m.energy[-1],
+                                 (model.m.energy[1]-model.m.energy[0])*self.parametersettingwid.smoothPoints)
+                ynew = interpolate.splev(xnew, tck, der=0)
+                self.averageSmoothLine.set_data(xnew, ynew)
+            else:
+                for line in self.axes.lines:
+                    if line.get_label()=='Smooth Average':
+                        self.axes.lines.remove(line)
+                self.averageLine.set_data(model.m.energy, intensity)
         else:
-            for line in self.axes.lines:
-                if line.get_label()=='Average':
-                    self.axes.lines.remove(line)
+                for line in self.axes.lines:
+                    if line.get_label()=='Average':
+                        self.axes.lines.remove(line)
+        
         # ... axes limits
         self.axes.relim()
         self.axes.autoscale_view(True,True,True)
@@ -445,6 +477,16 @@ class ParameterSettingWidget(QWidget):
         
         self.intensTime = QCheckBox("Extract I(time) - fixed energy")
         self.intensTime.setChecked(config.GraphicsScene_intensTimeOn)
+        
+        self.smoothPoints = QSpinBox(self)
+        self.smoothPoints.setWrapping(True)
+        self.smoothPoints.setValue(config.GraphicsScene_smoothPoints)
+        self.smPoiLabel = QLabel("Interval of points to be rescaled for smoothing average", self)
+        
+        self.smoothSpline = QSpinBox(self)
+        self.smoothSpline.setWrapping(True)
+        self.smoothSpline.setValue(config.GraphicsScene_smoothSpline)
+        self.smSplLabel = QLabel("Amount of smoothing to perform", self)
 
         self.spotIdentification = QComboBox(self)
         self.spotIdentification.addItem("guess_from_Gaussian")
@@ -471,6 +513,8 @@ class ParameterSettingWidget(QWidget):
         self.vertLine.setFrameStyle(QFrame.HLine)
         self.horLine = QFrame()
         self.horLine.setFrameStyle(QFrame.HLine)
+        self.horLine2 = QFrame()
+        self.horLine2.setFrameStyle(QFrame.HLine)
 
         #Layouts
         self.setGeometry(700, 0, 300, 150)
@@ -499,11 +543,16 @@ class ParameterSettingWidget(QWidget):
 
         #2nd (right) vertical layout
         self.rvLayout = QVBoxLayout()
+        self.rvLayout.addWidget(self.intensTime)
         self.rvLayout.addWidget(self.integrationWindowScale)
         self.rvLayout.addWidget(self.backgroundSubstraction)
         self.rvLayout.addWidget(self.livePlotting)
-        self.rvLayout.addWidget(self.intensTime)
         self.rvLayout.addWidget(self.horLine)
+        self.rvLayout.addWidget(self.smPoiLabel)
+        self.rvLayout.addWidget(self.smoothPoints)
+        self.rvLayout.addWidget(self.smSplLabel)
+        self.rvLayout.addWidget(self.smoothSpline)
+        self.rvLayout.addWidget(self.horLine2)
         self.rvLayout.addWidget(self.siLabel)
         self.rvLayout.addWidget(self.spotIdentification)
         self.rvLayout.addWidget(self.fnLabel)
@@ -553,6 +602,8 @@ class ParameterSettingWidget(QWidget):
         config.GraphicsScene_intensTimeOn = self.intensTime.isChecked()
         config.Tracking_processNoisePosition = self.processNoisePosition.value()
         config.Tracking_processNoiseVelocity = self.processNoiseVelocity.value()
+        config.GraphicsScene_smoothPoints = self.smoothPoints.value()
+        config.GraphicsScene_smoothSpline = self.smoothSpline.value()
 
     def defaultValues(self):
         """Reload config-module and get the default values"""
@@ -567,6 +618,8 @@ class ParameterSettingWidget(QWidget):
         self.processNoisePosition.setValue(self.Tracking_processNoisePosition)
         self.processNoiseVelocity.setValue(self.Tracking_processNoiseVelocity)
         self.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
+        self.smoothPoints.setValue(config.GraphicsScene_smoothPoints)
+        self.smoothSpline.setValue(config.GraphicsScene_smoothSpline)
 
     def saveValues(self):
         """ Basic saving of the set parameter values to a file """

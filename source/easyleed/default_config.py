@@ -27,6 +27,13 @@ GraphicsScene_livePlottingOn = True
 GraphicsScene_intensTimeOn = False
 # Plot averages
 GraphicsScene_plotAverage = False
+# Plot smoothAverages
+GraphicsScene_plotSmoothAverage = False
+# Interval of points to be rescaled for smoothing average
+GraphicsScene_smoothPoints = 4
+# Amount of smoothing to perform during the spline fit.
+# The default value of s is s=m-\sqrt{2m} where m is the number of data-points being fit.
+GraphicsScene_smoothSpline = 50
 
 ## QGraphicsMovableItem ##
 # change in position per key press (Arrow keys)
