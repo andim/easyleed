@@ -1130,13 +1130,13 @@ class Worker(QObject):
         
         # Save Average intensity (if checkbox selected)
         if self.parent().plotwid.averageCheck.isChecked() == True:
-            intensity = []
+            intensity = np.zeros(self.numProcessed())
             for model, tracker in self.spots_map.itervalues():
                 intensity += model.m.intensity
-            intensity = [i/len(energy[0]) for i in intensity]
+            intensity = [i/len(self.spots_map) for i in intensity]
             zipped = zip(energy[0], intensity)
             np.savetxt(filename + ".average.txt", zipped)
-        
+    
     def saveloc(self, filename):
         # model = QSpotModel object tracker = tracker
         # dict function .itervalues() = return an iterator over the mapping's values
