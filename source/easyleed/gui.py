@@ -514,8 +514,8 @@ class ParameterSettingWidget(QWidget):
         self.cancelButton = QPushButton('&Cancel', self)
         
         # Disable Load and Save Buttons (they are non functional right now)
-        self.saveButton.setEnabled(False)
-        self.loadButton.setEnabled(False)
+        #self.saveButton.setEnabled(False)
+        #self.loadButton.setEnabled(False)
 
         self.vertLine = QFrame()
         self.vertLine.setFrameStyle(QFrame.VLine)
@@ -586,8 +586,8 @@ class ParameterSettingWidget(QWidget):
 
         #horizontal layout left
         self.hLayout = QHBoxLayout()
-        self.hLayout.addWidget(self.saveButton)
         self.hLayout.addWidget(self.loadButton)
+        self.hLayout.addWidget(self.saveButton)
         self.hLayout.addWidget(self.defaultButton)
         self.hLayout.addWidget(self.wrongLabel)
 
@@ -623,6 +623,7 @@ class ParameterSettingWidget(QWidget):
         QObject.connect(self.defaultButton, SIGNAL("clicked()"), self.defaultValues)
         QObject.connect(self.saveButton, SIGNAL("clicked()"), self.saveValues)
         QObject.connect(self.loadButton, SIGNAL("clicked()"), self.loadValues)
+    
 
     def applyParameters(self):
         """Parameter setting control"""
@@ -650,44 +651,52 @@ class ParameterSettingWidget(QWidget):
         self.integrationWindowRadius.setValue(config.Tracking_minWindowSize)
         self.validationRegionSize.setValue(config.Tracking_gamma)
         self.determinationCoefficient.setValue(config.Tracking_minRsq)
-        self.integrationWindowScale.setChecked(config.Tracking_windowScalingOn)
-        self.backgroundSubstraction.setChecked(config.Processing_backgroundSubstractionOn)
-        self.processNoisePosition.setValue(self.Tracking_processNoisePosition)
-        self.processNoiseVelocity.setValue(self.Tracking_processNoiseVelocity)
-        self.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
         self.smoothPoints.setValue(config.GraphicsScene_smoothPoints)
         self.smoothSpline.setValue(config.GraphicsScene_smoothSpline)
+        self.intensTime.setChecked(config.GraphicsScene_intensTimeOn)
+        self.integrationWindowScale.setChecked(config.Tracking_windowScalingOn)
+        self.backgroundSubstraction.setChecked(config.Processing_backgroundSubstractionOn)
+        self.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
+        self.processNoisePosition.setValue(config.Tracking_processNoisePosition)
+        self.processNoiseVelocity.setValue(config.Tracking_processNoiseVelocity)
 
     def saveValues(self):
         """ Basic saving of the set parameter values to a file """
-        pass
-#        filename = str(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
-#        if filename:
-#            output = open(filename, 'w')
-#            writelist = [self.inputPrecision.value(), self.integrationWindowScale.isChecked(), self.integrationWindowRadius.value(), self.spotIdentification.currentText(), self.validationRegionSize.value(), self.determinationCoefficient.value(), self.backgroundSubstraction.isChecked(), backgroundsublist,self.livePlotting.isChecked()]
-#            pickle.dump(writelist, output)
+        filename = str(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
+        if filename:
+            output = open(filename, 'w')
+            writelist = [self.inputPrecision.value(), self.integrationWindowRadiusNew.value(),
+                         self.integrationWindowRadius.value(), self.validationRegionSize.value(),
+                         self.determinationCoefficient.value(), self.smoothPoints.value(),
+                         self.smoothSpline.value(), self.intensTime.isChecked(),
+                         self.integrationWindowScale.isChecked() , self.backgroundSubstraction.isChecked(),
+                         self.livePlotting.isChecked(), self.spotIdentification.currentIndex(),
+                         self.processNoisePosition.value(), self.processNoiseVelocity.value()]
+            pickle.dump(writelist, output)
 
     def loadValues(self):
         """ Load a file of set parameter values that has been saved with the widget """
-        pass
-        #namefile = str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
-        #try:
-        #    loadput = open(namefile, 'r')
-        #    loadlist = pickle.load(loadput)
-        #    self.inputPrecision.setValue(loadlist[0])
-        #    self.integrationWindowScale.setChecked(loadlist[1])
-        #    self.integrationWindowRadius.setValue(loadlist[2])
-        #    self.spotIdentification.setCurrentIndex(self.spotIdentification.findText(loadlist[3]))
-        #    self.validationRegionSize.setValue(loadlist[4])
-        #    self.determinationCoefficient.setValue(loadlist[5])
-        #    self.backgroundSubstraction.setChecked(loadlist[6])
-        #    self.value1.setText(str(loadlist[7][0]))
-        #    self.value2.setText(str(loadlist[7][1]))
-        #    self.value3.setText(str(loadlist[7][2]))
-        #    self.value4.setText(str(loadlist[7][3]))
-        #    self.livePlotting.setChecked(loadlist[8])
-        #except:
-        #    print "Invalid file"
+        namefile = str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
+        try:
+            loadput = open(namefile, 'r')
+            loadlist = pickle.load(loadput)
+            self.inputPrecision.setValue(loadlist[0])
+            self.integrationWindowRadiusNew.setValue(loadlist[1])
+            self.integrationWindowRadius.setValue(loadlist[2])
+            self.validationRegionSize.setValue(loadlist[3])
+            self.determinationCoefficient.setValue(loadlist[4])
+            self.smoothPoints.setValue(loadlist[5])
+            self.smoothSpline.setValue(loadlist[6])
+            self.intensTime.setChecked(loadlist[7])
+            self.integrationWindowScale.setChecked(loadlist[8])
+            self.backgroundSubstraction.setChecked(loadlist[9])
+            self.livePlotting.setChecked(loadlist[10])
+            self.spotIdentification.setCurrentIndex(loadlist[11])
+            self.processNoisePosition.setValue(loadlist[12])
+            self.processNoiseVelocity.setValue(loadlist[13])
+            print "Custom settings restored."
+        except:
+            print "Invalid file"
 
 class MainWindow(QMainWindow):
     """ EasyLEED's main window. """
