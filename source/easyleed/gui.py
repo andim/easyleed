@@ -1073,6 +1073,10 @@ class Worker(QObject):
 
     def __init__(self, spots, center, energy, parent=None):
         super(Worker, self).__init__(parent)
+        
+        #### setup widgets ####
+        self.plotwid = PlotWidget()
+        
         # spots_map:
         # - key: spot
         # - value: SpotModel, Tracker
@@ -1111,17 +1115,27 @@ class Worker(QObject):
         zipped = zip(energy[0], *intensities)
         
         if config.Processing_backgroundSubstractionOn == True:
-            np.savetxt(filename + "_bs.int", zipped)
+            np.savetxt(filename + "_bs.int.txt", zipped)
         else:
-            np.savetxt(filename + "_no-bs.int", zipped)
+            np.savetxt(filename + "_no-bs.int.txt", zipped)
         
         x = [model.m.x for model, tracker \
                 in self.spots_map.itervalues()]
         y = [model.m.y for model, tracker \
                 in self.spots_map.itervalues()]
+                
         x.extend(y)
         zipped = zip(energy[0], *x)
-        np.savetxt(filename + ".pos", zipped)
+        np.savetxt(filename + ".pos.txt", zipped)
+        
+        # Save Average intensity (if checkbox selected)
+        if self.parent().plotwid.averageCheck.isChecked() == True:
+            intensity = []
+            for model, tracker in self.spots_map.itervalues():
+                intensity += model.m.intensity
+            intensity = [i/len(energy[0]) for i in intensity]
+            zipped = zip(energy[0], intensity)
+            np.savetxt(filename + ".average.txt", zipped)
         
     def saveloc(self, filename):
         # model = QSpotModel object tracker = tracker
