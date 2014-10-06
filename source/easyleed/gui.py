@@ -401,9 +401,9 @@ class PlotWidget(QWidget):
             if self.smoothCheck.isChecked():
                 self.averageSmoothLine, = self.axes.plot([], [], 'b', lw = 2, label = 'Smooth Average')
 
-                tck = interpolate.splrep(model.m.energy, intensity, s=self.parametersettingwid.smoothSpline)
+                tck = interpolate.splrep(model.m.energy, intensity, s=config.GraphicsScene_smoothSpline)
                 xnew = np.arange(model.m.energy[0], model.m.energy[-1],
-                                 (model.m.energy[1]-model.m.energy[0])*self.parametersettingwid.smoothPoints)
+                                 (model.m.energy[1]-model.m.energy[0])*config.GraphicsScene_smoothPoints)
                 ynew = interpolate.splev(xnew, tck, der=0)
                 self.averageSmoothLine.set_data(xnew, ynew)
             else:
