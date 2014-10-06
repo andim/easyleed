@@ -508,6 +508,10 @@ class ParameterSettingWidget(QWidget):
         self.wrongLabel = QLabel(" ", self)
         self.applyButton = QPushButton('&Apply', self)
         self.cancelButton = QPushButton('&Cancel', self)
+        
+        # Disable Load and Save Buttons (they are non functional right now)
+        self.saveButton.setEnabled(False)
+        self.loadButton.setEnabled(False)
 
         self.vertLine = QFrame()
         self.vertLine.setFrameStyle(QFrame.VLine)
@@ -553,7 +557,6 @@ class ParameterSettingWidget(QWidget):
         self.lh8Layout = QHBoxLayout()
         self.lh8Layout.addWidget(self.smSplLabel)
         self.lh8Layout.addWidget(self.smoothSpline)
-
 
         #2nd (right) vertical layout
         #self.rvLayout = QVBoxLayout()
