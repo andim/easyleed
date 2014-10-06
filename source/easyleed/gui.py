@@ -511,11 +511,6 @@ class ParameterSettingWidget(QWidget):
         self.defaultButton = QPushButton('&Default', self)
         self.wrongLabel = QLabel(" ", self)
         self.applyButton = QPushButton('&Apply', self)
-        self.cancelButton = QPushButton('&Cancel', self)
-        
-        # Disable Load and Save Buttons (they are non functional right now)
-        #self.saveButton.setEnabled(False)
-        #self.loadButton.setEnabled(False)
 
         self.vertLine = QFrame()
         self.vertLine.setFrameStyle(QFrame.VLine)
@@ -537,7 +532,6 @@ class ParameterSettingWidget(QWidget):
         self.vlineLayout.addWidget(self.vertLine)
 
         #1st (left) vertical layout
-        #self.lvLayout = QVBoxLayout()
         self.lh1Layout = QHBoxLayout()
         self.lh1Layout.addWidget(self.ipLabel)
         self.lh1Layout.addWidget(self.inputPrecision)
@@ -554,16 +548,16 @@ class ParameterSettingWidget(QWidget):
         self.lh5Layout.addWidget(self.dcLabel)
         self.lh5Layout.addWidget(self.determinationCoefficient)
         self.lh6Layout = QHBoxLayout()
-        self.lh6Layout.addWidget(self.horLine)
+        self.lh6Layout.addWidget(self.smPoiLabel)
+        self.lh6Layout.addWidget(self.smoothPoints)
         self.lh7Layout = QHBoxLayout()
-        self.lh7Layout.addWidget(self.smPoiLabel)
-        self.lh7Layout.addWidget(self.smoothPoints)
+        self.lh7Layout.addWidget(self.smSplLabel)
+        self.lh7Layout.addWidget(self.smoothSpline)
         self.lh8Layout = QHBoxLayout()
-        self.lh8Layout.addWidget(self.smSplLabel)
-        self.lh8Layout.addWidget(self.smoothSpline)
+        self.lh8Layout.addWidget(self.horLine)
+
 
         #2nd (right) vertical layout
-        #self.rvLayout = QVBoxLayout()
         self.rh1Layout = QHBoxLayout()
         self.rh1Layout.addWidget(self.intensTime)
         self.rh2Layout = QHBoxLayout()
@@ -573,16 +567,18 @@ class ParameterSettingWidget(QWidget):
         self.rh4Layout = QHBoxLayout()
         self.rh4Layout.addWidget(self.livePlotting)
         self.rh5Layout = QHBoxLayout()
-        self.rh5Layout.addWidget(self.siLabel)
-        self.rh5Layout.addWidget(self.spotIdentification)
+        self.rh5Layout.addWidget(self.horLine2)
         self.rh6Layout = QHBoxLayout()
-        self.rh6Layout.addWidget(self.fnLabel)
+        self.rh6Layout.addWidget(self.siLabel)
+        self.rh6Layout.addWidget(self.spotIdentification)
         self.rh7Layout = QHBoxLayout()
-        self.rh7Layout.addWidget(self.processNoisePositionLabel)
-        self.rh7Layout.addWidget(self.processNoisePosition)
+        self.rh7Layout.addWidget(self.fnLabel)
         self.rh8Layout = QHBoxLayout()
-        self.rh8Layout.addWidget(self.processNoiseVelocityLabel)
-        self.rh8Layout.addWidget(self.processNoiseVelocity)
+        self.rh8Layout.addWidget(self.processNoisePositionLabel)
+        self.rh8Layout.addWidget(self.processNoisePosition)
+        self.rh9Layout = QHBoxLayout()
+        self.rh9Layout.addWidget(self.processNoiseVelocityLabel)
+        self.rh9Layout.addWidget(self.processNoiseVelocity)
 
         #horizontal layout left
         self.hLayout = QHBoxLayout()
@@ -590,11 +586,7 @@ class ParameterSettingWidget(QWidget):
         self.hLayout.addWidget(self.saveButton)
         self.hLayout.addWidget(self.defaultButton)
         self.hLayout.addWidget(self.wrongLabel)
-
-        #horizontal layout right
-        self.h2Layout = QHBoxLayout()
-        self.h2Layout.addWidget(self.applyButton)
-        self.h2Layout.addWidget(self.cancelButton)
+        self.hLayout.addWidget(self.applyButton)
 
         #adding layouts to the grid
         self.gridLayout.addLayout(self.lh1Layout, 0, 0)
@@ -614,10 +606,10 @@ class ParameterSettingWidget(QWidget):
         self.gridLayout.addLayout(self.rh6Layout, 5, 2)
         self.gridLayout.addLayout(self.rh7Layout, 6, 2)
         self.gridLayout.addLayout(self.rh8Layout, 7, 2)
+        self.gridLayout.addLayout(self.rh9Layout, 8, 2)
         
         self.gridLayout.addLayout(self.hLayout, 8, 0)
-        self.gridLayout.addLayout(self.h2Layout, 8, 2)
-        self.gridLayout.addLayout(self.vlineLayout, 0,1,8,1)
+        self.gridLayout.addLayout(self.vlineLayout, 0,1,9,1)
 
         QObject.connect(self.applyButton, SIGNAL("clicked()"), self.applyParameters)
         QObject.connect(self.defaultButton, SIGNAL("clicked()"), self.defaultValues)
