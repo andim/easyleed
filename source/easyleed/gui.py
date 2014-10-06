@@ -184,7 +184,6 @@ class GraphicsScene(QGraphicsScene):
         """
     
         if hasattr(self,"image"):
-        
             if self.itemAt(event.scenePos()):
                 super(GraphicsScene, self).mousePressEvent(event)
             elif event.button() == Qt.LeftButton:
@@ -241,7 +240,8 @@ class GraphicsScene(QGraphicsScene):
             self.imlabel = QGraphicsSimpleTextItem(labeltext)
             self.imlabel.setBrush(QBrush(Qt.white))
             self.imlabel.setPos(5, 5)
-        self.addItem(self.imlabel)
+        if not hasattr(self,"image"):
+            self.addItem(self.imlabel)
         self.imlabel.setText(labeltext)
         self.image = image
         self.update()
