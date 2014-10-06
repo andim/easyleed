@@ -1136,6 +1136,16 @@ class Worker(QObject):
             intensity = [i/len(self.spots_map) for i in intensity]
             zipped = zip(energy[0], intensity)
             np.savetxt(filename + ".average.txt", zipped)
+
+            if self.parent().plotwid.smoothCheck.isChecked():
+                ynew = np.zeros(self.numProcessed())
+                tck = np.zeros(self.numProcessed())
+                tck = interpolate.splrep(model.m.energy, intensity, s=config.GraphicsScene_smoothSpline)
+                xnew = np.arange(model.m.energy[0], model.m.energy[-1],
+                                 (model.m.energy[1]-model.m.energy[0])*config.GraphicsScene_smoothPoints)
+                ynew = interpolate.splev(xnew, tck, der=0)
+                zipped = zip(xnew, ynew)
+                np.savetxt(filename + ".sm-average.txt", zipped)
     
     def saveloc(self, filename):
         # model = QSpotModel object tracker = tracker
