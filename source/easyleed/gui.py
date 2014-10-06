@@ -397,6 +397,7 @@ class PlotWidget(QWidget):
             for model, tracker in self.worker.spots_map.itervalues():
                 intensity += model.m.intensity
             intensity /= len(self.worker.spots_map)
+            self.averageLine.set_data(model.m.energy, intensity)
             
             if self.smoothCheck.isChecked():
                 self.averageSmoothLine, = self.axes.plot([], [], 'b', lw = 2, label = 'Smooth Average')
@@ -410,7 +411,6 @@ class PlotWidget(QWidget):
                 for line in self.axes.lines:
                     if line.get_label()=='Smooth Average':
                         self.axes.lines.remove(line)
-                self.averageLine.set_data(model.m.energy, intensity)
         else:
                 for line in self.axes.lines:
                     if line.get_label()=='Average':
