@@ -194,6 +194,10 @@ class GraphicsScene(QGraphicsScene):
                 item.setSelected(True)
                 self.setFocusItem(item)
                 self.spots.append(item)
+                # Enable spots to be saved when present on the image
+                if len(self.spots) > 0:
+                    self.parent().fileSaveSpotsAction.setEnabled(True)
+
             elif event.button() == Qt.RightButton:
                 if self.center is None:
                     item = QGraphicsCenterItem(event.scenePos(),
@@ -755,11 +759,12 @@ class MainWindow(QMainWindow):
         self.fileSaveSpotsAction = self.createAction("&Save spot locations...", self.saveSpots,
                 QKeySequence("Ctrl+t"), None,
                 "Save the spots to a file.")
-        # Enables when data to be saved
-        self.fileSaveSpotsAction.setEnabled(False)
         self.fileLoadSpotsAction = self.createAction("&Load spot locations...", self.loadSpots,
                 QKeySequence("Ctrl+l"), None,
                 "Load spots from a file.")
+        # Disable when program starts.
+        self.fileSaveSpotsAction.setEnabled(False)
+        self.fileLoadSpotsAction.setEnabled(False)
         self.helpAction = self.createAction("&Help", self.helpBoxShow,
                 None, None,
                 "Show help")
@@ -900,7 +905,8 @@ class MainWindow(QMainWindow):
         self.plotwid.close()
         self.sliderCurrentPos = 1
         self.slider.setValue(1)
-
+        self.fileSaveSpotsAction.setEnabled(False)
+    
     def setImage(self, image):
         npimage, energy = image
         qimage = npimage2qimage(npimage)
@@ -936,6 +942,7 @@ class MainWindow(QMainWindow):
                 self.nextButton.setEnabled(True)
                 self.slider.setEnabled(True)
                 self.fileSaveScreenAction.setEnabled(True)
+                self.fileLoadSpotsAction.setEnabled(True)
                 selfsliderCurrentPos = self.slider.setValue(1)
             except IOError, err:
                 self.statusBar().showMessage('IOError: ' + str(err), 5000)
@@ -944,6 +951,8 @@ class MainWindow(QMainWindow):
         if len(self.scene.items(0)) > 1:
             self.scene.spots.remove(self.scene.spots[-1])
             self.scene.removeItem(self.scene.items(0)[-1])
+        if len(self.scene.items(0)) == 1:
+            self.fileSaveSpotsAction.setEnabled(False)
 
     def stopProcessing(self):
         self.stopped = True
