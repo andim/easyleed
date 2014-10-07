@@ -753,7 +753,7 @@ class MainWindow(QMainWindow):
         # Will only enable plot saving after there is a plot to be saved
         self.fileSavePlotAction.setEnabled(False)
         self.fileSaveScreenAction = self.createAction("&Save screenshot...", self.saveScreenShot,
-                QKeySequence("Ctrl+d"), None,
+                QKeySequence("Ctrl+f"), None,
                 "Save image to a file.")
         self.fileSaveScreenAction.setEnabled(False)
         self.fileQuitAction = self.createAction("&Quit", self.fileQuit,
