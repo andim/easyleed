@@ -18,6 +18,7 @@ Changelog since version 1.0
 - Average intensities can be now plotted “on the fly” using a checkbox in the Plot.
 - Smoothed (cubic spline) average intensities an be now plotted using a checkbox in the Plot.
 - Average and smoothed averages can be saved into their own intensity files.
+- Improved control over clearing plots: there is now a dedicated button in Plot.
 - Added “Stop” button to stop acquisition (somehow missing). 
 - Running an acquisition without any spot selected is prevented. 
 - Added ability to take screenshots from menu (including integration windows and energy in filename).
