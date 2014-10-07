@@ -211,7 +211,6 @@ class GraphicsScene(QGraphicsScene):
                     print "failure: center already defined"
         else:
             self.parent().statusBar().showMessage("Spots require a loaded image", 5000)
-            #print "Spots require a loaded image"
 
     def keyPressEvent(self, event):
         """ Processes key events through either            
@@ -972,9 +971,12 @@ class MainWindow(QMainWindow):
         self.stopped = True
 
     def plot(self): 
-        self.plotwid.setupPlot(self.worker)
-        # can save the plot now
-        self.fileSavePlotAction.setEnabled(True)
+        if hasattr(self,'worker'):
+            self.plotwid.setupPlot(self.worker)
+            # can save the plot now
+            self.fileSavePlotAction.setEnabled(True)
+        else:
+            self.statusBar().showMessage("Please run acquisition first.", 5000)
 
     def run(self):
         if len(self.scene.spots) == 0:
