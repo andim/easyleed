@@ -4,6 +4,7 @@ Changelog since version 1.0
 (NF): 
 - New energy slider for fast scrolling over opened frames.
 - Integration windows (when present) are tracked with the energy slider.
+- Redesigned Set Parameters panel.
 - New entry in Set Parameters panel for size of integration circle.
 - API: New self.loader.this() method to identify the current image.
 - Size of default intensity integration circle can now be restored with Default button in Set Parameters
@@ -15,16 +16,19 @@ Changelog since version 1.0
 - Added option to display I(E) spectra during acquisition (live plotting).
 - Removed Plotting option panel (no longer needed). 
 - Average intensities can be now plotted “on the fly” using a checkbox in the Plot.
+- Smoothed (cubic spline) average intensities an be now plotted using a checkbox in the Plot.
+- Average and smoothed averages can be saved into their own intensity files.
 - Added “Stop” button to stop acquisition (somehow missing). 
-- Restructured order in Set Parameters (and cleanup).
+- Running an acquisition without any spot selected is prevented. 
+- Added ability to take screenshots from menu (including integration windows and energy in filename).
+- Moved buttons “next, previous” close to the slider.
+- Added ability to acquire I(frame) - fix energy acquisitions.
+- Saving and loading custom settings now works properly.
 - New About Box.
 - Restored working Help (redirects to main website - User Manual).
 - Reorganized position of windows/panels to avoid overlapping.
 - Re-introduced toolbar in plotting window. 
-- Running an acquisition without any spot selected is prevented. 
-- Added ability to take screenshots from menu (including integration windows and energy in filename).
-- Moved buttons “next, previous” close to the slider.
-- Added ability to acquire I(time) - fix energy acquisitions.
+- Extensive optimization of user workflow.
 
 (AM):
 - added ability to set center by user
