@@ -318,7 +318,7 @@ class PlotWidget(QWidget):
     def create_main_frame(self):       
         """ Create the mpl Figure and FigCanvas objects. """
         # 5x4 inches, 100 dots-per-inch
-        self.setGeometry(700, 450, 600, 450)
+        self.setGeometry(700, 450, 600, 500)
         self.dpi = 100
         self.fig = Figure((5.0, 4.0), dpi=self.dpi)
         self.axes = self.fig.add_subplot(111)
@@ -335,18 +335,23 @@ class PlotWidget(QWidget):
         # Add checkbox for smooth average
         self.smoothCheck = QCheckBox("Smooth Average")
         self.smoothCheck.setChecked(config.GraphicsScene_plotSmoothAverage)
+        # Add cButton for clearing plot
+        self.clearPlotButton = QPushButton('&Clear Plot', self)
         
         # Layout
-        vbox = QVBoxLayout()
-        vbox.addWidget(self.mpl_toolbar)
-        vbox.addWidget(self.canvas)
-        vbox.addWidget(self.averageCheck)
-        vbox.addWidget(self.smoothCheck)
-        self.setLayout(vbox)
+        self.gridLayout = QGridLayout()
+        self.setLayout(self.gridLayout)
+        
+        self.gridLayout.addWidget(self.mpl_toolbar, 0, 0, 1, -1)
+        self.gridLayout.addWidget(self.canvas, 1, 0, 1, -1)
+        self.gridLayout.addWidget(self.averageCheck, 2, 0, 1, 1)
+        self.gridLayout.addWidget(self.smoothCheck, 3, 0, 1, 1)
+        self.gridLayout.addWidget(self.clearPlotButton, 2, 1, -1, 1)
 
         # Define events for checkbox
         QObject.connect(self.averageCheck, SIGNAL("clicked()"), self.updatePlot)
         QObject.connect(self.smoothCheck, SIGNAL("clicked()"), self.updatePlot)
+        QObject.connect(self.clearPlotButton, SIGNAL("clicked()"), self.clearPlot)
     
     def setAverageChecks(self):
         if self.averageCheck.isChecked():
@@ -354,7 +359,7 @@ class PlotWidget(QWidget):
         else:
             self.smoothCheck.setEnabled(False)
 
-    def setupPlot(self, worker):
+    def initPlot(self):
         # Setup axis, labels, lines, ...
         if config.GraphicsScene_intensTimeOn == False:
             self.axes.set_xlabel("Energy [eV]")
@@ -363,6 +368,9 @@ class PlotWidget(QWidget):
         self.axes.set_ylabel("Intensity")
         # removes the ticks from y-axis
         self.axes.set_yticks([])
+
+    def setupPlot(self, worker):
+        self.initPlot()
         self.worker = worker
         self.lines_map = {}
         for spot in self.worker.spots_map:
@@ -422,9 +430,14 @@ class PlotWidget(QWidget):
         # and show the new plot
         self.canvas.draw()
 
+    def clearPlot(self):
+        self.axes.cla()
+        self.initPlot()
+        self.canvas.draw()
+
     def close(self):
         self.axes.cla()
-        super(PlotWidget, self).close()
+        #super(PlotWidget, self).close()
 
     def save(self):
         """ Saving the plot """
@@ -903,7 +916,7 @@ class MainWindow(QMainWindow):
         self.scene.removeAll()
         self.loader.restart()
         self.setImage(self.loader.next())
-        self.plotwid.close()
+        #self.plotwid.close()
         self.sliderCurrentPos = 1
         self.slider.setValue(1)
         self.fileSaveSpotsAction.setEnabled(False)
