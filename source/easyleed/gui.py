@@ -195,8 +195,8 @@ class GraphicsScene(QGraphicsScene):
                 self.setFocusItem(item)
                 self.spots.append(item)
                 # Enable spots to be saved when present on the image
-                if len(self.spots) > 0:
-                    self.parent().fileSaveSpotsAction.setEnabled(True)
+                #if len(self.spots) > 0:
+                #    self.parent().fileSaveSpotsAction.setEnabled(True)
 
             elif event.button() == Qt.RightButton:
                 if self.center is None:
