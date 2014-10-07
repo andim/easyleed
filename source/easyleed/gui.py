@@ -737,6 +737,7 @@ class MainWindow(QMainWindow):
                 "Remove Last Spot.")
 
         self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotOptions, None, self.processRemoveSpot]
+        
         fileOpenAction = self.createAction("&Open...", self.fileOpen,
                 QKeySequence.Open, None,
                 "Open a directory containing the image files.")
@@ -748,6 +749,7 @@ class MainWindow(QMainWindow):
         self.fileSavePlotAction = self.createAction("&Save plot...", self.plotwid.save,
                 QKeySequence("Ctrl+a"), None,
                 "Save the plot to a pdf file.")
+                
         # Will only enable plot saving after there is a plot to be saved
         self.fileSavePlotAction.setEnabled(False)
         self.fileSaveScreenAction = self.createAction("&Save screenshot...", self.saveScreenShot,
@@ -773,7 +775,6 @@ class MainWindow(QMainWindow):
                 None, None,
                 "About EasyLEED")
         self.helpActions = [None, self.helpAction, None, self.aboutAction]
-        
         
         self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction,
                 self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileQuitAction]
@@ -819,7 +820,6 @@ class MainWindow(QMainWindow):
         QObject.connect(self.prevButton, SIGNAL("clicked()"), self.prevBtnClicked)
         QObject.connect(self.nextButton, SIGNAL("clicked()"), self.nextBtnClicked)
     
-
     def slider_moved(self, sliderNewPos):
         """
         This function tracks what to do with a slider movement.
@@ -989,10 +989,8 @@ class MainWindow(QMainWindow):
             self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
             self.fileSaveAction.setEnabled(True)
             self.fileSaveSpotsAction.setEnabled(True)
-
             if config.GraphicsScene_livePlottingOn == True:
                 self.plot()
-            
             for image in self.loader:
                 if self.stopped:
                     break
@@ -1005,7 +1003,6 @@ class MainWindow(QMainWindow):
                     self.plotwid.updatePlot()
                 self.sliderCurrentPos = self.sliderCurrentPos + 1
                 self.slider.setValue(self.sliderCurrentPos)
-
             self.view.setInteractive(True)
             self.slider.setEnabled(True)
             self.processRemoveSpot.setEnabled(True)
@@ -1020,7 +1017,6 @@ class MainWindow(QMainWindow):
 
     def helpBoxShow(self):
         webbrowser.open("http://andim.github.io/easyleed/userdoc.html")
-
 
     def saveScreenShot(self):
         """ Save Screenshot """
@@ -1073,7 +1069,6 @@ class Worker(QObject):
 
     def __init__(self, spots, center, energy, parent=None):
         super(Worker, self).__init__(parent)
-        
         #### setup widgets ####
         self.plotwid = PlotWidget()
         
@@ -1123,7 +1118,7 @@ class Worker(QObject):
                 in self.spots_map.itervalues()]
         y = [model.m.y for model, tracker \
                 in self.spots_map.itervalues()]
-                
+
         x.extend(y)
         zipped = zip(energy[0], *x)
         np.savetxt(filename + ".pos.txt", zipped)
@@ -1148,5 +1143,4 @@ class Worker(QObject):
         zipped = zip(energy, *locations)
         output = open(filename, 'wb')
         pickle.dump(zipped, output)
-        output.close()  
-    
+        output.close()
