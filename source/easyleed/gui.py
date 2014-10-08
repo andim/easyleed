@@ -1134,7 +1134,10 @@ class Worker(QObject):
 
         x.extend(y)
         zipped = zip(energy[0], *x)
-        np.savetxt(filename + ".spot-coord.txt", zipped)
+        if config.Processing_backgroundSubstractionOn == True:
+            np.savetxt(filename + "_bs.spot-coord.txt", zipped)
+        else:
+            np.savetxt(filename + "_no-bs.spot-coord.txt", zipped)
         
         # Save Average intensity (if checkbox selected)
         if self.parent().plotwid.averageCheck.isChecked() == True:
@@ -1143,7 +1146,10 @@ class Worker(QObject):
                 intensity += model.m.intensity
             intensity = [i/len(self.spots_map) for i in intensity]
             zipped = zip(energy[0], intensity)
-            np.savetxt(filename + ".average.txt", zipped)
+            if config.Processing_backgroundSubstractionOn == True:
+                np.savetxt(filename + "_bs.average.txt", zipped)
+            else:
+                np.savetxt(filename + "_no-bs.average.txt", zipped)
 
             if self.parent().plotwid.smoothCheck.isChecked():
                 ynew = np.zeros(self.numProcessed())
@@ -1153,7 +1159,10 @@ class Worker(QObject):
                                  (model.m.energy[1]-model.m.energy[0])*config.GraphicsScene_smoothPoints)
                 ynew = interpolate.splev(xnew, tck, der=0)
                 zipped = zip(xnew, ynew)
-                np.savetxt(filename + ".sm-average.txt", zipped)
+                if config.Processing_backgroundSubstractionOn == True:
+                    np.savetxt(filename + "_bs.sm-average.txt", zipped)
+                else:
+                    np.savetxt(filename + "_no-bs.sm-average.txt", zipped)
     
     def saveloc(self, filename):
         # model = QSpotModel object tracker = tracker
