@@ -20,7 +20,7 @@ IO_energyRegex = "[0-9]*\.?[0-9]+(?=\.)"
 
 ## GraphicsScene ##
 # default radius of a new spot
-GraphicsScene_defaultRadius = 20
+GraphicsScene_defaultRadius = 40
 # Live IV plotting during acquisition
 GraphicsScene_livePlottingOn = True
 # Acquire I(time) at fixed energy
