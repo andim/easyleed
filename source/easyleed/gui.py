@@ -252,7 +252,7 @@ class GraphicsScene(QGraphicsScene):
     def removeAll(self):
         """ Remove all items from the scene (leaves background unchanged). """
         for item in self.items():
-            if item.type() != 3 and item.type() != 9:
+            if type(item) == QGraphicsSpotItem:
                 self.removeItem(item)
         self.spots = []
 
