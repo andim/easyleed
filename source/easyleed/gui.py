@@ -435,10 +435,6 @@ class PlotWidget(QWidget):
         self.canvas.draw()
         self.smoothCheck.setChecked(False)
 
-    def close(self):
-        self.axes.cla()
-        #super(PlotWidget, self).close()
-
     def save(self):
         """ Saving the plot """
         # savefile prompt
@@ -917,7 +913,7 @@ class MainWindow(QMainWindow):
         self.scene.removeAll()
         self.loader.restart()
         self.setImage(self.loader.next())
-        #self.plotwid.close()
+        self.plotwid.clearPlot()
         self.sliderCurrentPos = 1
         self.slider.setValue(1)
         self.fileSaveSpotsAction.setEnabled(False)
