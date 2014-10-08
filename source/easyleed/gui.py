@@ -737,7 +737,7 @@ class MainWindow(QMainWindow):
                 "Open previous image.")
 
         processPlotOptions = self.createAction("&Plot...", self.plot,
-                QKeySequence("Ctrl+d"), None,
+                QKeySequence("Ctrl+p"), None,
                 "Plot Intensities.")
         processSetParameters = self.createAction("&Set Parameters", self.parametersettingwid.show,
                 None, None,
@@ -763,17 +763,17 @@ class MainWindow(QMainWindow):
         # Will only enable plot saving after there is a plot to be saved
         self.fileSavePlotAction.setEnabled(False)
         self.fileSaveScreenAction = self.createAction("&Save screenshot...", self.saveScreenShot,
-                QKeySequence("Ctrl+f"), None,
+                QKeySequence("Ctrl+d"), None,
                 "Save image to a file.")
         self.fileSaveScreenAction.setEnabled(False)
         self.fileQuitAction = self.createAction("&Quit", self.fileQuit,
                 QKeySequence("Ctrl+q"), None,
                 "Close the application.")
         self.fileSaveSpotsAction = self.createAction("&Save spot locations...", self.saveSpots,
-                QKeySequence("Ctrl+t"), None,
+                QKeySequence("Ctrl+c"), None,
                 "Save the spots to a file.")
         self.fileLoadSpotsAction = self.createAction("&Load spot locations...", self.loadSpots,
-                QKeySequence("Ctrl+l"), None,
+                QKeySequence("Ctrl+v"), None,
                 "Load spots from a file.")
         # Disable when program starts.
         self.fileSaveSpotsAction.setEnabled(False)
