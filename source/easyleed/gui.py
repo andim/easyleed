@@ -1052,7 +1052,7 @@ class MainWindow(QMainWindow):
         """Saves the spot locations to a file, uses workers saveloc-function"""
         filename = str(QFileDialog.getSaveFileName(self, "Save the spot locations to a file"))
         if filename:
-            self.worker.saveloc(filename)
+            self.worker.saveloc(filename + ".pos.txt")
 
     def loadSpots(self):
         """Load saved spot positions"""
@@ -1137,7 +1137,7 @@ class Worker(QObject):
 
         x.extend(y)
         zipped = zip(energy[0], *x)
-        np.savetxt(filename + ".pos.txt", zipped)
+        np.savetxt(filename + ".spot-coord.txt", zipped)
         
         # Save Average intensity (if checkbox selected)
         if self.parent().plotwid.averageCheck.isChecked() == True:
