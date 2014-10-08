@@ -969,9 +969,14 @@ class MainWindow(QMainWindow):
                 self.statusBar().showMessage('IOError: ' + str(err), 5000)
 
     def removeLastSpot(self):
-        if len(self.scene.items(0)) > 1:
+        for item in self.scene.items():
+            if type(item) == QGraphicsSpotItem:
+                self.scene.removeItem(item)
+                break
+        try:
             self.scene.spots.remove(self.scene.spots[-1])
-            self.scene.removeItem(self.scene.items(0)[-1])
+        except IndexError:
+            self.statusBar().showMessage('No spots to be removed', 5000)
         if len(self.scene.items(0)) == 1:
             self.fileSaveSpotsAction.setEnabled(False)
 
