@@ -677,6 +677,7 @@ class ParameterSettingWidget(QWidget):
                          self.livePlotting.isChecked(), self.spotIdentification.currentIndex(),
                          self.processNoisePosition.value(), self.processNoiseVelocity.value()]
             pickle.dump(writelist, output)
+            print "Custom settings saved."
 
     def loadValues(self):
         """ Load a file of set parameter values that has been saved with the widget """
