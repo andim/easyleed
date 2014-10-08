@@ -306,6 +306,16 @@ class AboutWidget(QWidget):
         self.label.setOpenExternalLinks(True);
         self.verticalLayout.addWidget(self.label)
 
+class CustomPlotToolbar(NavigationToolbar2QT):
+    # only display the buttons we need
+    toolitems = [t for t in NavigationToolbar2QT.toolitems if
+                 t[0] not in ('Home','Back','Forward', 'Subplots', None)]
+        
+    def __init__(self, *args, **kwargs):
+        super(CustomPlotToolbar, self).__init__(*args, **kwargs)
+        self.layout().takeAt(1)  #or more than 1 if you have more buttons
+
+
 class PlotWidget(QWidget):
     """ Custom PyQt widget canvas for plotting """
 
@@ -326,7 +336,7 @@ class PlotWidget(QWidget):
         self.canvas.setParent(self)
         
         # Create the navigation toolbar, tied to the canvas
-        self.mpl_toolbar = NavigationToolbar2QT(self.canvas, self)
+        self.mpl_toolbar = CustomPlotToolbar(self.canvas, self)
 
         # Add checkbox for average
         self.averageCheck = QCheckBox("Average")
@@ -351,7 +361,7 @@ class PlotWidget(QWidget):
         QObject.connect(self.averageCheck, SIGNAL("clicked()"), self.updatePlot)
         QObject.connect(self.smoothCheck, SIGNAL("clicked()"), self.updatePlot)
         QObject.connect(self.clearPlotButton, SIGNAL("clicked()"), self.clearPlot)
-    
+        
     def setAverageChecks(self):
         if self.averageCheck.isChecked():
             self.smoothCheck.setEnabled(True)
