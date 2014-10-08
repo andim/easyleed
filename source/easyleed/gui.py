@@ -433,6 +433,7 @@ class PlotWidget(QWidget):
         self.axes.cla()
         self.initPlot()
         self.canvas.draw()
+        self.smoothCheck.setChecked(False)
 
     def close(self):
         self.axes.cla()
