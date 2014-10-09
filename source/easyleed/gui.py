@@ -818,27 +818,35 @@ class MainWindow(QMainWindow):
         #### Create status bar ####
         self.statusBar().showMessage("Ready", 5000)
 
-        ### Create previous and next buttons
+        ### Create buttons and custom energy button and text in statusbar
         self.prevButton = QToolButton(self)
         self.prevButton.setArrowType(Qt.LeftArrow)
+        self.prevButton.setEnabled(False)
         self.nextButton = QToolButton(self)
         self.nextButton.setArrowType(Qt.RightArrow)
-        self.prevButton.setEnabled(False)
         self.nextButton.setEnabled(False)
-        
+        self.custEnergyButton = QPushButton("C", self)
+        self.custEnergyButton.setCheckable(True)
+        self.custEnergyButton.setEnabled(False)
+        self.custEnergyText = QLineEdit()
+
         ### Create slider
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setEnabled(False)
         
-        ### Create "next" and "previous" buttons.
+        ### Add buttons, slider and custom energy button and text in statusbar
+        self.statusBar().addWidget(self.custEnergyText)
         self.statusBar().addPermanentWidget(self.prevButton)
         self.statusBar().addPermanentWidget(self.nextButton)
         self.statusBar().addPermanentWidget(self.slider)
-    
-        ### Create event connector for slider
+        self.statusBar().addPermanentWidget(self.custEnergyButton)
+
+        ### Create event connector for slider and buttons in statusbar
         QObject.connect(self.slider, SIGNAL("sliderMoved(int)"), self.slider_moved)
         QObject.connect(self.prevButton, SIGNAL("clicked()"), self.prevBtnClicked)
         QObject.connect(self.nextButton, SIGNAL("clicked()"), self.nextBtnClicked)
+        QObject.connect(self.custEnergyButton, SIGNAL("clicked()"), self.custEnBtnClicked)
+        QObject.connect(self.custEnergyText, SIGNAL("returnPressed()"), self.setCustEnergy)
     
     def slider_moved(self, sliderNewPos):
         """
@@ -868,6 +876,21 @@ class MainWindow(QMainWindow):
     def nextBtnClicked(self):
         self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
         self.next_()
+        self.worker.process(self.loader.this())
+    
+    def custEnBtnClicked(self):
+        ''' Action when custom energy button is clicked'''
+        if self.custEnergyButton.isChecked():
+            self.custEnergyText.show()
+            self.custEnergyText.setText("%s" % self.current_energy)
+        else:
+            self.setCustEnergy()
+            self.custEnergyText.hide()
+
+    def setCustEnergy(self):
+        ''' Take energy from custom energy text and move the corresponding frame'''
+        self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
+        self.goto(float(self.custEnergyText.text()))
         self.worker.process(self.loader.this())
 
     def addActions(self, target, actions):
@@ -982,6 +1005,7 @@ class MainWindow(QMainWindow):
                 self.prevButton.setEnabled(True)
                 self.nextButton.setEnabled(True)
                 self.slider.setEnabled(True)
+                self.custEnergyButton.setEnabled(True)
                 self.fileSaveScreenAction.setEnabled(True)
                 self.fileLoadSpotsAction.setEnabled(True)
                 selfsliderCurrentPos = self.slider.setValue(1)
