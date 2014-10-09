@@ -862,11 +862,15 @@ class MainWindow(QMainWindow):
         self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
         self.previous()
         self.worker.process(self.loader.this())
+        self.sliderCurrentPos -= 1
+        self.slider.setValue(self.sliderCurrentPos)
 
     def nextBtnClicked(self):
         self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
         self.next_()
         self.worker.process(self.loader.this())
+        self.sliderCurrentPos += 1
+        self.slider.setValue(self.sliderCurrentPos)
 
     def addActions(self, target, actions):
         """
@@ -1029,7 +1033,7 @@ class MainWindow(QMainWindow):
                 QApplication.processEvents()
                 if config.GraphicsScene_livePlottingOn == True:
                     self.plotwid.updatePlot()
-                self.sliderCurrentPos = self.sliderCurrentPos + 1
+                self.sliderCurrentPos += 1
                 self.slider.setValue(self.sliderCurrentPos)
             self.view.setInteractive(True)
             self.slider.setEnabled(True)
