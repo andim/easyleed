@@ -869,8 +869,6 @@ class MainWindow(QMainWindow):
         self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
         self.next_()
         self.worker.process(self.loader.this())
-        self.sliderCurrentPos += 1
-        self.slider.setValue(self.sliderCurrentPos)
 
     def addActions(self, target, actions):
         """
@@ -913,6 +911,8 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Reached last picture", 5000)
         else:
             self.setImage(image)
+            self.sliderCurrentPos += 1
+            self.slider.setValue(self.sliderCurrentPos)
 
     def previous(self):
         try:
@@ -921,6 +921,8 @@ class MainWindow(QMainWindow):
             self.statusBar().showMessage("Reached first picture", 5000)
         else:
             self.setImage(image)
+            self.sliderCurrentPos -= 1
+            self.slider.setValue(self.sliderCurrentPos)
 
     def restart(self):
         """ Delete stored plot information and start fresh """
