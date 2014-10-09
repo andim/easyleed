@@ -3,6 +3,7 @@ Changelog since version 1.0
 
 (NF): 
 - New energy slider for fast scrolling over opened frames.
+- A “custom energy button” is added to move to a particular energy framework.
 - Integration windows (when present) are tracked with the energy slider.
 - Redesigned Set Parameters panel.
 - New entry in Set Parameters panel for size of integration circle.
