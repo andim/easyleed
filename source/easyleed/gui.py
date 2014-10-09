@@ -842,13 +842,13 @@ class MainWindow(QMainWindow):
         self.statusBar().addPermanentWidget(self.custEnergyButton)
 
         ### Create event connector for slider and buttons in statusbar
-        QObject.connect(self.slider, SIGNAL("sliderMoved(int)"), self.slider_moved)
+        QObject.connect(self.slider, SIGNAL("sliderMoved(int)"), self.sliderMoved)
         QObject.connect(self.prevButton, SIGNAL("clicked()"), self.prevBtnClicked)
         QObject.connect(self.nextButton, SIGNAL("clicked()"), self.nextBtnClicked)
         QObject.connect(self.custEnergyButton, SIGNAL("clicked()"), self.custEnBtnClicked)
         QObject.connect(self.custEnergyText, SIGNAL("returnPressed()"), self.setCustEnergy)
     
-    def slider_moved(self, sliderNewPos):
+    def sliderMoved(self, sliderNewPos):
         """
         This function tracks what to do with a slider movement.
             
