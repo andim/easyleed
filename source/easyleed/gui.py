@@ -924,6 +924,20 @@ class MainWindow(QMainWindow):
             self.sliderCurrentPos -= 1
             self.slider.setValue(self.sliderCurrentPos)
 
+    def goto(self, energy):
+        if energy >= 0:
+            try:
+                stepsGoto = self.loader.energySteps(energy)
+                image = self.loader.goto(energy)
+            except StopIteration:
+                self.statusBar().showMessage("Outside of energy range", 5000)
+            else:
+                self.setImage(image)
+                self.sliderCurrentPos += stepsGoto
+                self.slider.setValue(self.sliderCurrentPos)
+        else:
+            self.statusBar().showMessage("Energy must be positive", 5000)
+
     def restart(self):
         """ Delete stored plot information and start fresh """
         self.scene.removeAll()

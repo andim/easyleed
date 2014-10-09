@@ -87,6 +87,22 @@ class ImageLoader(object):
         else:
             raise StopIteration()
 
+    def goto(self, energy):
+        """ Get image custom beam energy. """
+        stepsGoto = self.energySteps(energy)
+        if self.index < len(self.energies)-stepsGoto:
+            self.index += stepsGoto
+            newEnergy = self.energies[self.index]
+            return self.get_image(self.files[newEnergy]), newEnergy
+        else:
+            raise StopIteration()
+
+    def energySteps(self, energy):
+        """ Get # frame steps for custom beam energy. """
+        currEnergy = self.energies[self.index]
+        stepsGoto = int((energy - self.energies[self.index])/(self.energies[1]-self.energies[0]))
+        return stepsGoto
+
     def this(self):
         """ Get image at next higher beam energy. """
         energy = self.energies[self.index]
