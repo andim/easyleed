@@ -309,7 +309,7 @@ class AboutWidget(QWidget):
 class CustomPlotToolbar(NavigationToolbar2QT):
     # only display the buttons we need
     toolitems = [t for t in NavigationToolbar2QT.toolitems if
-                 t[0] not in ('Home','Back','Forward', 'Subplots', None)]
+                t[0] in ('Home', None,'Pan','Zoom','Save')]
         
     def __init__(self, *args, **kwargs):
         super(CustomPlotToolbar, self).__init__(*args, **kwargs)
