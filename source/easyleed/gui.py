@@ -327,7 +327,7 @@ class PlotWidget(QWidget):
     def create_main_frame(self):       
         """ Create the mpl Figure and FigCanvas objects. """
         # 5x4 inches, 100 dots-per-inch
-        self.setGeometry(700, 450, 600, 500)
+        self.setGeometry(700, 420, 600, 500)
         self.dpi = 100
         self.fig = Figure((5.0, 4.0), dpi=self.dpi)
         self.axes = self.fig.add_subplot(111)
@@ -539,7 +539,7 @@ class ParameterSettingWidget(QWidget):
         self.horLine2.setFrameStyle(QFrame.HLine)
 
         #Layouts
-        self.setGeometry(700, 0, 300, 100)
+        self.setGeometry(700, 30, 300, 100)
         self.setWindowTitle('Set acquisition parameters')
      
         #base grid
@@ -726,7 +726,7 @@ class MainWindow(QMainWindow):
         self.view = GraphicsView()
         self.view.setScene(self.scene)
         self.view.setMinimumSize(660, 480)
-        self.setGeometry(10, 10, 660, 480)
+        self.setGeometry(10, 30, 660, 480)
         self.setCentralWidget(self.view)
         
         #### define actions ####
