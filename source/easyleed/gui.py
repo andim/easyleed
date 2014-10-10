@@ -1030,17 +1030,6 @@ class MainWindow(QMainWindow):
             time_before = time.time()
 
             self.stopped = False
-            progress = QProgressBar()
-            stop = QPushButton("Stop", self)
-            self.connect(stop, SIGNAL("clicked()"), self.stopProcessing)
-            progress.setMinimum(int(self.loader.current_energy()))
-            progress.setMaximum(int(self.loader.energies[-1]))
-            statusLayout = QHBoxLayout()
-            statusLayout.addWidget(progress)
-            statusLayout.addWidget(stop)
-            statusWidget = QWidget(self)
-            statusWidget.setLayout(statusLayout)
-            self.statusBar().addWidget(statusWidget)
             self.view.setInteractive(False)
             self.slider.setEnabled(False)
             self.processRemoveSpot.setEnabled(False)
@@ -1053,7 +1042,6 @@ class MainWindow(QMainWindow):
             for image in self.loader:
                 if self.stopped:
                     break
-                progress.setValue(int(image[1]))
                 QApplication.processEvents()
                 self.setImage(image)
                 self.worker.process(image)
@@ -1066,7 +1054,6 @@ class MainWindow(QMainWindow):
             self.slider.setEnabled(True)
             self.processRemoveSpot.setEnabled(True)
             print "Total time acquisition:", time.time() - time_before, "s"
-            self.statusBar().removeWidget(statusWidget)
 
     def disableInput(self):
         for item in self.scene.spots:
