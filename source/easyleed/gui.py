@@ -864,17 +864,13 @@ class MainWindow(QMainWindow):
         This function tracks what to do with a slider movement.
             
         """
-        self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
-
         diff = self.sliderCurrentPos - sliderNewPos
         if diff > 0:
             for i in range(0, diff):
                 self.previous()
-                self.worker.process(self.loader.goto(self.current_energy))
         else:
             for i in range(diff, 0):
                 self.next_()
-                self.worker.process(self.loader.goto(self.current_energy))
         self.sliderCurrentPos = sliderNewPos
 
     def prevBtnClicked(self):
