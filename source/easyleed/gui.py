@@ -1028,7 +1028,7 @@ class MainWindow(QMainWindow):
         else:
             import time
             time_before = time.time()
-
+            self.initial_energy = self.current_energy
             self.stopped = False
             self.view.setInteractive(False)
             self.slider.setEnabled(False)
@@ -1083,7 +1083,7 @@ class MainWindow(QMainWindow):
         """Saves the spot locations to a file, uses workers saveloc-function"""
         filename = str(QFileDialog.getSaveFileName(self, "Save the spot locations to a file"))
         if filename:
-            self.worker.saveloc(filename + "_" + str(self.current_energy) + "eV_pos.txt")
+            self.worker.saveloc(filename + "_" + str(self.initial_energy) + "eV_pos.txt")
 
     def loadSpots(self):
         """Load saved spot positions"""
