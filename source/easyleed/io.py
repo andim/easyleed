@@ -99,9 +99,7 @@ class ImageLoader(object):
 
     def energySteps(self, energy):
         """ Get # frame steps for custom beam energy. """
-        currEnergy = self.energies[self.index]
-        stepsGoto = int((energy - self.energies[self.index])/(self.energies[1]-self.energies[0]))
-        return stepsGoto
+        return int((energy - self.energies[self.index])/(self.energies[1]-self.energies[0]))
 
     # FIXME: untested
     def custom_iter(self, energies):
