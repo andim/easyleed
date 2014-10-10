@@ -1109,6 +1109,7 @@ class MainWindow(QMainWindow):
                 self.scene.addItem(item)
                 item.setSelected(True)
                 self.scene.setFocusItem(item)
+                self.scene.spots.append(item)
             
 class Worker(QObject):
     """ Worker that manages the spots."""
