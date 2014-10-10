@@ -869,7 +869,7 @@ class MainWindow(QMainWindow):
     def prevBtnClicked(self):
         self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
         self.previous()
-        self.worker.process(goto(self.current_energy))
+        self.worker.process(self.loader.goto(self.current_energy))
         self.sliderCurrentPos -= 1
         self.slider.setValue(self.sliderCurrentPos)
 
