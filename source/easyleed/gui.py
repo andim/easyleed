@@ -203,6 +203,7 @@ class GraphicsScene(QGraphicsScene):
                     item.setSelected(True)
                     self.setFocusItem(item)
                     self.center = item
+                    self.parent().fileSaveCenterAction.setEnabled(True)
                 else:
                     print "failure: center already defined"
         else:
@@ -250,6 +251,13 @@ class GraphicsScene(QGraphicsScene):
             if type(item) == QGraphicsSpotItem:
                 self.removeItem(item)
         self.spots = []
+
+    def removeCenter(self):
+        """ Remove all items from the scene (leaves background unchanged). """
+        for item in self.items():
+            if type(item) == QGraphicsCenterItem:
+                self.removeItem(item)
+        self.center = []
 
 class GraphicsView(QGraphicsView):
     """ Custom GraphicsView to display the scene. """
@@ -756,7 +764,7 @@ class MainWindow(QMainWindow):
         self.fileSavePlotAction = self.createAction("&Save plot...", self.plotwid.save,
                 QKeySequence("Ctrl+a"), None,
                 "Save the plot to a pdf file.")
-                
+
         # Will only enable plot saving after there is a plot to be saved
         self.fileSavePlotAction.setEnabled(False)
         self.fileSaveScreenAction = self.createAction("&Save screenshot...", self.saveScreenShot,
@@ -772,9 +780,19 @@ class MainWindow(QMainWindow):
         self.fileLoadSpotsAction = self.createAction("&Load spot locations...", self.loadSpots,
                 QKeySequence("Ctrl+v"), None,
                 "Load spots from a file.")
+        self.fileSaveCenterAction = self.createAction("&Save center location...", self.saveCenter,
+                QKeySequence("Ctrl+n"), None,
+                "Save the center to a file.")
+        self.fileLoadCenterAction = self.createAction("&Load center location...", self.loadCenter,
+                QKeySequence("Ctrl+m"), None,
+                "Load center from a file.")
+                
         # Disable when program starts.
         self.fileSaveSpotsAction.setEnabled(False)
         self.fileLoadSpotsAction.setEnabled(False)
+        self.fileSaveCenterAction.setEnabled(False)
+        self.fileLoadCenterAction.setEnabled(False)
+        
         self.helpAction = self.createAction("&Help", self.helpBoxShow,
                 None, None,
                 "Show help")
@@ -783,8 +801,14 @@ class MainWindow(QMainWindow):
                 "About EasyLEED")
         self.helpActions = [None, self.helpAction, None, self.aboutAction]
         
-        self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction,
-                self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileQuitAction]
+        #self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction, None,
+        #        self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileSaveCenterAction, self.fileLoadCenterAction,
+        #        None, self.fileQuitAction]
+        
+        self.fileActions = [fileOpenAction, None, self.fileLoadSpotsAction, self.fileLoadCenterAction, None,
+                            self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction,
+                            self.fileSaveSpotsAction, self.fileSaveCenterAction, 
+                            None, self.fileQuitAction]
 
         #### Create menu bar ####
         fileMenu = self.menuBar().addMenu("&File")
@@ -995,6 +1019,7 @@ class MainWindow(QMainWindow):
                 self.custEnergyButton.setEnabled(True)
                 self.fileSaveScreenAction.setEnabled(True)
                 self.fileLoadSpotsAction.setEnabled(True)
+                self.fileLoadCenterAction.setEnabled(True)
                 selfsliderCurrentPos = self.slider.setValue(1)
             except IOError, err:
                 self.statusBar().showMessage('IOError: ' + str(err), 5000)
@@ -1087,7 +1112,6 @@ class MainWindow(QMainWindow):
 
     def loadSpots(self):
         """Load saved spot positions"""
-        # FIXME: this does not work yet
         # This can probably be done in a better way
         filename = QFileDialog.getOpenFileName(self, 'Open spot location file')
         if filename:
@@ -1111,7 +1135,42 @@ class MainWindow(QMainWindow):
                 item.setSelected(True)
                 self.scene.setFocusItem(item)
                 self.scene.spots.append(item)
-            
+
+    def saveCenter(self):
+        """Saves the center locations to a file"""
+        filename = str(QFileDialog.getSaveFileName(self, "Save the center location to a file"))
+        if filename:
+            zipped = zip([self.scene.center.x()], [self.scene.center.y()])
+            output = open(filename + "_center.txt", 'wb')
+            pickle.dump(zipped, output)
+            output.close()
+
+    def loadCenter(self):
+        """Load saved center position from file"""
+        # This can probably be done in a better way
+        filename = QFileDialog.getOpenFileName(self, 'Open center location file')
+        if filename:
+            if hasattr (self.scene, "center"):
+                self.scene.removeCenter()
+            # pickle doesn't recognise the file opened by PyQt's openfile dialog as a file so 'normal' file processing
+            pkl_file = open(filename, 'rb')
+            # loading the zipped info to "location"
+            location = pickle.load(pkl_file)
+            pkl_file.close()
+            # unzipping the "location"
+            cLocx = 0
+            cLocy = 0
+            cLocx, cLocy = zip(*location)
+            point = QPointF(cLocx[0], cLocy[0])
+            item = QGraphicsCenterItem(point, config.QGraphicsCenterItem_size)
+            # adding the item to the gui
+            self.scene.clearSelection()
+            self.scene.addItem(item)
+            item.setSelected(True)
+            self.scene.center = item
+            self.scene.setFocusItem(item)
+            self.fileSaveCenterAction.setEnabled(True)
+
 class Worker(QObject):
     """ Worker that manages the spots."""
 
