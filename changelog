@@ -25,10 +25,12 @@ Changelog since version 1.0
 - Moved buttons “next, previous” close to the slider.
 - Added ability to acquire I(frame) - fix energy acquisitions.
 - Saving and loading custom settings now works properly.
+- Location of the integration windows can be saved and reloaded.
+- Location of the center of the screen can be saved and reloaded.
 - New About Box.
 - Restored working Help (redirects to main website - User Manual).
 - Reorganized position of windows/panels to avoid overlapping.
-- Re-introduced toolbar in plotting window. 
+- Introduced toolbar in plotting window. 
 - Extensive optimization of user workflow.
 
 API:
