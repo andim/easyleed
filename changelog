@@ -7,7 +7,6 @@ Changelog since version 1.0
 - Integration windows (when present) are tracked with the energy slider.
 - Redesigned Set Parameters panel.
 - New entry in Set Parameters panel for size of integration circle.
-- API: New self.loader.this() method to identify the current image.
 - Size of default intensity integration circle can now be restored with Default button in Set Parameters
 - Set Preference panel is always visible (i.e. can be accessed with no images loaded).
 - Added "Apply" button in Set Preference, so that settings can be applied without closing the Set Preference panel. 
@@ -31,6 +30,11 @@ Changelog since version 1.0
 - Reorganized position of windows/panels to avoid overlapping.
 - Re-introduced toolbar in plotting window. 
 - Extensive optimization of user workflow.
+
+API:
+- New loader.goto(energy): load image at specified energy.
+- New loader.energySteps(energy): get # frame steps for custom beam energy.
+
 
 (AM):
 - added ability to set center by user
