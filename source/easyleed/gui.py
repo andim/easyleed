@@ -1035,6 +1035,7 @@ class MainWindow(QMainWindow):
             self.processRemoveSpot.setEnabled(False)
             self.scene.clearSelection()
             self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
+            print self.current_energy
             self.fileSaveAction.setEnabled(True)
             self.fileSaveSpotsAction.setEnabled(True)
             if config.GraphicsScene_livePlottingOn == True:
@@ -1082,7 +1083,7 @@ class MainWindow(QMainWindow):
         """Saves the spot locations to a file, uses workers saveloc-function"""
         filename = str(QFileDialog.getSaveFileName(self, "Save the spot locations to a file"))
         if filename:
-            self.worker.saveloc(filename + ".pos.txt")
+            self.worker.saveloc(filename + "_" + str(self.current_energy) + "eV_pos.txt")
 
     def loadSpots(self):
         """Load saved spot positions"""
