@@ -5,7 +5,6 @@ easyleed.gui
 Various classes for providing a graphical user interface.
 """
 
-
 import logging
 import webbrowser
 import pickle
@@ -104,8 +103,7 @@ class QGraphicsSpotItem(QGraphicsEllipseItem, QGraphicsMovableItem):
 
     def keyPressEvent(self, event):
         """ Handles keyPressEvents.
-
-
+            
             The circles radius can be changed using the plus and minus keys.
         """
 
@@ -120,10 +118,8 @@ class QGraphicsSpotItem(QGraphicsEllipseItem, QGraphicsMovableItem):
         """ Handles incoming radius change request."""
         self.changeSize(radius - self.radius())
 
-
     def radius(self):
         return self.rect().width() / 2.0
-
 
     def changeSize(self, inc):
         """ Change radius by inc.
@@ -217,7 +213,6 @@ class GraphicsScene(QGraphicsScene):
               - deleting the focus item
             or   
               - propagating the event
-
         """
 
         item = self.focusItem()
@@ -274,17 +269,14 @@ class FileDialog(QFileDialog):
         super(FileDialog, self).__init__(**kwargs)
         self.setFileMode(QFileDialog.ExistingFiles)
 
-
 class AboutWidget(QWidget):
     """ PyQt widget for About Box Panel """
     
     def __init__(self):
         super(AboutWidget, self).__init__()
-        
         self.initUI()
     
     def initUI(self):
-        
         self.setGeometry(100, 200, 400, 200)
         self.setWindowTitle('About EasyLEED')
         self.gridLayout = QGridLayout()
@@ -314,7 +306,6 @@ class CustomPlotToolbar(NavigationToolbar2QT):
     def __init__(self, *args, **kwargs):
         super(CustomPlotToolbar, self).__init__(*args, **kwargs)
         self.layout().takeAt(1)  #or more than 1 if you have more buttons
-
 
 class PlotWidget(QWidget):
     """ Custom PyQt widget canvas for plotting """
@@ -455,13 +446,11 @@ class PlotWidget(QWidget):
 class ParameterSettingWidget(QWidget): 
     """PyQt widget for setting tracking parameters"""
  
-    
     def __init__(self):
         super(ParameterSettingWidget, self).__init__()
         self.initUI()
         
     def initUI(self):
-        
         # Buttons/elements
         self.inputPrecision = QSpinBox(self)
         self.inputPrecision.setWrapping(True)
@@ -575,7 +564,6 @@ class ParameterSettingWidget(QWidget):
         self.lh8Layout = QHBoxLayout()
         self.lh8Layout.addWidget(self.horLine)
 
-
         #2nd (right) vertical layout
         self.rh1Layout = QHBoxLayout()
         self.rh1Layout.addWidget(self.intensTime)
@@ -635,7 +623,6 @@ class ParameterSettingWidget(QWidget):
         QObject.connect(self.saveButton, SIGNAL("clicked()"), self.saveValues)
         QObject.connect(self.loadButton, SIGNAL("clicked()"), self.loadValues)
     
-
     def applyParameters(self):
         """Parameter setting control"""
         config.Tracking_inputPrecision = self.inputPrecision.value()
