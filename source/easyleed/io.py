@@ -6,7 +6,6 @@ Import routines for different LEED file formats
 
 """
 
-
 import numpy as np
 import PyQt4.QtGui as qt
 
