@@ -1060,7 +1060,6 @@ class MainWindow(QMainWindow):
             self.processRemoveSpot.setEnabled(False)
             self.scene.clearSelection()
             self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
-            print self.current_energy
             self.fileSaveAction.setEnabled(True)
             self.fileSaveSpotsAction.setEnabled(True)
             if config.GraphicsScene_livePlottingOn == True:
