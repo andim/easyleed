@@ -833,13 +833,17 @@ class MainWindow(QMainWindow):
         self.prevButton = QToolButton(self)
         self.prevButton.setArrowType(Qt.LeftArrow)
         self.prevButton.setEnabled(False)
+        self.prevButton.setToolTip("Previous image")
         self.nextButton = QToolButton(self)
         self.nextButton.setArrowType(Qt.RightArrow)
         self.nextButton.setEnabled(False)
+        self.nextButton.setToolTip("Next image")
         self.custEnergyButton = QPushButton("eV", self)
         self.custEnergyButton.setCheckable(True)
         self.custEnergyButton.setEnabled(False)
+        self.custEnergyButton.setToolTip("Push to set custom energy")
         self.custEnergyText = QLineEdit()
+        self.custEnergyText.setToolTip("Press Enter to set")
 
         ### Create slider
         self.slider = QSlider(Qt.Horizontal)
