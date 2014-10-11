@@ -836,7 +836,7 @@ class MainWindow(QMainWindow):
         self.nextButton = QToolButton(self)
         self.nextButton.setArrowType(Qt.RightArrow)
         self.nextButton.setEnabled(False)
-        self.custEnergyButton = QPushButton("C", self)
+        self.custEnergyButton = QPushButton("eV", self)
         self.custEnergyButton.setCheckable(True)
         self.custEnergyButton.setEnabled(False)
         self.custEnergyText = QLineEdit()
