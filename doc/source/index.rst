@@ -25,19 +25,35 @@ EasyLEED is written in `Python <http://www.python.org/>`_ and relies on the foll
 - Python 2.6 or 2.7 `<http://www.python.org/>`_
 - Qt 4.6 `<http://qt.nokia.com/>`_ and PyQt 4.7 `<http://www.riverbankcomputing.co.uk/>`_
 - Numpy >1.5 and Scipy >0.9 `<http://www.scipy.org/>`_
-- Matplotlib >0.9 `<http://matplotlib.org/>`_
-
-Under Windows a simple way to get all the required python packages at once is to install the Python distribution `Python(x,y) <http://code.google.com/p/pythonxy/>`_.
+- Matplotlib >0.9 `<http://matplotlib.org/>`_ 
 
 Dependent on the file format of your input LEED images, you should also install the following packages:
 
 - Python Imaging Library (for .tif, .png, .jpg) http://www.pythonware.com/products/pil/
 - PyFITS (for .fits) `<http://www.stsci.edu/resources/software_hardware/pyfits/>`_
 
+Installation - Windows
+----------------------
+
+The simplest way to get all the required python packages at once is to install the Python distribution `Python(x,y) <http://code.google.com/p/pythonxy/>`_.
+
+
+Installation - Mac OSX
+----------------------
+
+All required packages can be obtained through `MacPorts <http://www.macports.org/>`_. After installing macports, individual libraries are installed with the following:
+
+sudo port install py-pyqt4
+sudo port install py-numpy
+sudo port install py-scipy
+sudo port install py-matplotlib
+sudo port install py-pil 
+
+
 Run
 ---
 
-After downloading the zip-file extract its content to a directory. If you have already installed the dependencies, you are ready to go and can open the graphical user interface by running ``run-gui.py``.
+After downloading the zip-file extract its content to a directory. If you have already installed the dependencies, you are ready to go and can open the graphical user interface by running ``run-gui.py``. In Unix systems (such as Mac OS X), you can run it from the terminal with the command: python2.7 run-gui.py
 
 
 Documentation
@@ -50,8 +66,8 @@ Documentation
    api
 
    
-Outro
-=====
+Developer Team
+===============
 
 Development of EasyLEED was started by Andreas Mayer while working in Renee Diehl's lab (Penn State). Hanna Salopaasi has contributed to the user interface while working in Katariina Pussi's lab (Lappeenranta University of Technology). Further UI and core improvements are currently contributed by Nicola Ferralis (Massachusetts Institute of Technology). We continue to work on facilitating LEED pattern analysis and therefore appreciate any form of user feedback! 
 
