@@ -170,6 +170,7 @@ class GraphicsScene(QGraphicsScene):
         super(GraphicsScene, self).__init__(parent)
         self.spots = []
         self.center = None
+        self.spotsLabel = []
     
     def mousePressEvent(self, event):
         """ Processes mouse events through either            
@@ -190,7 +191,8 @@ class GraphicsScene(QGraphicsScene):
                 item.setSelected(True)
                 self.setFocusItem(item)
                 self.spots.append(item)
-                item.setToolTip(str(len(self.spots)-1))
+                self.spotsLabel.append(str(len(self.spots)-1))
+                item.setToolTip(self.spotsLabel[-1])
                 # Enable spots to be saved when present on the image
                 #if len(self.spots) > 0:
                 #    self.parent().fileSaveSpotsAction.setEnabled(True)
