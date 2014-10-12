@@ -1072,7 +1072,6 @@ class MainWindow(QMainWindow):
                 QApplication.processEvents()
                 self.setImage(image)
                 self.worker.process(image)
-                print self.current_energy
                 QApplication.processEvents()
                 if config.GraphicsScene_livePlottingOn == True:
                     self.plotwid.updatePlot()
