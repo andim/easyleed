@@ -27,11 +27,13 @@ Changelog since version 1.0
 - Saving and loading custom settings now works properly.
 - Location of the integration windows can be saved and reloaded.
 - Location of the center of the screen can be saved and reloaded.
+- Hovering over integration windows shows the windows number for rapid identification of corresponding curve.
 - New About Box.
 - Restored working Help (redirects to main website - User Manual).
 - Reorganized position of windows/panels to avoid overlapping.
 - Introduced toolbar in plotting window. 
 - Extensive optimization of user workflow.
+- Several bug fixes and optimization.
 
 API:
 - New loader.goto(energy): load image at specified energy.
