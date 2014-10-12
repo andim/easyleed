@@ -1065,12 +1065,14 @@ class MainWindow(QMainWindow):
             self.fileSaveSpotsAction.setEnabled(True)
             if config.GraphicsScene_livePlottingOn == True:
                 self.plot()
+            self.worker.process(self.loader.goto(self.current_energy))
             for image in self.loader:
                 if self.stopped:
                     break
                 QApplication.processEvents()
                 self.setImage(image)
                 self.worker.process(image)
+                print self.current_energy
                 QApplication.processEvents()
                 if config.GraphicsScene_livePlottingOn == True:
                     self.plotwid.updatePlot()
