@@ -190,6 +190,7 @@ class GraphicsScene(QGraphicsScene):
                 item.setSelected(True)
                 self.setFocusItem(item)
                 self.spots.append(item)
+                item.setToolTip(str(len(self.spots)-1))
                 # Enable spots to be saved when present on the image
                 #if len(self.spots) > 0:
                 #    self.parent().fileSaveSpotsAction.setEnabled(True)
