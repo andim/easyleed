@@ -1204,6 +1204,10 @@ class Worker(QObject):
             self.connect(tup[0], SIGNAL("radiusChanged"), view.onRadiusChange)
 
     def process(self, image):
+        if config.GraphicsScene_intensTimeOn == False:
+            print "Current image energy: " + str(self.parent().current_energy) + "eV"
+        else:
+            print "Current frame: " + str(self.parent().current_energy)
         for model, tracker in self.spots_map.itervalues():
             tracker_result = tracker.feed_image(image)
             # feed_image returns x, y, intensity, energy and radius
