@@ -386,11 +386,12 @@ class PlotWidget(QWidget):
         self.lines_map = {}
         for spot in self.worker.spots_map:
             self.lines_map[spot], = self.axes.plot([], [])
+        
         # set up averageLine
-        if not hasattr(self, 'averageLine'):
-            self.averageLine = []
-        if not hasattr(self, 'averageSmoothLine'):
-            self.averageSmoothLine = []
+        self.averageLine, = self.axes.plot([], [], 'k', lw = 2, label = 'Average')
+        # set up averageSmoothLine
+        self.averageSmoothLine, = self.axes.plot([], [], 'b', lw = 2, label = 'Smooth Average')
+        
         # show dashed line at y = 0
         self.axes.axhline(0.0, color = 'k', ls = '--')
         # try to auto-adjust plot margins (might not be available in all matplotlib versions)
@@ -408,7 +409,6 @@ class PlotWidget(QWidget):
         for spot, line in self.lines_map.iteritems():
             line.set_data(self.worker.spots_map[spot][0].m.energy, self.worker.spots_map[spot][0].m.intensity)
         if self.averageCheck.isChecked():
-            self.averageLine, = self.axes.plot([], [], 'k', lw = 2, label = 'Average')
             intensity = np.zeros(self.worker.numProcessed())
             ynew = np.zeros(self.worker.numProcessed())
             tck = np.zeros(self.worker.numProcessed())
@@ -419,22 +419,16 @@ class PlotWidget(QWidget):
             self.averageLine.set_data(model.m.energy, intensity)
             
             if self.smoothCheck.isChecked():
-                self.averageSmoothLine, = self.axes.plot([], [], 'b', lw = 2, label = 'Smooth Average')
-
                 tck = interpolate.splrep(model.m.energy, intensity, s=config.GraphicsScene_smoothSpline)
                 xnew = np.arange(model.m.energy[0], model.m.energy[-1],
                                  (model.m.energy[1]-model.m.energy[0])*config.GraphicsScene_smoothPoints)
                 ynew = interpolate.splev(xnew, tck, der=0)
                 self.averageSmoothLine.set_data(xnew, ynew)
             else:
-                for line in self.axes.lines:
-                    if line.get_label()=='Smooth Average':
-                        self.axes.lines.remove(line)
+                self.averageSmoothLine.set_data([], [])
         else:
-                for line in self.axes.lines:
-                    if line.get_label()=='Average':
-                        self.axes.lines.remove(line)
-        
+            self.averageLine.set_data([], [])
+
         # ... axes limits
         self.axes.relim()
         self.axes.autoscale_view(True,True,True)
