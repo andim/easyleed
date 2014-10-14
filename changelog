@@ -28,10 +28,11 @@ Changelog since version 1.0
 - Location of the integration windows can be saved and reloaded.
 - Location of the center of the screen can be saved and reloaded.
 - Hovering over integration windows shows the windows number for rapid identification of corresponding curve.
-- New About Box.
-- Restored working Help (redirects to main website - User Manual).
+- Legend can be displayed in plot with reference to the integration window.
+- Introduced toolbar in plotting window.
 - Reorganized position of windows/panels to avoid overlapping.
-- Introduced toolbar in plotting window. 
+- New About Box.
+- Restored working Help (redirects to main website - User Manual). 
 - Extensive optimization of user workflow.
 - Several bug fixes and optimization.
 
