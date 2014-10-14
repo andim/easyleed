@@ -193,9 +193,6 @@ class GraphicsScene(QGraphicsScene):
                 self.spots.append(item)
                 self.spotsLabel.append(str(len(self.spots)-1))
                 item.setToolTip(self.spotsLabel[-1])
-                # Enable spots to be saved when present on the image
-                #if len(self.spots) > 0:
-                #    self.parent().fileSaveSpotsAction.setEnabled(True)
 
             elif event.button() == Qt.RightButton:
                 if self.center is None:
