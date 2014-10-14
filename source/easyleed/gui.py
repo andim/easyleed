@@ -384,8 +384,10 @@ class PlotWidget(QWidget):
         self.initPlot()
         self.worker = worker
         self.lines_map = {}
+        j = 0
         for spot in self.worker.spots_map:
-            self.lines_map[spot], = self.axes.plot([], [])
+            self.lines_map[spot], = self.axes.plot([], [], label= str(j))
+            j+=1
         # set up averageLine
         if not hasattr(self, 'averageLine'):
             self.averageLine = []
@@ -399,6 +401,7 @@ class PlotWidget(QWidget):
         except:
             pass
         self.updatePlot()
+        self.axes.legend(loc='upper right', fontsize=10)
         self.show()
 
     def updatePlot(self):
