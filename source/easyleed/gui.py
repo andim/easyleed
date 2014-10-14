@@ -346,7 +346,10 @@ class PlotWidget(QWidget):
         # Add checkbox for smooth average
         self.smoothCheck = QCheckBox("Smooth Average")
         self.smoothCheck.setChecked(config.GraphicsScene_plotSmoothAverage)
-        # Add cButton for clearing plot
+        # Add checkbox for hiding legend in plot
+        self.legendCheck = QCheckBox("Hide Legend")
+        self.legendCheck.setChecked(False)
+        # Add Button for clearing plot
         self.clearPlotButton = QPushButton('&Clear Plot', self)
         
         # Layout
@@ -357,11 +360,13 @@ class PlotWidget(QWidget):
         self.gridLayout.addWidget(self.canvas, 1, 0, 1, -1)
         self.gridLayout.addWidget(self.averageCheck, 2, 0, 1, 1)
         self.gridLayout.addWidget(self.smoothCheck, 3, 0, 1, 1)
-        self.gridLayout.addWidget(self.clearPlotButton, 2, 1, -1, 1)
+        self.gridLayout.addWidget(self.legendCheck, 3, 1, 1, 1)
+        self.gridLayout.addWidget(self.clearPlotButton, 2, 1, 1, 1)
 
         # Define events for checkbox
         QObject.connect(self.averageCheck, SIGNAL("clicked()"), self.updatePlot)
         QObject.connect(self.smoothCheck, SIGNAL("clicked()"), self.updatePlot)
+        QObject.connect(self.legendCheck, SIGNAL("clicked()"), self.updatePlot)
         QObject.connect(self.clearPlotButton, SIGNAL("clicked()"), self.clearPlot)
         
     def setAverageChecks(self):
@@ -408,6 +413,10 @@ class PlotWidget(QWidget):
         """ Basic Matplotlib plotting I(E)-curve """
         # update data
         self.setAverageChecks()
+        if self.legendCheck.isChecked():
+            self.axes.legend().set_visible(False)
+        else:
+            self.axes.legend(fontsize=10).set_visible(True)
         for spot, line in self.lines_map.iteritems():
             line.set_data(self.worker.spots_map[spot][0].m.energy, self.worker.spots_map[spot][0].m.intensity)
         if self.averageCheck.isChecked():
