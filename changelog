@@ -16,7 +16,8 @@ Changelog since version 1.0
 - Added option to display I(E) spectra during acquisition (live plotting).
 - Removed Plotting option panel (no longer needed). 
 - Average intensities can be now plotted “on the fly” using a checkbox in the Plot.
-- Smoothed (cubic spline) average intensities an be now plotted using a checkbox in the Plot.
+- Smoothed (cubic spline) average intensities can be now plotted using a checkbox in the Plot.
+  * Smoothing parameters act “live” on the plot (just type and press Enter, the plot is automatically updated).
 - Average and smoothed averages can be saved into their own intensity files.
 - Improved control over clearing plots: there is now a dedicated button in Plot.
 - Added “Stop” button to stop acquisition (somehow missing). 

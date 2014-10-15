@@ -512,11 +512,13 @@ class ParameterSettingWidget(QWidget):
         
         self.smoothPoints = QSpinBox(self)
         self.smoothPoints.setWrapping(True)
+        self.smoothPoints.setToolTip("Press Enter to update plot")
         self.smoothPoints.setValue(config.GraphicsScene_smoothPoints)
         self.smPoiLabel = QLabel("# points to be rescaled for smoothing", self)
         
         self.smoothSpline = QSpinBox(self)
         self.smoothSpline.setWrapping(True)
+        self.smoothSpline.setToolTip("Press Enter to update plot")
         self.smoothSpline.setValue(config.GraphicsScene_smoothSpline)
         self.smSplLabel = QLabel("Amount of smoothing to perform", self)
 
@@ -875,6 +877,10 @@ class MainWindow(QMainWindow):
         QObject.connect(self.custEnergyButton, SIGNAL("clicked()"), self.custEnBtnClicked)
         QObject.connect(self.custEnergyText, SIGNAL("returnPressed()"), self.setCustEnergy)
     
+        ### Create event connector for enabling fast changes to smoothing parameters
+        QObject.connect(self.parametersettingwid.smoothPoints, SIGNAL("editingFinished()"), self.liveSmoothParameters)
+        QObject.connect(self.parametersettingwid.smoothSpline, SIGNAL("editingFinished()"), self.liveSmoothParameters)
+
     def slider_moved(self, sliderNewPos):
         """
         This function tracks what to do with a slider movement.
@@ -915,6 +921,13 @@ class MainWindow(QMainWindow):
         self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
         self.goto(float(self.custEnergyText.text()))
         self.worker.process(self.loader.goto(self.current_energy))
+    
+    def liveSmoothParameters(self):
+        ''' Real time setting smoothing parameters from Parameter Settings panel into actual smoothed curve '''
+        config.GraphicsScene_smoothPoints = self.parametersettingwid.smoothPoints.value()
+        config.GraphicsScene_smoothSpline = self.parametersettingwid.smoothSpline.value()
+        if self.plotwid.smoothCheck.isChecked():
+            self.plotwid.updatePlot()
 
     def addActions(self, target, actions):
         """

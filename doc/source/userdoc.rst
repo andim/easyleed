@@ -11,6 +11,9 @@ Here is a short step-by-step guide:
 - Change the tracking parameters using "Process -- Set Parameters" or pressing "Set Parameters" in the toolbar. (Optional)
 - Start the tracking of the spots using "Process --> Run" or pressing "Run" in the toolbar. The I(E) plot starts automatically.
 - I(E) averages can be plotted directly from the check box in the Plot window.
+- Smoothed I(E) averages can be plotted directly from the check box in the Plot window (uses cubic spline).
+  * Any change in smoothing parameters in settings is immediately applied in the plot.
+- Tooltips in the image in correspondence to the spots show the spot number. The same number is displayed in the legend in the plot.
 - Click the stop button in the status bar to stop processing. (optional)
 - Save the generated intensities using "File --> Save Intensities..." OR
 - Plot the generated intensities using "Process --> Plot" or the "Plot" option in the toolbar.
