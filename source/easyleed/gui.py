@@ -416,11 +416,13 @@ class PlotWidget(QWidget):
         # update data
         self.setAverageChecks()
         # decide whether to show legend
-        if self.legendCheck.isChecked():
-            self.axes.legend(fontsize=10).set_visible(True)
-        else:
-            self.axes.legend().set_visible(False)
-        
+        if self.axes.legend() is not None:
+            # decide whether to show legend
+            if self.legendCheck.isChecked():
+                self.axes.legend(fontsize=10).set_visible(True)
+            else:
+                self.axes.legend().set_visible(False)
+            
         for spot, line in self.lines_map.iteritems():
             line.set_data(self.worker.spots_map[spot][0].m.energy, self.worker.spots_map[spot][0].m.intensity)
         if self.averageCheck.isChecked():
