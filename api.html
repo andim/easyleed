@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 1.1dev documentation</title>
+    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1dev',
+        VERSION:     '2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -27,7 +27,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/theme_extras.js"></script>
     <link rel="shortcut icon" href="_static/icon.ico"/>
-    <link rel="top" title="EasyLEED 1.1dev documentation" href="index.html" />
+    <link rel="top" title="EasyLEED 2.0 documentation" href="index.html" />
     <link rel="prev" title="User’s Guide" href="userdoc.html" /> 
   </head>
   <body>
@@ -98,14 +98,6 @@ This array can be useful for fancy indexing of numpy arrays.</p>
 x, y: position of the spot
 radius: radius of the spot
 background_substraction: boolean to turn substraction on/off</p>
-</dd></dl>
-
-<dl class="function">
-<dt id="easyleed.base.flatten">
-<tt class="descclassname">easyleed.base.</tt><tt class="descname">flatten</tt><big>(</big><em>l</em>, <em>ltypes=(&lt;type 'list'&gt;</em>, <em>&lt;type 'tuple'&gt;)</em><big>)</big><a class="reference internal" href="_modules/easyleed/base.html#flatten"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.base.flatten" title="Permalink to this definition">¶</a></dt>
-<dd><p>Flatten a nested array.</p>
-<p>This is from Mike C. Fletcher&#8217;s BasicTypes library altered by MonkeeSage
-<a class="reference external" href="http://rightfootin.blogspot.com/2006/09/more-on-python-flatten.html">http://rightfootin.blogspot.com/2006/09/more-on-python-flatten.html</a></p>
 </dd></dl>
 
 <dl class="function">
@@ -233,6 +225,18 @@ R: measurement covariance matrix</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="easyleed.io.ImageLoader.energySteps">
+<tt class="descname">energySteps</tt><big>(</big><em>energy</em><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader.energySteps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader.energySteps" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get # frame steps for custom beam energy.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.io.ImageLoader.goto">
+<tt class="descname">goto</tt><big>(</big><em>energy</em><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader.goto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader.goto" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get image custom beam energy.</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="easyleed.io.ImageLoader.next">
 <tt class="descname">next</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader.next"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader.next" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get image at next higher beam energy.</p>
@@ -248,12 +252,6 @@ R: measurement covariance matrix</p>
 <dt id="easyleed.io.ImageLoader.restart">
 <tt class="descname">restart</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader.restart"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader.restart" title="Permalink to this definition">¶</a></dt>
 <dd><p>Start at lowest energy again.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="easyleed.io.ImageLoader.this">
-<tt class="descname">this</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader.this"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader.this" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get image at next higher beam energy.</p>
 </dd></dl>
 
 </dd></dl>
@@ -344,8 +342,14 @@ R: measurement covariance matrix</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="easyleed.gui.GraphicsScene.removeCenter">
+<tt class="descname">removeCenter</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#GraphicsScene.removeCenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.GraphicsScene.removeCenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove all items from the scene (leaves background unchanged).</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="easyleed.gui.GraphicsScene.setBackground">
-<tt class="descname">setBackground</tt><big>(</big><em>image</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#GraphicsScene.setBackground"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.GraphicsScene.setBackground" title="Permalink to this definition">¶</a></dt>
+<tt class="descname">setBackground</tt><big>(</big><em>image</em>, <em>labeltext</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#GraphicsScene.setBackground"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.GraphicsScene.setBackground" title="Permalink to this definition">¶</a></dt>
 <dd><p>Sets the background image.</p>
 </dd></dl>
 
@@ -362,28 +366,10 @@ R: measurement covariance matrix</p>
 <em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">MainWindow</tt><big>(</big><em>parent=None</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow" title="Permalink to this definition">¶</a></dt>
 <dd><p>EasyLEED&#8217;s main window.</p>
 <dl class="method">
-<dt id="easyleed.gui.MainWindow.SetAllParameters">
-<tt class="descname">SetAllParameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.SetAllParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.SetAllParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Parameter setting control</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="easyleed.gui.MainWindow.acceptParameters">
-<tt class="descname">acceptParameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.acceptParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.acceptParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set user values to the parameters</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="easyleed.gui.MainWindow.addActions">
 <tt class="descname">addActions</tt><big>(</big><em>target</em>, <em>actions</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.addActions"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.addActions" title="Permalink to this definition">¶</a></dt>
 <dd><p>Convenience function that adds the actions to the target.
 If an action is None a separator will be added.</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="easyleed.gui.MainWindow.applyParameters">
-<tt class="descname">applyParameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.applyParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.applyParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set user values to the parameters</p>
 </dd></dl>
 
 <dl class="method">
@@ -393,9 +379,9 @@ If an action is None a separator will be added.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="easyleed.gui.MainWindow.defaultValues">
-<tt class="descname">defaultValues</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.defaultValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.defaultValues" title="Permalink to this definition">¶</a></dt>
-<dd><p>Reload config-module and get the default values</p>
+<dt id="easyleed.gui.MainWindow.custEnBtnClicked">
+<tt class="descname">custEnBtnClicked</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.custEnBtnClicked"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.custEnBtnClicked" title="Permalink to this definition">¶</a></dt>
+<dd><p>Action when custom energy button is clicked</p>
 </dd></dl>
 
 <dl class="method">
@@ -411,27 +397,21 @@ If an action is None a separator will be added.</p>
 </dd></dl>
 
 <dl class="method">
+<dt id="easyleed.gui.MainWindow.liveSmoothParameters">
+<tt class="descname">liveSmoothParameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.liveSmoothParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.liveSmoothParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Real time setting smoothing parameters from Parameter Settings panel into actual smoothed curve</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.MainWindow.loadCenter">
+<tt class="descname">loadCenter</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.loadCenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.loadCenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load saved center position from file</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="easyleed.gui.MainWindow.loadSpots">
 <tt class="descname">loadSpots</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.loadSpots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.loadSpots" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load saved spot positions</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="easyleed.gui.MainWindow.loadValues">
-<tt class="descname">loadValues</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.loadValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.loadValues" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load a file of set parameter values that has been saved with the widget</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="easyleed.gui.MainWindow.plotting">
-<tt class="descname">plotting</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.plotting"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.plotting" title="Permalink to this definition">¶</a></dt>
-<dd><p>Basic Matplotlib plotting I(E)-curve</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="easyleed.gui.MainWindow.plottingAverage">
-<tt class="descname">plottingAverage</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.plottingAverage"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.plottingAverage" title="Permalink to this definition">¶</a></dt>
-<dd><p>Mostly the same as normal plotting but plots the average of the calculated intensities</p>
 </dd></dl>
 
 <dl class="method">
@@ -441,9 +421,9 @@ If an action is None a separator will be added.</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="easyleed.gui.MainWindow.savePlot">
-<tt class="descname">savePlot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.savePlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.savePlot" title="Permalink to this definition">¶</a></dt>
-<dd><p>Saving the plot</p>
+<dt id="easyleed.gui.MainWindow.saveCenter">
+<tt class="descname">saveCenter</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.saveCenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.saveCenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saves the center locations to a file</p>
 </dd></dl>
 
 <dl class="method">
@@ -455,13 +435,13 @@ If an action is None a separator will be added.</p>
 <dl class="method">
 <dt id="easyleed.gui.MainWindow.saveSpots">
 <tt class="descname">saveSpots</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.saveSpots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.saveSpots" title="Permalink to this definition">¶</a></dt>
-<dd><p>saves the spot locations to a file, uses workers saveloc-function</p>
+<dd><p>Saves the spot locations to a file, uses workers saveloc-function</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="easyleed.gui.MainWindow.saveValues">
-<tt class="descname">saveValues</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.saveValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.saveValues" title="Permalink to this definition">¶</a></dt>
-<dd><p>Basic saving of the set parameter values to a file</p>
+<dt id="easyleed.gui.MainWindow.setCustEnergy">
+<tt class="descname">setCustEnergy</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.setCustEnergy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.setCustEnergy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Take energy from custom energy text and move the corresponding frame</p>
 </dd></dl>
 
 <dl class="method">
@@ -473,13 +453,55 @@ If an action is None a separator will be added.</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="easyleed.gui.Plot">
-<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">Plot</tt><a class="reference internal" href="_modules/easyleed/gui.html#Plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Plot" title="Permalink to this definition">¶</a></dt>
+<dt id="easyleed.gui.ParameterSettingWidget">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">ParameterSettingWidget</tt><a class="reference internal" href="_modules/easyleed/gui.html#ParameterSettingWidget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.ParameterSettingWidget" title="Permalink to this definition">¶</a></dt>
+<dd><p>PyQt widget for setting tracking parameters</p>
+<dl class="method">
+<dt id="easyleed.gui.ParameterSettingWidget.applyParameters">
+<tt class="descname">applyParameters</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#ParameterSettingWidget.applyParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.ParameterSettingWidget.applyParameters" title="Permalink to this definition">¶</a></dt>
+<dd><p>Parameter setting control</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.ParameterSettingWidget.defaultValues">
+<tt class="descname">defaultValues</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#ParameterSettingWidget.defaultValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.ParameterSettingWidget.defaultValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reload config-module and get the default values</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.ParameterSettingWidget.loadValues">
+<tt class="descname">loadValues</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#ParameterSettingWidget.loadValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.ParameterSettingWidget.loadValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a file of set parameter values that has been saved with the widget</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.ParameterSettingWidget.saveValues">
+<tt class="descname">saveValues</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#ParameterSettingWidget.saveValues"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.ParameterSettingWidget.saveValues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic saving of the set parameter values to a file</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="easyleed.gui.PlotWidget">
+<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">PlotWidget</tt><a class="reference internal" href="_modules/easyleed/gui.html#PlotWidget"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.PlotWidget" title="Permalink to this definition">¶</a></dt>
 <dd><p>Custom PyQt widget canvas for plotting</p>
 <dl class="method">
-<dt id="easyleed.gui.Plot.create_main_frame">
-<tt class="descname">create_main_frame</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#Plot.create_main_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Plot.create_main_frame" title="Permalink to this definition">¶</a></dt>
+<dt id="easyleed.gui.PlotWidget.create_main_frame">
+<tt class="descname">create_main_frame</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#PlotWidget.create_main_frame"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.PlotWidget.create_main_frame" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create the mpl Figure and FigCanvas objects.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.PlotWidget.save">
+<tt class="descname">save</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#PlotWidget.save"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.PlotWidget.save" title="Permalink to this definition">¶</a></dt>
+<dd><p>Saving the plot</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.PlotWidget.updatePlot">
+<tt class="descname">updatePlot</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#PlotWidget.updatePlot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.PlotWidget.updatePlot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Basic Matplotlib plotting I(E)-curve</p>
 </dd></dl>
 
 </dd></dl>
@@ -573,15 +595,15 @@ inc &lt; 0: decrease</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="easyleed.gui.SetParameters">
-<em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">SetParameters</tt><a class="reference internal" href="_modules/easyleed/gui.html#SetParameters"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.SetParameters" title="Permalink to this definition">¶</a></dt>
-<dd><p>PyQt widget for setting tracking parameters</p>
-</dd></dl>
-
-<dl class="class">
 <dt id="easyleed.gui.Worker">
 <em class="property">class </em><tt class="descclassname">easyleed.gui.</tt><tt class="descname">Worker</tt><big>(</big><em>spots</em>, <em>center</em>, <em>energy</em>, <em>parent=None</em><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#Worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Worker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Worker that manages the spots.</p>
+<dl class="method">
+<dt id="easyleed.gui.Worker.numProcessed">
+<tt class="descname">numProcessed</tt><big>(</big><big>)</big><a class="reference internal" href="_modules/easyleed/gui.html#Worker.numProcessed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Worker.numProcessed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the number of processed images.</p>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -601,7 +623,7 @@ inc &lt; 0: decrease</p>
 
     <div class="footer">
         &copy; Copyright 2010-14, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2014-10-02.
+      Last updated on 2014-10-21.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>

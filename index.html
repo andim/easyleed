@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 1.1dev documentation</title>
+    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1dev',
+        VERSION:     '2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -27,7 +27,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/theme_extras.js"></script>
     <link rel="shortcut icon" href="_static/icon.ico"/>
-    <link rel="top" title="EasyLEED 1.1dev documentation" href="#" />
+    <link rel="top" title="EasyLEED 2.0 documentation" href="#" />
     <link rel="next" title="User’s Guide" href="userdoc.html" /> 
   </head>
   <body>
@@ -46,6 +46,7 @@
 <h3>Timeline</h3>
 
 <ul style="list-style-type:disc">
+    <li>October 2014: Easyleed 2.0 released. Many improvements and bug fixes (see <a href="https://github.com/andim/easyleed/blob/master/changelog">changelog</a>).</li>
     <li>March 2014: Fixed a number of minor bugs.</li>
     <li>August 2013: Code and documentation moved to Github.</li>
     <li>July 2012: Publication of paper on tracking algorithm.</li>
@@ -81,7 +82,7 @@ If you have any questions, comments or bug reports please <a href="mailto:andiss
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="download">
 <h2>Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h2>
-<p>EasyLEED is open-source software licensed under the GPL v2. The software can be downloaded as a zip-file (<a class="reference download internal" href="_downloads/source.zip"><tt class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">ZIP-File</span></tt></a>, last update 2014-10-02). Alternatively the developer version of the code can be obtained by cloning the git repository: <a class="reference external" href="https://github.com/andim/easyleed/">https://github.com/andim/easyleed/</a></p>
+<p>EasyLEED is open-source software licensed under the GPL v2. The software can be downloaded as a zip-file (<a class="reference download internal" href="_downloads/source.zip"><tt class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">ZIP-File</span></tt></a>, last update 2014-10-21). Alternatively the developer version of the code can be obtained by cloning the git repository: <a class="reference external" href="https://github.com/andim/easyleed/">https://github.com/andim/easyleed/</a></p>
 </div>
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
@@ -92,16 +93,30 @@ If you have any questions, comments or bug reports please <a href="mailto:andiss
 <li>Numpy &gt;1.5 and Scipy &gt;0.9 <a class="reference external" href="http://www.scipy.org/">http://www.scipy.org/</a></li>
 <li>Matplotlib &gt;0.9 <a class="reference external" href="http://matplotlib.org/">http://matplotlib.org/</a></li>
 </ul>
-<p>Under Windows a simple way to get all the required python packages at once is to install the Python distribution <a class="reference external" href="http://code.google.com/p/pythonxy/">Python(x,y)</a>.</p>
 <p>Dependent on the file format of your input LEED images, you should also install the following packages:</p>
 <ul class="simple">
 <li>Python Imaging Library (for .tif, .png, .jpg) <a class="reference external" href="http://www.pythonware.com/products/pil/">http://www.pythonware.com/products/pil/</a></li>
 <li>PyFITS (for .fits) <a class="reference external" href="http://www.stsci.edu/resources/software_hardware/pyfits/">http://www.stsci.edu/resources/software_hardware/pyfits/</a></li>
 </ul>
+<div class="section" id="installing-dependencies-on-windows">
+<h3>Installing dependencies on Windows<a class="headerlink" href="#installing-dependencies-on-windows" title="Permalink to this headline">¶</a></h3>
+<p>The simplest way to get all the required python packages at once is to install the Python distribution <a class="reference external" href="http://code.google.com/p/pythonxy/">Python(x,y)</a>.</p>
+</div>
+<div class="section" id="installing-dependencies-on-mac-osx">
+<h3>Installing dependencies on Mac OSX<a class="headerlink" href="#installing-dependencies-on-mac-osx" title="Permalink to this headline">¶</a></h3>
+<p>All required packages can be obtained through <a class="reference external" href="http://www.macports.org/">MacPorts</a>. After installing macports, individual libraries are installed with the following:</p>
+<div class="highlight-python"><div class="highlight"><pre>sudo port install py-pyqt4
+sudo port install py-numpy
+sudo port install py-scipy
+sudo port install py-matplotlib
+sudo port install py-pil
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="run">
 <h2>Run<a class="headerlink" href="#run" title="Permalink to this headline">¶</a></h2>
-<p>After downloading the zip-file extract its content to a directory. If you have already installed the dependencies, you are ready to go and can open the graphical user interface by running <tt class="docutils literal"><span class="pre">run-gui.py</span></tt>.</p>
+<p>After downloading the zip-file extract its content to a directory. If you have already installed the dependencies, you are ready to go and can open the graphical user interface by running <tt class="docutils literal"><span class="pre">run-gui.py</span></tt>. In Unix systems (such as Mac OS X), you can run it from the terminal with the command: python2.7 run-gui.py</p>
 </div>
 </div>
 <div class="section" id="documentation">
@@ -113,17 +128,17 @@ If you have any questions, comments or bug reports please <a href="mailto:andiss
 </ul>
 </div>
 </div>
-<div class="section" id="outro">
-<h1>Outro<a class="headerlink" href="#outro" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="developer-team">
+<h1>Developer Team<a class="headerlink" href="#developer-team" title="Permalink to this headline">¶</a></h1>
 <p>Development of EasyLEED was started by Andreas Mayer while working in Renee Diehl&#8217;s lab (Penn State). Hanna Salopaasi has contributed to the user interface while working in Katariina Pussi&#8217;s lab (Lappeenranta University of Technology). Further UI and core improvements are currently contributed by Nicola Ferralis (Massachusetts Institute of Technology). We continue to work on facilitating LEED pattern analysis and therefore appreciate any form of user feedback!</p>
+</div>
 <div class="section" id="citing-easyleed">
-<h2>Citing EasyLEED<a class="headerlink" href="#citing-easyleed" title="Permalink to this headline">¶</a></h2>
+<h1>Citing EasyLEED<a class="headerlink" href="#citing-easyleed" title="Permalink to this headline">¶</a></h1>
 <p>We have described the algorithm, which is implemented in EasyLEED in the following article (<a class="reference download internal" href="_downloads/easyleed.bib"><tt class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">Bibtex-File</span></tt></a>):</p>
 <ol class="upperalpha simple">
 <li>Mayer, H. Salopaasi, K. Pussi, R.D. Diehl. A novel method for the extraction of intensity-energy spectra from low-energy electron diffraction patterns. Comput. Phys. Commun. 183, 1443-1447 (2012)</li>
 </ol>
 <p>The paper is available <a class="reference external" href="http://dx.doi.org/10.1016/j.cpc.2012.02.019">online</a> at the publisher&#8217;s website. If you are unable to assess the paper at your institution, feel free to contact us via email for a preprint.</p>
-</div>
 </div>
 
 
@@ -141,7 +156,7 @@ If you have any questions, comments or bug reports please <a href="mailto:andiss
 
     <div class="footer">
         &copy; Copyright 2010-14, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2014-10-02.
+      Last updated on 2014-10-21.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>

@@ -8,7 +8,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 1.1dev documentation</title>
+    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 2.0 documentation</title>
     
     <link rel="stylesheet" href="_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -17,7 +17,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '1.1dev',
+        VERSION:     '2.0',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -28,7 +28,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/theme_extras.js"></script>
     <link rel="shortcut icon" href="_static/icon.ico"/>
-    <link rel="top" title="EasyLEED 1.1dev documentation" href="index.html" /> 
+    <link rel="top" title="EasyLEED 2.0 documentation" href="index.html" /> 
   </head>
   <body>
       <div class="header">
@@ -85,10 +85,6 @@
   <dt><a href="api.html#easyleed.kalman.AbstractPVKalmanFilter">AbstractPVKalmanFilter (class in easyleed.kalman)</a>
   </dt>
 
-      
-  <dt><a href="api.html#easyleed.gui.MainWindow.acceptParameters">acceptParameters() (easyleed.gui.MainWindow method)</a>
-  </dt>
-
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
@@ -100,7 +96,7 @@
   </dt>
 
       
-  <dt><a href="api.html#easyleed.gui.MainWindow.applyParameters">applyParameters() (easyleed.gui.MainWindow method)</a>
+  <dt><a href="api.html#easyleed.gui.ParameterSettingWidget.applyParameters">applyParameters() (easyleed.gui.ParameterSettingWidget method)</a>
   </dt>
 
   </dl></td>
@@ -122,7 +118,7 @@
   </dt>
 
       
-  <dt><a href="api.html#easyleed.gui.Plot.create_main_frame">create_main_frame() (easyleed.gui.Plot method)</a>
+  <dt><a href="api.html#easyleed.gui.PlotWidget.create_main_frame">create_main_frame() (easyleed.gui.PlotWidget method)</a>
   </dt>
 
   </dl></td>
@@ -136,6 +132,10 @@
   </dt>
 
       
+  <dt><a href="api.html#easyleed.gui.MainWindow.custEnBtnClicked">custEnBtnClicked() (easyleed.gui.MainWindow method)</a>
+  </dt>
+
+      
   <dt><a href="api.html#easyleed.io.ImageLoader.custom_iter">custom_iter() (easyleed.io.ImageLoader method)</a>
   </dt>
 
@@ -146,7 +146,7 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api.html#easyleed.gui.MainWindow.defaultValues">defaultValues() (easyleed.gui.MainWindow method)</a>
+  <dt><a href="api.html#easyleed.gui.ParameterSettingWidget.defaultValues">defaultValues() (easyleed.gui.ParameterSettingWidget method)</a>
   </dt>
 
   </dl></td>
@@ -183,6 +183,10 @@
   <dt><a href="api.html#module-easyleed.kalman">easyleed.kalman (module)</a>
   </dt>
 
+      
+  <dt><a href="api.html#easyleed.io.ImageLoader.energySteps">energySteps() (easyleed.io.ImageLoader method)</a>
+  </dt>
+
   </dl></td>
 </tr></table>
 
@@ -203,10 +207,6 @@
   <dt><a href="api.html#easyleed.io.FitsImageLoader">FitsImageLoader (class in easyleed.io)</a>
   </dt>
 
-      
-  <dt><a href="api.html#easyleed.base.flatten">flatten() (in module easyleed.base)</a>
-  </dt>
-
   </dl></td>
 </tr></table>
 
@@ -215,6 +215,10 @@
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#easyleed.base.gaussian2d">gaussian2d() (in module easyleed.base)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#easyleed.io.ImageLoader.goto">goto() (easyleed.io.ImageLoader method)</a>
   </dt>
 
       
@@ -278,13 +282,21 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api.html#easyleed.gui.MainWindow.loadSpots">loadSpots() (easyleed.gui.MainWindow method)</a>
+  <dt><a href="api.html#easyleed.gui.MainWindow.liveSmoothParameters">liveSmoothParameters() (easyleed.gui.MainWindow method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#easyleed.gui.MainWindow.loadCenter">loadCenter() (easyleed.gui.MainWindow method)</a>
   </dt>
 
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api.html#easyleed.gui.MainWindow.loadValues">loadValues() (easyleed.gui.MainWindow method)</a>
+  <dt><a href="api.html#easyleed.gui.MainWindow.loadSpots">loadSpots() (easyleed.gui.MainWindow method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#easyleed.gui.ParameterSettingWidget.loadValues">loadValues() (easyleed.gui.ParameterSettingWidget method)</a>
   </dt>
 
   </dl></td>
@@ -347,6 +359,10 @@
   <dt><a href="api.html#easyleed.io.npimage2qimage">npimage2qimage() (in module easyleed.io)</a>
   </dt>
 
+      
+  <dt><a href="api.html#easyleed.gui.Worker.numProcessed">numProcessed() (easyleed.gui.Worker method)</a>
+  </dt>
+
   </dl></td>
 </tr></table>
 
@@ -370,19 +386,15 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
+  <dt><a href="api.html#easyleed.gui.ParameterSettingWidget">ParameterSettingWidget (class in easyleed.gui)</a>
+  </dt>
+
+      
   <dt><a href="api.html#easyleed.io.PILImageLoader">PILImageLoader (class in easyleed.io)</a>
   </dt>
 
       
-  <dt><a href="api.html#easyleed.gui.Plot">Plot (class in easyleed.gui)</a>
-  </dt>
-
-      
-  <dt><a href="api.html#easyleed.gui.MainWindow.plotting">plotting() (easyleed.gui.MainWindow method)</a>
-  </dt>
-
-      
-  <dt><a href="api.html#easyleed.gui.MainWindow.plottingAverage">plottingAverage() (easyleed.gui.MainWindow method)</a>
+  <dt><a href="api.html#easyleed.gui.PlotWidget">PlotWidget (class in easyleed.gui)</a>
   </dt>
 
   </dl></td>
@@ -433,6 +445,10 @@
   <dt><a href="api.html#easyleed.gui.GraphicsScene.removeAll">removeAll() (easyleed.gui.GraphicsScene method)</a>
   </dt>
 
+      
+  <dt><a href="api.html#easyleed.gui.GraphicsScene.removeCenter">removeCenter() (easyleed.gui.GraphicsScene method)</a>
+  </dt>
+
   </dl></td>
   <td style="width: 33%" valign="top"><dl>
       
@@ -452,7 +468,11 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api.html#easyleed.gui.MainWindow.savePlot">savePlot() (easyleed.gui.MainWindow method)</a>
+  <dt><a href="api.html#easyleed.gui.PlotWidget.save">save() (easyleed.gui.PlotWidget method)</a>
+  </dt>
+
+      
+  <dt><a href="api.html#easyleed.gui.MainWindow.saveCenter">saveCenter() (easyleed.gui.MainWindow method)</a>
   </dt>
 
       
@@ -464,11 +484,7 @@
   </dt>
 
       
-  <dt><a href="api.html#easyleed.gui.MainWindow.saveValues">saveValues() (easyleed.gui.MainWindow method)</a>
-  </dt>
-
-      
-  <dt><a href="api.html#easyleed.gui.MainWindow.SetAllParameters">SetAllParameters() (easyleed.gui.MainWindow method)</a>
+  <dt><a href="api.html#easyleed.gui.ParameterSettingWidget.saveValues">saveValues() (easyleed.gui.ParameterSettingWidget method)</a>
   </dt>
 
   </dl></td>
@@ -478,7 +494,7 @@
   </dt>
 
       
-  <dt><a href="api.html#easyleed.gui.SetParameters">SetParameters (class in easyleed.gui)</a>
+  <dt><a href="api.html#easyleed.gui.MainWindow.setCustEnergy">setCustEnergy() (easyleed.gui.MainWindow method)</a>
   </dt>
 
       
@@ -496,12 +512,6 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%" valign="top"><dl>
       
-  <dt><a href="api.html#easyleed.io.ImageLoader.this">this() (easyleed.io.ImageLoader method)</a>
-  </dt>
-
-  </dl></td>
-  <td style="width: 33%" valign="top"><dl>
-      
   <dt><a href="api.html#easyleed.base.Tracker">Tracker (class in easyleed.base)</a>
   </dt>
 
@@ -513,6 +523,12 @@
   <td style="width: 33%" valign="top"><dl>
       
   <dt><a href="api.html#easyleed.kalman.AbstractKalmanFilter.update">update() (easyleed.kalman.AbstractKalmanFilter method)</a>
+  </dt>
+
+  </dl></td>
+  <td style="width: 33%" valign="top"><dl>
+      
+  <dt><a href="api.html#easyleed.gui.PlotWidget.updatePlot">updatePlot() (easyleed.gui.PlotWidget method)</a>
   </dt>
 
   </dl></td>
@@ -543,7 +559,7 @@
 
     <div class="footer">
         &copy; Copyright 2010-14, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2014-10-02.
+      Last updated on 2014-10-21.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
     </div>
   </body>
