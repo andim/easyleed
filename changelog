@@ -1,5 +1,8 @@
-Changelog since version 1.0
-=============================
+Changelog
+==========
+
+Version 2.0
+------------
 
 (NF): 
 - New energy slider for fast scrolling over opened frames.
@@ -52,3 +55,4 @@ Changes in  defaults:
 - default size of integration window 10 --> 20
 - Tracking input precision 5 --> 2
 - Tracking process noise in position 0.04 --> 0.1
+
