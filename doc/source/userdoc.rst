@@ -38,4 +38,4 @@ You can change the regular expression that is used for parsing energies from fil
 Custom configuration
 --------------------
 
-Most of the default parameters of the algorithm as well as many . Copy `easyleed/default-config.py` to `config.py` and edit this file (it takes precedence over the former file).
+Most of the default parameters of the algorithm as well as many UI tweaks are controlled via a config file. Copy `easyleed/default-config.py` to `config.py` and edit this file (it takes precedence over the former file) for customization.
