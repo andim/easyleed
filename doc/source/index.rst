@@ -32,22 +32,24 @@ Dependent on the file format of your input LEED images, you should also install 
 - Python Imaging Library (for .tif, .png, .jpg) http://www.pythonware.com/products/pil/
 - PyFITS (for .fits) `<http://www.stsci.edu/resources/software_hardware/pyfits/>`_
 
-Installation - Windows
-----------------------
+Installing dependencies on Windows
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The simplest way to get all the required python packages at once is to install the Python distribution `Python(x,y) <http://code.google.com/p/pythonxy/>`_.
 
 
-Installation - Mac OSX
-----------------------
+Installing dependencies on Mac OSX
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 All required packages can be obtained through `MacPorts <http://www.macports.org/>`_. After installing macports, individual libraries are installed with the following:
 
-sudo port install py-pyqt4
-sudo port install py-numpy
-sudo port install py-scipy
-sudo port install py-matplotlib
-sudo port install py-pil 
+::
+
+    sudo port install py-pyqt4
+    sudo port install py-numpy
+    sudo port install py-scipy
+    sudo port install py-matplotlib
+    sudo port install py-pil 
 
 
 Run
@@ -72,7 +74,8 @@ Developer Team
 Development of EasyLEED was started by Andreas Mayer while working in Renee Diehl's lab (Penn State). Hanna Salopaasi has contributed to the user interface while working in Katariina Pussi's lab (Lappeenranta University of Technology). Further UI and core improvements are currently contributed by Nicola Ferralis (Massachusetts Institute of Technology). We continue to work on facilitating LEED pattern analysis and therefore appreciate any form of user feedback! 
 
 Citing EasyLEED
----------------
+===============
+
 
 We have described the algorithm, which is implemented in EasyLEED in the following article (:download:`Download Bibtex-File<easyleed.bib>`):
 
