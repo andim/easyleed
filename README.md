@@ -1,7 +1,7 @@
-Easyleed
-========
+EasyLEED
+=========
 
-A program for Low Energy Electron Diffraction I(E)-spectra analysis. 
+A software for semi-automated Low Energy Electron Diffraction I(E)-spectra analysis. 
 
 See also http://andim.github.io/easyleed/. 
 
