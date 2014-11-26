@@ -13,8 +13,9 @@ PAPEROPT_letter = -D latex_paper_size=letter
 ALLSPHINXOPTS   = -d $(BUILDDIR)/doctrees $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
 # the i18n builder cannot share the environment and doctrees with the others
 I18NSPHINXOPTS  = $(PAPEROPT_$(PAPER)) $(SPHINXOPTS) source
+SOURCE = $(shell find ../source/ -name "*.py")
 
-.PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext show uplad
+.PHONY: help clean html dirhtml singlehtml pickle json htmlhelp qthelp devhelp epub latex latexpdf text man changes linkcheck doctest gettext show uplad zipsource
 
 help:
 	@echo "Please use \`make <target>' where <target> is one of"
@@ -41,8 +42,10 @@ help:
 clean:
 	-rm -rf $(BUILDDIR)/*
 
-source.zip:
-	find ../source/ -name "*.py" | zip source/_static/source.zip -@
+zipsource: source/_static/source.zip
+
+source/_static/source.zip: $(SOURCE)
+	zip source/_static/source.zip $(SOURCE)
 
 html: 
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
@@ -145,6 +148,6 @@ doctest:
 show:
 	firefox build/html/index.html &
 
-ghpages: html
+ghpages: html zipsource
 	cp -r build/html/* ../../easyleed-github-pages/
 
