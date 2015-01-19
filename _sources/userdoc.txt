@@ -1,6 +1,11 @@
 User's Guide
 ============
 
+.. warning:: This guide is incomplete and not always up-to-date with the newest version of the software.
+    If you are running into trouble using the software we are happy to provide further assistance via email.
+
+    We would also be happy about volunteers who want to contribute to EasyLEED by extending this guide!
+
 Here is a short step-by-step guide:
 
 - Open the images you want to work with using "File --> Open..." or use "Open" in the toolbar. Only the images selected in the file dialog will be processed later on.
