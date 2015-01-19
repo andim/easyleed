@@ -47,7 +47,7 @@ zipsource: source/_static/source.zip
 source/_static/source.zip: $(SOURCE)
 	zip source/_static/source.zip $(SOURCE)
 
-html: 
+html: zipsource
 	$(SPHINXBUILD) -b html $(ALLSPHINXOPTS) $(BUILDDIR)/html
 	@echo
 	@echo "Build finished. The HTML pages are in $(BUILDDIR)/html."
@@ -148,6 +148,6 @@ doctest:
 show:
 	firefox build/html/index.html &
 
-ghpages: html zipsource
+ghpages: html
 	cp -r build/html/* ../../easyleed-github-pages/
 
