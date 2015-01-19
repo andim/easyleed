@@ -81,4 +81,4 @@ We have described the algorithm, which is implemented in EasyLEED in the followi
 
 A. Mayer, H. Salopaasi, K. Pussi, R.D. Diehl. A novel method for the extraction of intensity-energy spectra from low-energy electron diffraction patterns. Comput. Phys. Commun. 183, 1443-1447 (2012)
 
-The paper is available `online <http://dx.doi.org/10.1016/j.cpc.2012.02.019>`_ at the publisher's website. If you are unable to assess the paper at your institution, feel free to contact us via email for a preprint.
+The paper is available `online <http://dx.doi.org/10.1016/j.cpc.2012.02.019>`_ at the publisher's website. If you are unable to access the paper at your institution, feel free to contact us via email for a preprint.
