@@ -27,6 +27,8 @@ Here is a short step-by-step guide:
 - Parameter settings can also be saved/loaded
 - The selected spot and center positions can also be saved and reloaded for further intensity acquisitions.
 
+It might be useful to get a rough understanding of the underlying algorithm for intuition into how to set parameters. We recommend you read our paper for an introduction to the ideas behind EasyLEED.
+
 File naming policy
 ------------------
 
