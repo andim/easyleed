@@ -29,7 +29,7 @@ EasyLEED is written in `Python <http://www.python.org/>`_ and relies on the foll
 
 Dependent on the file format of your input LEED images, you should also install the following packages:
 
-- Python Imaging Library (for .tif, .png, .jpg) http://www.pythonware.com/products/pil/
+- Pillow (for .tif, .png, .jpg) `https://python-pillow.github.io/>`_
 - PyFITS (for .fits) `<http://www.stsci.edu/resources/software_hardware/pyfits/>`_
 
 Installing dependencies on Windows
