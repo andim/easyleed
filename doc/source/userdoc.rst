@@ -44,3 +44,8 @@ Custom configuration
 --------------------
 
 Most of the default parameters of the algorithm as well as many UI tweaks are controlled via a config file. Copy `easyleed/default-config.py` to `config.py` and edit this file (it takes precedence over the former file) for customization.
+
+Qt Wrapper
+----------
+
+There exist to different python wrappers for the `Qt` library (`PyQt4` and `PySide`). Both can be used with EasyLEED. To select which one to use set the `QT_API` environment variable to either `pyqt` or `pyside`.

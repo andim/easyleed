@@ -23,13 +23,14 @@ Dependencies
 EasyLEED is written in `Python <http://www.python.org/>`_ and relies on the following libraries:
 
 - Python 2.6 or 2.7 `<http://www.python.org/>`_
-- Qt 4.6 `<http://qt.nokia.com/>`_ and PyQt 4.7 `<http://www.riverbankcomputing.co.uk/>`_
+- Qt 4.6 `<http://qt.nokia.com/>`_ 
+- PyQt 4.7 `<http://www.riverbankcomputing.co.uk/>`_ or PySide `<https://wiki.qt.io/Category:LanguageBindings::PySide>`_
 - Numpy >1.5 and Scipy >0.9 `<http://www.scipy.org/>`_
 - Matplotlib >0.9 `<http://matplotlib.org/>`_ 
 
 Dependent on the file format of your input LEED images, you should also install the following packages:
 
-- Pillow (for .tif, .png, .jpg) `https://python-pillow.github.io/>`_
+- Pillow (for .tif, .png, .jpg) `<https://python-pillow.github.io/>`_
 - PyFITS (for .fits) `<http://www.stsci.edu/resources/software_hardware/pyfits/>`_
 
 Installing dependencies on Windows
