@@ -213,13 +213,13 @@ table.index a:hover, table.index a:active {
 /* Sidebar settings */
 
 div.bodywrapper {
-    margin: 0 {{ theme_sidebarwidth|toint + 15 }}px 0 0;
+    margin: 0 calc({{ theme_sidebarwidth|toint + 1 }}px + 1em) 0 0;
     border-right: 1px solid #ccc;
 }
 
 div.body {
     margin: 0;
-    padding: 0.5em 20px 20px 20px;
+    padding: 0.5em 2em 2em 2em;
 }
 
 div.sphinxsidebarwrapper {
