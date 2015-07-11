@@ -9,8 +9,8 @@ import logging
 import webbrowser
 import pickle
 
-from PyQt4.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
-from PyQt4.QtGui import (QApplication, QMainWindow, QGraphicsView,
+from qt.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
+from qt.QtGui import (QApplication, QMainWindow, QGraphicsView,
     QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
     QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsRectItem, QGraphicsItem,
     QGraphicsSimpleTextItem, QToolButton,
