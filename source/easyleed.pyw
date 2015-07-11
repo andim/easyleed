@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 import sys
-from PyQt4.QtGui import QApplication
+from easyleed.qt.QtGui import QApplication
 import easyleed
 
 app = QApplication(sys.argv)

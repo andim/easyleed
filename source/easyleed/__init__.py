@@ -35,4 +35,5 @@ import kalman
 import io
 import base
 import test
+import qt
 import gui
