@@ -11,7 +11,7 @@ setup(
     author='Andreas Mayer, Hanna Salopaasi, Nicola Ferralis',
     author_email='andisspam@gmail.com',
     url='https://andim.github.io/easyleed/',
-    download_url='https://github.com/andim/easyleed/tarball/2.1rc1',
+    download_url='https://github.com/andim/easyleed/archive/2.1rc1.tar.gz',
     keywords=['LEED', 'surface science', 'image analysis', 'I(E) spectra', 'spot tracking'],
     license='GPLv2',
     platforms='any',
