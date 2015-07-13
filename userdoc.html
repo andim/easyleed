@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 2.0 documentation</title>
+    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 2.1 documentation</title>
     
     <link rel="stylesheet" href="_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.0',
+        VERSION:     '2.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -27,9 +27,9 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/theme_extras.js"></script>
     <link rel="shortcut icon" href="_static/icon.ico"/>
-    <link rel="top" title="EasyLEED 2.0 documentation" href="index.html" />
+    <link rel="top" title="EasyLEED 2.1 documentation" href="index.html" />
     <link rel="next" title="The EasyLEED API" href="api.html" />
-    <link rel="prev" title="Intro" href="index.html" /> 
+    <link rel="prev" title="Manual Installation" href="maninstall.html" /> 
   </head>
   <body>
       <div class="header">
@@ -74,6 +74,7 @@ If you are running into trouble using the software we are happy to provide furth
 <li>Parameter settings can also be saved/loaded</li>
 <li>The selected spot and center positions can also be saved and reloaded for further intensity acquisitions.</li>
 </ul>
+<p>It might be useful to get a rough understanding of the underlying algorithm for intuition into how to set parameters. We recommend you read our paper for an introduction to the ideas behind EasyLEED.</p>
 <div class="section" id="file-naming-policy">
 <h2>File naming policy<a class="headerlink" href="#file-naming-policy" title="Permalink to this headline">¶</a></h2>
 <p>EasyLEED tries to infer the beam energy from the filename.</p>
@@ -88,6 +89,10 @@ You can change the regular expression that is used for parsing energies from fil
 <div class="section" id="custom-configuration">
 <h2>Custom configuration<a class="headerlink" href="#custom-configuration" title="Permalink to this headline">¶</a></h2>
 <p>Most of the default parameters of the algorithm as well as many UI tweaks are controlled via a config file. Copy <cite>easyleed/default-config.py</cite> to <cite>config.py</cite> and edit this file (it takes precedence over the former file) for customization.</p>
+</div>
+<div class="section" id="qt-wrapper">
+<h2>Qt Wrapper<a class="headerlink" href="#qt-wrapper" title="Permalink to this headline">¶</a></h2>
+<p>There exist to different python wrappers for the <cite>Qt</cite> library (<cite>PyQt4</cite> and <cite>PySide</cite>). Both can be used with EasyLEED. To select which one to use set the <cite>QT_API</cite> environment variable to either <cite>pyqt</cite> or <cite>pyside</cite>.</p>
 </div>
 </div>
 
@@ -105,8 +110,8 @@ You can change the regular expression that is used for parsing energies from fil
 
     <div class="footer">
         &copy; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2015-01-19.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.2.
+      Last updated on 2015-07-13.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
     </div>
   </body>
 </html>
