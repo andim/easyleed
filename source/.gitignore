@@ -2,3 +2,4 @@ config.py
 MANIFEST
 dist/
 build/
+*.egg-info/
