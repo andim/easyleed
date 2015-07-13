@@ -11,7 +11,7 @@ The user selects the spots he wants to track and the software then tries to auto
 Quickstart
 ==========
 
-EasyLEED is available from `PyPI <https://pypi.python.org/pypi/EasyLEED/` and can thus by installed by executing the following command in a console.
+EasyLEED is available from `PyPI <https://pypi.python.org/pypi/EasyLEED/>` and can thus by installed by executing the following command in a console.
 
 ::
 
