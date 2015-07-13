@@ -9,8 +9,8 @@ import logging
 import webbrowser
 import pickle
 
-from qt.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
-from qt.QtGui import (QApplication, QMainWindow, QGraphicsView,
+from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
+from .qt.QtGui import (QApplication, QMainWindow, QGraphicsView,
     QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
     QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsRectItem, QGraphicsItem,
     QGraphicsSimpleTextItem, QToolButton,
@@ -22,8 +22,8 @@ import numpy as np
 from . import config
 from . import __version__
 from . import __author__
-from base import *
-from io import *
+from .base import *
+from .io import *
 from scipy import interpolate
 
 from matplotlib.figure import Figure
@@ -205,7 +205,7 @@ class GraphicsScene(QGraphicsScene):
                     self.center = item
                     self.parent().fileSaveCenterAction.setEnabled(True)
                 else:
-                    print "failure: center already defined"
+                    print("failure: center already defined")
         else:
             self.parent().statusBar().showMessage("Spots require a loaded image", 5000)
 
@@ -692,7 +692,7 @@ class ParameterSettingWidget(QWidget):
                          self.livePlotting.isChecked(), self.spotIdentification.currentIndex(),
                          self.processNoisePosition.value(), self.processNoiseVelocity.value()]
             pickle.dump(writelist, output)
-            print "Custom settings saved."
+            print("Custom settings saved.")
 
     def loadValues(self):
         """ Load a file of set parameter values that has been saved with the widget """
@@ -714,9 +714,9 @@ class ParameterSettingWidget(QWidget):
             self.spotIdentification.setCurrentIndex(loadlist[11])
             self.processNoisePosition.setValue(loadlist[12])
             self.processNoiseVelocity.setValue(loadlist[13])
-            print "Custom settings restored."
+            print("Custom settings restored.")
         except:
-            print "Invalid file"
+            print("Invalid file")
 
 class MainWindow(QMainWindow):
     """ EasyLEED's main window. """
@@ -1045,7 +1045,7 @@ class MainWindow(QMainWindow):
                 self.fileLoadSpotsAction.setEnabled(True)
                 self.fileLoadCenterAction.setEnabled(True)
                 selfsliderCurrentPos = self.slider.setValue(1)
-            except IOError, err:
+            except IOError as err:
                 self.statusBar().showMessage('IOError: ' + str(err), 5000)
 
     def removeLastSpot(self):
@@ -1105,7 +1105,7 @@ class MainWindow(QMainWindow):
             self.plotwid.clearPlotButton.setEnabled(True)
             self.slider.setEnabled(True)
             self.processRemoveSpot.setEnabled(True)
-            print "Total time acquisition:", time.time() - time_before, "s"
+            print("Total time acquisition:", time.time() - time_before, "s")
 
     def disableInput(self):
         for item in self.scene.spots:
@@ -1228,9 +1228,9 @@ class Worker(QObject):
 
     def process(self, image):
         if config.GraphicsScene_intensTimeOn == False:
-            print "Current image energy: " + str(self.parent().current_energy) + "eV"
+            print("Current image energy: " + str(self.parent().current_energy) + "eV")
         else:
-            print "Current frame: " + str(self.parent().current_energy)
+            print("Current frame: " + str(self.parent().current_energy))
         for model, tracker in self.spots_map.itervalues():
             tracker_result = tracker.feed_image(image)
             # feed_image returns x, y, intensity, energy and radius

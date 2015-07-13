@@ -75,7 +75,7 @@ class Tracker:
             x_th, y_th, guess_cov = guess
             # spot in validation region?  (based on residual covariance)
             if self.kalman.measurement_distance((x_th, y_th), guess_cov) > config.Tracking_gamma:
-                print " no spot in validation gate"
+                print(" no spot in validation gate")
             else:
                 self.kalman.update([x_th, y_th], guess_cov)
         x, y = self.kalman.get_position()
@@ -103,7 +103,7 @@ def guess_from_Gaussian(image, *args, **kwargs):
     p_cov = output[1]
     infodict = output[2]
     if infodict["nfev"] >= 150 or p_cov is None:
-        print " fit failed"
+        print(" fit failed")
         return None
     # residual sum of squares sum (x_i - f_i)^2
     sum_of_squares_regression = (errfunc(p_opt)**2).sum()
@@ -112,7 +112,7 @@ def guess_from_Gaussian(image, *args, **kwargs):
     # calculate R^2
     Rsq = 1 - sum_of_squares_regression / sum_of_squares_total
     if Rsq < config.Tracking_minRsq:
-        print " Rsq to low"
+        print(" Rsq to low")
         return None
     # estimate sigma^2 from a chi^2 equivalent
     s_sq = sum_of_squares_regression/(len(image.flatten())-len(params))
@@ -125,7 +125,7 @@ def guess_from_Gaussian(image, *args, **kwargs):
 def guesser(npimage, x_in, y_in, radius, func = eval(config.Tracking_guessFunc), fit_region_factor = config.Tracking_fitRegionFactor):
     def failure(reason):
         logger.info(" no guess, because " + reason)
-        print reason
+        print(reason)
         return None
 
     # try to get patch from image around estimated position

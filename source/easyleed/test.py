@@ -11,7 +11,7 @@ import numpy as np
 np.seterr(all="ignore")
 import scipy.optimize
 
-from base import *
+from .base import *
 
 logging.basicConfig(level=logging.INFO)
 
@@ -46,7 +46,7 @@ BACKGROUND_NORMAL = Background(partial(back_normal, mu=4, sigma=3), (400, 400), 
 
 #### intensity_funcs ####
 def constant_factory(value, *args, **kwargs):
-    return eat_args(itertools.repeat(value).next)
+    return eat_args(next(itertools.repeat(value)))
 
 def eat_args(func):
     def new(*args, **kwargs):
@@ -202,8 +202,8 @@ class TestTracking:
         """ output in ["summary", "full", None] """
         for key in sorted(self.kwarg_dict.keys()):
             if output == "full":
-                print
-                print key
+                print()
+                print(key)
             # this is a hack as run is now an iterator for display
             [item for item in self.run(key)]
             if output == "full":
@@ -271,7 +271,7 @@ def compute_stddev(values):
 def print_bias_stddev(bias, stddev, prefix="", round_=4):
     if not prefix == "":
         prefix = prefix + " "
-    print prefix + "bias %s, sigma %s" % (round(bias, round_), round(stddev, round_))
+    print(prefix + "bias %s, sigma %s" % (round(bias, round_), round(stddev, round_)))
 ######################
 
 #### main methods ####
@@ -287,7 +287,7 @@ def identification(sys_args):
     sigma_back = 1
     nRuns = 100
     for intensity in np.arange(10, 1, -1):
-        print intensity / sigma_back,
+        print(intensity / sigma_back),
         tester = TestIdentification(x_true, y_true, intensity, 3, sigma_back, nRuns)
         xs = []
         ys = []
@@ -302,11 +302,11 @@ def identification(sys_args):
                 xs.append((x, x_true))
                 ys.append((y, y_true))
             except:
-                print i, "failed"
+                print(i, "failed")
         bias_pos = (compute_bias(xs)**2 + compute_bias(ys)**2)**0.5
         stddev_pos = (compute_stddev(xs)**2 + compute_stddev(ys)**2)**0.5
         print_bias_stddev(bias_pos, stddev_pos)
-        print np.mean(xerr), np.mean(snr)
+        print(np.mean(xerr), np.mean(snr))
 
 def calc_v(z_r, z_c, z_dev, z_c_dev, E, dE):
     # make sure the state variables are numpy array
@@ -372,7 +372,7 @@ if __name__ == "__main__":
     #TODO: There must be a better way to do this!
 
     if len(sys.argv) == 1:
-        print "not enough arguments"
+        print("not enough arguments")
 
     elif sys.argv[1] == "tracking":
         if len(sys.argv) == 3:
@@ -393,4 +393,4 @@ if __name__ == "__main__":
         profile(sys.argv)
 
     else:
-        print "unknown command"
+        print("unknown command")
