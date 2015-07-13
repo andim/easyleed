@@ -1,10 +1,11 @@
-from distutils.core import setup
+from setuptools import setup
 
 setup(
     name='EasyLEED',
     packages=['easyleed'],
     requires=['numpy', 'matplotlib', 'scipy', 'pillow', 'pyqt4'],
-    scripts=['easyleed.pyw'],
+#    scripts=['easyleed.pyw'],
+    entry_points={'gui_scripts' : ['easyleed = easyleed.__main__:main']},
     version='2.1',
     description='Automated extraction of intensity-energy spectra from low-energy electron diffraction patterns',
     long_description= """
