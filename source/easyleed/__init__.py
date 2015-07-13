@@ -30,10 +30,10 @@ try:
     sys.path.append('..')
     import config
 except:
-    import default_config as config
-import kalman
-import io
-import base
-import test
-import qt
-import gui
+    from . import defaultconfig as config
+from . import kalman
+from . import io
+from . import base
+from . import test
+from . import qt
+from . import gui
