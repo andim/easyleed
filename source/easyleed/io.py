@@ -7,7 +7,7 @@ Import routines for different LEED file formats
 """
 
 import numpy as np
-import PyQt4.QtGui as qt
+import qt.QtGui as qtgui
 
 # load regular expression package (for parsing of energy from file name)
 import re
@@ -210,7 +210,7 @@ def npimage2qimage(npimage):
     npimage = normalize255(npimage)
     # second w to avoid problems if image is not 32-bit aligned
     # --> indicates bytesPerLine
-    qimage = qt.QImage(npimage.data, w, h, w, qt.QImage.Format_Indexed8)
+    qimage = qtgui.QImage(npimage.data, w, h, w, qtgui.QImage.Format_Indexed8)
     for i in range(256):
-        qimage.setColor(i, qt.qRgb(i, i, i))
+        qimage.setColor(i, qtgui.qRgb(i, i, i))
     return qimage
