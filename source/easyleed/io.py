@@ -7,12 +7,12 @@ Import routines for different LEED file formats
 """
 
 import numpy as np
-import qt.QtGui as qtgui
+from .qt import QtGui as qtgui
 
 # load regular expression package (for parsing of energy from file name)
 import re
 
-from base import logger
+from .base import logger
 
 #### load packages for available file types ####
 formats_available = ['IMG']
