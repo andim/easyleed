@@ -1,5 +1,5 @@
 [![License](https://img.shields.io/pypi/l/easyleed.svg)](https://github.com/andim/easyleed/blob/master/LICENSE)
-[![Status](https://img.shields.io/pypi/status/easyleed.svg)
+![Status](https://img.shields.io/pypi/status/easyleed.svg)
 [![Latest release](https://img.shields.io/pypi/v/easyleed.svg)](https://pypi.python.org/pypi/easyleed)
 [![Research software impact](http://depsy.org/api/package/pypi/EasyLEED/badge.svg)](http://depsy.org/package/python/EasyLEED)
 
