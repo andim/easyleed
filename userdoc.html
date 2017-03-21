@@ -31,7 +31,7 @@
     <link rel="next" title="The EasyLEED API" href="api.html" />
     <link rel="prev" title="Manual Installation" href="maninstall.html" /> 
   </head>
-  <body>
+  <body role="document">
       <div class="header">
         <a href="index.html">
           <img class="logo" src="_static/logo.png" alt="Logo"/>
@@ -74,7 +74,13 @@ If you are running into trouble using the software we are happy to provide furth
 <li>Parameter settings can also be saved/loaded</li>
 <li>The selected spot and center positions can also be saved and reloaded for further intensity acquisitions.</li>
 </ul>
+<div class="section" id="parameter-settings">
+<h2>Parameter settings<a class="headerlink" href="#parameter-settings" title="Permalink to this headline">¶</a></h2>
 <p>It might be useful to get a rough understanding of the underlying algorithm for intuition into how to set parameters. We recommend you read our paper for an introduction to the ideas behind EasyLEED.</p>
+<p>Broadly in the algorithm there is a trade-off between how much to rely on the fitted vs predicted positions. Fitted positions are roughly the maxima of intensity of the spots. The prediction comes from a simple dynamical model of the spots moving towards the center as beam energy is increased. How much the algorithm relies on one over the other depends on an assumed variance of both predictions. The variance of predictions increases if there is more &#8220;process noise&#8221;, i.e. the larger you set those parameters the more the algorithm is going to rely on its fitted position.</p>
+<p>The algorithm also uses the user input of initial spot positions (and if set center position). The weight put on this information is controlled by the parameter &#8220;User input precision&#8221;. Larger values of this parameter lead to less weight being put on this prior information.</p>
+<p>Sometimes spots vanish so they cannot be fit accurately. The algorithm should then purely rely on the prediction. The &#8220;Minimal R^2 to accept fit&#8221; specifies the quality of fit below which to reject the position from the fit. Similarly the fit might go awry and converge to a different spot. The parameter &#8220;Size of the validation region&#8221; sets a cutoff on how much the fitted position can differ from the predicted position, before it is discarded.</p>
+</div>
 <div class="section" id="file-naming-policy">
 <h2>File naming policy<a class="headerlink" href="#file-naming-policy" title="Permalink to this headline">¶</a></h2>
 <p>EasyLEED tries to infer the beam energy from the filename.</p>
@@ -108,10 +114,10 @@ You can change the regular expression that is used for parsing energies from fil
     <a href="http://github.com/andim/easyleed"><img style="position: fixed; top: 0; right: 0; border: 0;"
     src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" /></a>
 
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2015-07-13.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Last updated on 2017-03-21.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>

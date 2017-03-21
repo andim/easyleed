@@ -30,7 +30,7 @@
     <link rel="top" title="EasyLEED 2.1 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
-  <body>
+  <body role="document">
       <div class="header">
         <a href="../../index.html">
           <img class="logo" src="../../_static/logo.png" alt="Logo"/>
@@ -46,7 +46,7 @@
             <div class="body">
                 
   <h1>Source code for easyleed.base</h1><div class="highlight"><pre>
-<span class="sd">&quot;&quot;&quot;</span>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">easyleed.base</span>
 <span class="sd">-------------</span>
 
@@ -55,7 +55,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s">&quot;leedbase&quot;</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;leedbase&quot;</span><span class="p">)</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">optimize</span>
@@ -92,8 +92,8 @@
             <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">x_in</span> <span class="o">-</span> <span class="n">x_c</span><span class="p">,</span> <span class="n">y_in</span> <span class="o">-</span> <span class="n">y_c</span> 
             <span class="n">r</span> <span class="o">=</span> <span class="p">(</span><span class="n">x</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="n">y</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">**.</span><span class="mi">5</span>
             <span class="n">v</span> <span class="o">=</span> <span class="o">-</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">r</span> <span class="o">/</span> <span class="n">energy</span>
-            <span class="c"># calculate std. dev. of velocity guess</span>
-            <span class="c"># by propagation of uncertainty from the input precision</span>
+            <span class="c1"># calculate std. dev. of velocity guess</span>
+            <span class="c1"># by propagation of uncertainty from the input precision</span>
             <span class="n">v_precision</span> <span class="o">=</span> <span class="mi">2</span><span class="o">**.</span><span class="mi">5</span> <span class="o">*</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="n">input_precision</span> <span class="o">/</span> <span class="n">energy</span>
             <span class="n">phi</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arctan2</span><span class="p">(</span><span class="n">y</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span>
             <span class="n">cov_input</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">([</span><span class="n">input_precision</span><span class="p">,</span> <span class="n">input_precision</span><span class="p">,</span> <span class="n">v_precision</span><span class="p">,</span> <span class="n">v_precision</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span>
@@ -121,9 +121,9 @@
         <span class="n">guess</span> <span class="o">=</span> <span class="n">guesser</span><span class="p">(</span><span class="n">npimage</span><span class="p">,</span> <span class="n">x_p</span><span class="p">,</span> <span class="n">y_p</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">radius</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">guess</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
             <span class="n">x_th</span><span class="p">,</span> <span class="n">y_th</span><span class="p">,</span> <span class="n">guess_cov</span> <span class="o">=</span> <span class="n">guess</span>
-            <span class="c"># spot in validation region?  (based on residual covariance)</span>
+            <span class="c1"># spot in validation region?  (based on residual covariance)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">kalman</span><span class="o">.</span><span class="n">measurement_distance</span><span class="p">((</span><span class="n">x_th</span><span class="p">,</span> <span class="n">y_th</span><span class="p">),</span> <span class="n">guess_cov</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">config</span><span class="o">.</span><span class="n">Tracking_gamma</span><span class="p">:</span>
-                <span class="k">print</span> <span class="s">&quot; no spot in validation gate&quot;</span>
+                <span class="k">print</span><span class="p">(</span><span class="s2">&quot; no spot in validation gate&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">kalman</span><span class="o">.</span><span class="n">update</span><span class="p">([</span><span class="n">x_th</span><span class="p">,</span> <span class="n">y_th</span><span class="p">],</span> <span class="n">guess_cov</span><span class="p">)</span>
         <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">kalman</span><span class="o">.</span><span class="n">get_position</span><span class="p">()</span>
@@ -132,17 +132,17 @@
 </div>
 <div class="viewcode-block" id="guess_from_Gaussian"><a class="viewcode-back" href="../../api.html#easyleed.base.guess_from_Gaussian">[docs]</a><span class="k">def</span> <span class="nf">guess_from_Gaussian</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Guess position of spot from a Gaussian fit. &quot;&quot;&quot;</span>
-    <span class="c"># construct circle where data is fit</span>
+    <span class="c1"># construct circle where data is fit</span>
     <span class="n">radius</span> <span class="o">=</span> <span class="mf">0.5</span> <span class="o">*</span> <span class="nb">min</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
     <span class="n">distances</span> <span class="o">=</span> <span class="n">calc_distances</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">radius</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">radius</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">,</span> <span class="n">radius</span><span class="p">)</span>
     <span class="n">circle</span> <span class="o">=</span> <span class="n">distances</span> <span class="o">&lt;=</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span>
 
-    <span class="c"># generate good guesses for the Gaussian distribution</span>
+    <span class="c1"># generate good guesses for the Gaussian distribution</span>
     <span class="n">background</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
     <span class="n">params</span> <span class="o">=</span> <span class="n">moments</span><span class="p">(</span><span class="n">image</span><span class="o">-</span><span class="n">background</span><span class="p">)</span>
     <span class="n">params</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">background</span><span class="p">)</span>
     <span class="n">errfunc</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">p</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ravel</span><span class="p">(</span><span class="n">gaussian2d</span><span class="p">(</span><span class="o">*</span><span class="n">p</span><span class="p">)(</span><span class="o">*</span><span class="n">np</span><span class="o">.</span><span class="n">indices</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">))[</span><span class="n">circle</span><span class="p">]</span> <span class="o">-</span> <span class="n">image</span><span class="p">[</span><span class="n">circle</span><span class="p">])</span>
-    <span class="c"># fit Gaussian</span>
+    <span class="c1"># fit Gaussian</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">output</span> <span class="o">=</span> <span class="n">optimize</span><span class="o">.</span><span class="n">leastsq</span><span class="p">(</span><span class="n">errfunc</span><span class="p">,</span> <span class="n">params</span><span class="p">,</span> <span class="n">full_output</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">maxfev</span><span class="o">=</span><span class="mi">200</span><span class="p">)</span>
     <span class="k">except</span><span class="p">:</span>
@@ -150,19 +150,19 @@
     <span class="n">p_opt</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
     <span class="n">p_cov</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">infodict</span> <span class="o">=</span> <span class="n">output</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span>
-    <span class="k">if</span> <span class="n">infodict</span><span class="p">[</span><span class="s">&quot;nfev&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">150</span> <span class="ow">or</span> <span class="n">p_cov</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="k">print</span> <span class="s">&quot; fit failed&quot;</span>
+    <span class="k">if</span> <span class="n">infodict</span><span class="p">[</span><span class="s2">&quot;nfev&quot;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">150</span> <span class="ow">or</span> <span class="n">p_cov</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot; fit failed&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">None</span>
-    <span class="c"># residual sum of squares sum (x_i - f_i)^2</span>
+    <span class="c1"># residual sum of squares sum (x_i - f_i)^2</span>
     <span class="n">sum_of_squares_regression</span> <span class="o">=</span> <span class="p">(</span><span class="n">errfunc</span><span class="p">(</span><span class="n">p_opt</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="c"># variance of the data sum (x_i - &lt;x&gt;)^2</span>
+    <span class="c1"># variance of the data sum (x_i - &lt;x&gt;)^2</span>
     <span class="n">sum_of_squares_total</span> <span class="o">=</span> <span class="p">((</span><span class="n">image</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">image</span><span class="p">))</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
-    <span class="c"># calculate R^2</span>
+    <span class="c1"># calculate R^2</span>
     <span class="n">Rsq</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">-</span> <span class="n">sum_of_squares_regression</span> <span class="o">/</span> <span class="n">sum_of_squares_total</span>
     <span class="k">if</span> <span class="n">Rsq</span> <span class="o">&lt;</span> <span class="n">config</span><span class="o">.</span><span class="n">Tracking_minRsq</span><span class="p">:</span>
-        <span class="k">print</span> <span class="s">&quot; Rsq to low&quot;</span>
+        <span class="k">print</span><span class="p">(</span><span class="s2">&quot; Rsq to low&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">None</span>
-    <span class="c"># estimate sigma^2 from a chi^2 equivalent</span>
+    <span class="c1"># estimate sigma^2 from a chi^2 equivalent</span>
     <span class="n">s_sq</span> <span class="o">=</span> <span class="n">sum_of_squares_regression</span><span class="o">/</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">image</span><span class="o">.</span><span class="n">flatten</span><span class="p">())</span><span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">))</span>
     <span class="n">p_cov</span> <span class="o">*=</span> <span class="n">s_sq</span>
     <span class="n">p_cov</span> <span class="o">=</span> <span class="n">p_cov</span><span class="p">[</span><span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span><span class="mi">3</span><span class="p">]</span>
@@ -172,21 +172,21 @@
 </div>
 <span class="k">def</span> <span class="nf">guesser</span><span class="p">(</span><span class="n">npimage</span><span class="p">,</span> <span class="n">x_in</span><span class="p">,</span> <span class="n">y_in</span><span class="p">,</span> <span class="n">radius</span><span class="p">,</span> <span class="n">func</span> <span class="o">=</span> <span class="nb">eval</span><span class="p">(</span><span class="n">config</span><span class="o">.</span><span class="n">Tracking_guessFunc</span><span class="p">),</span> <span class="n">fit_region_factor</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">Tracking_fitRegionFactor</span><span class="p">):</span>
     <span class="k">def</span> <span class="nf">failure</span><span class="p">(</span><span class="n">reason</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s">&quot; no guess, because &quot;</span> <span class="o">+</span> <span class="n">reason</span><span class="p">)</span>
-        <span class="k">print</span> <span class="n">reason</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot; no guess, because &quot;</span> <span class="o">+</span> <span class="n">reason</span><span class="p">)</span>
+        <span class="k">print</span><span class="p">(</span><span class="n">reason</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">None</span>
 
-    <span class="c"># try to get patch from image around estimated position</span>
+    <span class="c1"># try to get patch from image around estimated position</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">x_min</span><span class="p">,</span> <span class="n">x_max</span><span class="p">,</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">adjust_slice</span><span class="p">(</span><span class="n">npimage</span><span class="p">,</span> <span class="n">x_in</span> <span class="o">-</span> <span class="n">fit_region_factor</span> <span class="o">*</span> <span class="n">radius</span><span class="p">,</span> <span class="n">x_in</span> <span class="o">+</span> <span class="n">fit_region_factor</span> <span class="o">*</span> <span class="n">radius</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
                                      <span class="n">y_in</span> <span class="o">-</span> <span class="n">fit_region_factor</span> <span class="o">*</span> <span class="n">radius</span><span class="p">,</span> <span class="n">y_in</span> <span class="o">+</span> <span class="n">fit_region_factor</span> <span class="o">*</span> <span class="n">radius</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">IndexError</span><span class="p">:</span>
-       <span class="k">return</span> <span class="n">failure</span><span class="p">(</span><span class="s">&quot; position outside image&quot;</span><span class="p">)</span>
+       <span class="k">return</span> <span class="n">failure</span><span class="p">(</span><span class="s2">&quot; position outside image&quot;</span><span class="p">)</span>
     <span class="n">image</span> <span class="o">=</span> <span class="n">npimage</span><span class="p">[</span><span class="n">y_min</span> <span class="p">:</span> <span class="n">y_max</span><span class="p">,</span> <span class="n">x_min</span> <span class="p">:</span> <span class="n">x_max</span><span class="p">]</span>
 
     <span class="n">result</span> <span class="o">=</span> <span class="n">func</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">x_mid</span> <span class="o">=</span> <span class="n">x_in</span> <span class="o">-</span> <span class="n">x_min</span><span class="p">,</span> <span class="n">y_mid</span> <span class="o">=</span> <span class="n">y_in</span> <span class="o">-</span> <span class="n">y_min</span><span class="p">,</span> <span class="n">size</span> <span class="o">=</span> <span class="n">radius</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">result</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">failure</span><span class="p">(</span><span class="s">&quot; fit failed&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">failure</span><span class="p">(</span><span class="s2">&quot; fit failed&quot;</span><span class="p">)</span>
     <span class="n">pos</span><span class="p">,</span> <span class="n">cov</span> <span class="o">=</span> <span class="n">result</span>
     <span class="n">y_res</span><span class="p">,</span> <span class="n">x_res</span> <span class="o">=</span> <span class="n">pos</span>
     <span class="n">x_res</span> <span class="o">+=</span> <span class="n">x_min</span>
@@ -251,7 +251,7 @@
                 <span class="n">indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ymax</span>
                 <span class="n">adjusted</span> <span class="o">=</span> <span class="bp">True</span>
     <span class="k">if</span> <span class="n">adjusted</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s">&quot; slice had to be adjusted to fit image.&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot; slice had to be adjusted to fit image.&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="nb">int</span><span class="p">(</span><span class="n">indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">indices</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">int</span><span class="p">(</span><span class="n">indices</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">indices</span><span class="p">[</span><span class="mi">3</span><span class="p">]):</span>
         <span class="k">raise</span> <span class="ne">IndexError</span><span class="p">()</span>
     <span class="k">return</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">indices</span><span class="p">)</span>
@@ -272,7 +272,7 @@
 <span class="k">def</span> <span class="nf">signal_to_background</span><span class="p">(</span><span class="n">npimage</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">radius</span><span class="p">):</span>
     <span class="n">distSquare</span> <span class="o">=</span> <span class="n">calc_distances</span><span class="p">(</span><span class="n">npimage</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
     <span class="n">signal</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">npimage</span><span class="p">[</span><span class="n">distSquare</span> <span class="o">&lt;=</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span><span class="p">])</span>
-    <span class="c"># average background intensity over annulus with equal area</span>
+    <span class="c1"># average background intensity over annulus with equal area</span>
     <span class="n">background</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">npimage</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">distSquare</span> <span class="o">&gt;=</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">distSquare</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span><span class="p">)])</span>
     <span class="k">return</span> <span class="n">signal</span><span class="o">/</span><span class="n">background</span>
   
@@ -288,7 +288,7 @@
     <span class="n">intensities</span> <span class="o">=</span> <span class="n">npimage</span><span class="p">[</span><span class="n">distSquare</span> <span class="o">&lt;=</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span><span class="p">]</span>
     <span class="n">intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">intensities</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">background_substraction</span><span class="p">:</span>
-        <span class="c"># average background intensity over annulus with approximately equal area</span>
+        <span class="c1"># average background intensity over annulus with approximately equal area</span>
         <span class="n">background_intensities</span> <span class="o">=</span> <span class="n">npimage</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">logical_and</span><span class="p">(</span><span class="n">distSquare</span> <span class="o">&gt;=</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span><span class="p">,</span> <span class="n">distSquare</span> <span class="o">&lt;=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">radius</span><span class="o">**</span><span class="mi">2</span><span class="p">)]</span>
         <span class="n">area</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">intensities</span><span class="p">)</span>
         <span class="n">intensity</span> <span class="o">-=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">background_intensities</span><span class="p">)</span> <span class="o">*</span> <span class="n">area</span>
@@ -306,10 +306,10 @@
     <a href="http://github.com/andim/easyleed"><img style="position: fixed; top: 0; right: 0; border: 0;"
     src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" /></a>
 
-    <div class="footer">
+    <div class="footer" role="contentinfo">
         &copy; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2015-07-13.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+      Last updated on 2017-03-21.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
 </html>
