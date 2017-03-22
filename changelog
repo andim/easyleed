@@ -1,6 +1,19 @@
 Changelog
 ==========
 
+Version 2.2
+-----------
+
+- Python 3 support
+
+Version 2.1
+-----------
+
+- added support for different Qt wrappers
+- renamed run-gui.py to easyleed.pyw
+- added setup.py to allow easier installation
+
+
 Version 2.0
 ------------
 
