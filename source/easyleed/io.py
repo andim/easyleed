@@ -77,7 +77,7 @@ class ImageLoader(object):
            energy = self.energies[self.index]
            return self.get_image(self.files[energy]), energy
 
-    def next(self):
+    def __next__(self):
         """ Get image at next higher beam energy. """
         if self.index < len(self.energies)-1:
             self.index += 1
@@ -85,6 +85,8 @@ class ImageLoader(object):
             return self.get_image(self.files[energy]), energy
         else:
             raise StopIteration()
+
+    next = __next__
 
     def goto(self, energy):
         """ Get image custom beam energy. """

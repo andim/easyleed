@@ -8,6 +8,7 @@ Various classes for providing a graphical user interface.
 import logging
 import webbrowser
 import pickle
+import six
 
 from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
 from .qt.QtGui import (QApplication, QMainWindow, QGraphicsView,
@@ -423,14 +424,14 @@ class PlotWidget(QWidget):
             else:
                 self.axes.legend().set_visible(False)
             
-        for spot, line in self.lines_map.iteritems():
+        for spot, line in six.iteritems(self.lines_map):
             line.set_data(self.worker.spots_map[spot][0].m.energy, self.worker.spots_map[spot][0].m.intensity)
         if self.averageCheck.isChecked():
             intensity = np.zeros(self.worker.numProcessed())
             ynew = np.zeros(self.worker.numProcessed())
             tck = np.zeros(self.worker.numProcessed())
             
-            for model, tracker in self.worker.spots_map.itervalues():
+            for model, tracker in six.itervalues(self.worker.spots_map):
                 intensity += model.m.intensity
             intensity /= len(self.worker.spots_map)
             self.averageLine.set_data(model.m.energy, intensity)
@@ -1224,7 +1225,7 @@ class Worker(QObject):
                             window_scaling = config.Tracking_windowScalingOn)
             self.spots_map[spot] = (QSpotModel(self), tracker)
 
-        for view, tup in self.spots_map.iteritems():
+        for view, tup in six.iteritems(self.spots_map):
             # view = QGraphicsSpotItem, tup = (QSpotModel, tracker) -> tup[0] = QSpotModel
             self.connect(tup[0], SIGNAL("positionChanged"), view.onPositionChange)
             self.connect(tup[0], SIGNAL("radiusChanged"), view.onRadiusChange)
@@ -1234,19 +1235,19 @@ class Worker(QObject):
             print("Current image energy: " + str(self.parent().current_energy) + "eV")
         else:
             print("Current frame: " + str(self.parent().current_energy))
-        for model, tracker in self.spots_map.itervalues():
+        for model, tracker in six.itervalues(self.spots_map):
             tracker_result = tracker.feed_image(image)
             # feed_image returns x, y, intensity, energy and radius
             model.update(*tracker_result)
 
     def numProcessed(self):
         """ Return the number of processed images. """
-        return len(self.spots_map.itervalues().next()[0].m.energy)
+        return len(six.itervalues(self.spots_map).next()[0].m.energy)
 
     def save(self, filename):
         intensities = [model.m.intensity for model, tracker \
-                                in self.spots_map.itervalues()]
-        energy = [model.m.energy for model, tracker in self.spots_map.itervalues()]
+                                in six.itervalues(self.spots_map)]
+        energy = [model.m.energy for model, tracker in six.itervalues(self.spots_map)]
         zipped = zip(energy[0], *intensities)
         
         if config.Processing_backgroundSubstractionOn == True:
@@ -1255,9 +1256,9 @@ class Worker(QObject):
             np.savetxt(filename + "_no-bs.int.txt", zipped)
         
         x = [model.m.x for model, tracker \
-                in self.spots_map.itervalues()]
+                in six.itervalues(self.spots_map)]
         y = [model.m.y for model, tracker \
-                in self.spots_map.itervalues()]
+                in six.itervalues(self.spots_map)]
 
         x.extend(y)
         zipped = zip(energy[0], *x)
@@ -1269,7 +1270,7 @@ class Worker(QObject):
         # Save Average intensity (if checkbox selected)
         if self.parent().plotwid.averageCheck.isChecked() == True:
             intensity = np.zeros(self.numProcessed())
-            for model, tracker in self.spots_map.itervalues():
+            for model, tracker in six.itervalues(self.spots_map):
                 intensity += model.m.intensity
             intensity = [i/len(self.spots_map) for i in intensity]
             zipped = zip(energy[0], intensity)
@@ -1294,10 +1295,10 @@ class Worker(QObject):
     def saveloc(self, filename):
         # model = QSpotModel object tracker = tracker
         # dict function .itervalues() = return an iterator over the mapping's values
-        energy = [model.m.energy for model, tracker in self.spots_map.itervalues()]
-        locationx = [model.m.x for model, tracker in self.spots_map.itervalues()]
-        locationy = [model.m.y for model, tracker in self.spots_map.itervalues()]
-        radius = [model.m.radius for model, tracker in self.spots_map.itervalues()]
+        energy = [model.m.energy for model, tracker in six.itervalues(self.spots_map)]
+        locationx = [model.m.x for model, tracker in six.itervalues(self.spots_map)]
+        locationy = [model.m.y for model, tracker in six.itervalues(self.spots_map)]
+        radius = [model.m.radius for model, tracker in six.itervalues(self.spots_map)]
         locations = [locationx, locationy, radius]
         zipped = zip(energy, *locations)
         output = open(filename, 'wb')
