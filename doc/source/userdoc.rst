@@ -59,4 +59,4 @@ Most of the default parameters of the algorithm as well as many UI tweaks are co
 Qt Wrapper
 ----------
 
-There exist to different python wrappers for the `Qt` library (`PyQt4` and `PySide`). Both can be used with EasyLEED. To select which one to use set the `QT_API` environment variable to either `pyqt` or `pyside`.
+There exist two different python wrappers for the `Qt` library (`PyQt4` and `PySide`). Both can be used with EasyLEED. To select which one to use set the `QT_API` environment variable to either `pyqt` or `pyside`.

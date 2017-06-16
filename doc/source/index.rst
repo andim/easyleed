@@ -21,7 +21,7 @@ Once installed you can launch the program with the command
 
 ::
 
-    $ easyleed.pyw
+    $ easyleed
 
 Open a series of diffraction images at successive energies and click on a diffraction spot you want to track. Click run and of you go! 
 
