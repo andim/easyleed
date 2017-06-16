@@ -154,7 +154,7 @@ class QSpotModel(QObject):
     - radiusChanged
     """
 
-    def __init__(self, parent = None):
+    def __init__(self, parent=None):
         super(QSpotModel, self).__init__(parent)
         self.m = SpotModel()
     
@@ -181,7 +181,7 @@ class GraphicsScene(QGraphicsScene):
               - instantiating a new Center (on right-click)
         """
     
-        if hasattr(self,"image"):
+        if hasattr(self, "image"):
             if self.itemAt(event.scenePos()):
                 super(GraphicsScene, self).mousePressEvent(event)
             elif event.button() == Qt.LeftButton:
@@ -225,9 +225,9 @@ class GraphicsScene(QGraphicsScene):
             if event.key() == Qt.Key_Delete:
                 if type(item) is QGraphicsSpotItem:
                     self.spots.remove(item)
-                else:
-                    self.center = None
-                self.removeItem(item)
+                    self.removeItem(item)
+                elif type(item) is QGraphicsCenterItem:
+                    self.removeCenter()
                 del item
             else:
                 super(GraphicsScene, self).keyPressEvent(event)
@@ -255,13 +255,15 @@ class GraphicsScene(QGraphicsScene):
             if type(item) == QGraphicsSpotItem:
                 self.removeItem(item)
         self.spots = []
+        self.removeCenter()
 
     def removeCenter(self):
         """ Remove all items from the scene (leaves background unchanged). """
-        for item in self.items():
-            if type(item) == QGraphicsCenterItem:
-                self.removeItem(item)
-        self.center = []
+        if self.center is not None:
+            center = self.center
+            self.removeItem(center)
+            del center
+        self.center = None
 
 class GraphicsView(QGraphicsView):
     """ Custom GraphicsView to display the scene. """
@@ -295,20 +297,16 @@ class AboutWidget(QWidget):
         self.setLayout(self.gridLayout)
         self.verticalLayout = QVBoxLayout()
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
-        self.label = QLabel("<qt><b><big><a href = http://andim.github.io/easyleed/index.html>EasyLEED %s</a></b></big></qt>" % __version__, self);
-        self.label.setOpenExternalLinks(True);
-        self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("by: %s" % __author__, self)
-        self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("<qt>Contacts: <a href = mailto:andimscience@gmail.com>andimscience@gmail.com</a>, <a href = mailto:feranick@hotmail.com> feranick@hotmail.com</a></qt>", self)
-        self.label.setOpenExternalLinks(True);
-        self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("More details: ", self)
-        self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("<qt><a href = http://dx.doi.org/10.1016/j.cpc.2012.02.019>A Mayer, H Salopaasi, K Pussi, RD Diehl. Comput. Phys. Commun. 183, 1443-1447 (2012)</a>", self)
-        self.label.setWordWrap(True)
-        self.label.setOpenExternalLinks(True);
-        self.verticalLayout.addWidget(self.label)
+
+        self.labelTitle = QLabel("<qt><b><big><a href = http://andim.github.io/easyleed/index.html>EasyLEED %s</a></b></big></qt>" % __version__, self);
+        self.labelBy = QLabel("by: %s" % __author__, self)
+        self.labelContact = QLabel("<qt>Contacts: <a href = mailto:andimscience@gmail.com>andimscience@gmail.com</a>, <a href = mailto:feranick@hotmail.com> feranick@hotmail.com</a></qt>", self)
+        self.labelDetails = QLabel("More details: ", self)
+        self.labelPaper = QLabel("<qt><a href = http://dx.doi.org/10.1016/j.cpc.2012.02.019>A Mayer, H Salopaasi, K Pussi, RD Diehl. Comput. Phys. Commun. 183, 1443-1447 (2012)</a>", self)
+        for label in [self.labelTitle, self.labelBy, self.labelContact, self.labelDetails, self.labelPaper]:
+            label.setWordWrap(True)
+            label.setOpenExternalLinks(True);
+            self.verticalLayout.addWidget(label)
 
 class CustomPlotToolbar(NavigationToolbar2QT):
     # only display the buttons we need
@@ -382,7 +380,7 @@ class PlotWidget(QWidget):
             self.axes.set_xlabel("Energy [eV]")
         else:
             self.axes.set_xlabel("Frame")
-        self.axes.set_ylabel("Intensity")
+        self.axes.set_ylabel("Intensity [a.u.]")
         # removes the ticks from y-axis
         self.axes.set_yticks([])
 
@@ -396,12 +394,12 @@ class PlotWidget(QWidget):
             j+=1
         
         # set up averageLine
-        self.averageLine, = self.axes.plot([], [], 'k', lw = 2, label = 'Average')
+        self.averageLine, = self.axes.plot([], [], 'k', lw=2, label='Average')
         # set up averageSmoothLine
-        self.averageSmoothLine, = self.axes.plot([], [], 'b', lw = 2, label = 'Smooth Average')
+        self.averageSmoothLine, = self.axes.plot([], [], 'b', lw = 2, label='Smooth Average')
         
         # show dashed line at y = 0
-        self.axes.axhline(0.0, color = 'k', ls = '--')
+        self.axes.axhline(0.0, color='k', ls='--')
         # try to auto-adjust plot margins (might not be available in all matplotlib versions)
         try:
             self.fig.tight_layout()
@@ -429,7 +427,6 @@ class PlotWidget(QWidget):
         if self.averageCheck.isChecked():
             intensity = np.zeros(self.worker.numProcessed())
             ynew = np.zeros(self.worker.numProcessed())
-            tck = np.zeros(self.worker.numProcessed())
             
             for model, tracker in six.itervalues(self.worker.spots_map):
                 intensity += model.m.intensity
@@ -449,7 +446,7 @@ class PlotWidget(QWidget):
 
         # ... axes limits
         self.axes.relim()
-        self.axes.autoscale_view(True,True,True)
+        self.axes.autoscale_view(True, True, True)
         # and show the new plot
         self.canvas.draw()
 
@@ -457,7 +454,6 @@ class PlotWidget(QWidget):
         self.axes.cla()
         self.initPlot()
         self.canvas.draw()
-        self.smoothCheck.setChecked(False)
 
     def save(self):
         """ Saving the plot """
@@ -911,7 +907,7 @@ class MainWindow(QMainWindow):
         self.worker.process(self.loader.goto(self.current_energy))
     
     def custEnBtnClicked(self):
-        ''' Action when custom energy button is clicked'''
+        """ Action when custom energy button is clicked"""
         if self.custEnergyButton.isChecked():
             self.custEnergyText.show()
             self.custEnergyText.setText("%s" % self.current_energy)
@@ -920,13 +916,13 @@ class MainWindow(QMainWindow):
             self.custEnergyText.hide()
 
     def setCustEnergy(self):
-        ''' Take energy from custom energy text and move the corresponding frame'''
+        """ Take energy from custom energy text and move the corresponding frame"""
         self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
         self.goto(float(self.custEnergyText.text()))
         self.worker.process(self.loader.goto(self.current_energy))
     
     def liveSmoothParameters(self):
-        ''' Real time setting smoothing parameters from Parameter Settings panel into actual smoothed curve '''
+        """ Real time setting smoothing parameters from Parameter Settings panel into actual smoothed curve """
         config.GraphicsScene_smoothPoints = self.parametersettingwid.smoothPoints.value()
         config.GraphicsScene_smoothSpline = self.parametersettingwid.smoothSpline.value()
         if self.plotwid.smoothCheck.isChecked():
@@ -1024,13 +1020,13 @@ class MainWindow(QMainWindow):
     def saveIntensity(self):
         filename = str(QFileDialog.getSaveFileName(self, "Save intensities to a file"))
         if filename:
-            self.worker.save(filename)
+            self.worker.saveIntensity(filename)
 
     def fileOpen(self):
         """ Prompts the user to select input image files."""
         self.scene.removeAll()
         dialog = FileDialog(parent = self,
-                caption = "Choose image files", filter= ";;".join(IMAGE_FORMATS))
+                caption = "Choose image files", filter=";;".join(IMAGE_FORMATS))
         if dialog.exec_():
             files = dialog.selectedFiles();
             filetype = IMAGE_FORMATS[str(dialog.selectedNameFilter())]
@@ -1138,7 +1134,7 @@ class MainWindow(QMainWindow):
         """Saves the spot locations to a file, uses workers saveloc-function"""
         filename = str(QFileDialog.getSaveFileName(self, "Save the spot locations to a file"))
         if filename:
-            self.worker.saveloc(filename + "_" + str(self.initial_energy) + "eV_pos.txt")
+            self.worker.saveLoc(filename + "_" + str(self.initial_energy) + "eV_pos.txt")
 
     def loadSpots(self):
         """Load saved spot positions"""
@@ -1188,8 +1184,6 @@ class MainWindow(QMainWindow):
             location = pickle.load(pkl_file)
             pkl_file.close()
             # unzipping the "location"
-            cLocx = 0
-            cLocy = 0
             cLocx, cLocy = zip(*location)
             point = QPointF(cLocx[0], cLocy[0])
             item = QGraphicsCenterItem(point, config.QGraphicsCenterItem_size)
@@ -1242,57 +1236,59 @@ class Worker(QObject):
 
     def numProcessed(self):
         """ Return the number of processed images. """
-        return len(six.itervalues(self.spots_map).next()[0].m.energy)
+        return len(next(six.itervalues(self.spots_map))[0].m.energy)
 
-    def save(self, filename):
+    def saveIntensity(self, filename):
+        """save intensities"""
         intensities = [model.m.intensity for model, tracker \
                                 in six.itervalues(self.spots_map)]
         energy = [model.m.energy for model, tracker in six.itervalues(self.spots_map)]
-        zipped = zip(energy[0], *intensities)
-        
-        if config.Processing_backgroundSubstractionOn == True:
-            np.savetxt(filename + "_bs.int.txt", zipped)
-        else:
-            np.savetxt(filename + "_no-bs.int.txt", zipped)
-        
-        x = [model.m.x for model, tracker \
-                in six.itervalues(self.spots_map)]
-        y = [model.m.y for model, tracker \
-                in six.itervalues(self.spots_map)]
+        zipped = np.asarray(list(zip(energy[0], *intensities)))
+        np.savetxt(filename, zipped, header='energy, intensity 1, intensity 2, ...')
 
-        x.extend(y)
-        zipped = zip(energy[0], *x)
-        if config.Processing_backgroundSubstractionOn == True:
-            np.savetxt(filename + "_bs.spot-coord.txt", zipped)
-        else:
-            np.savetxt(filename + "_no-bs.spot-coord.txt", zipped)
-        
-        # Save Average intensity (if checkbox selected)
-        if self.parent().plotwid.averageCheck.isChecked() == True:
-            intensity = np.zeros(self.numProcessed())
-            for model, tracker in six.itervalues(self.spots_map):
-                intensity += model.m.intensity
-            intensity = [i/len(self.spots_map) for i in intensity]
-            zipped = zip(energy[0], intensity)
-            if config.Processing_backgroundSubstractionOn == True:
-                np.savetxt(filename + "_bs.average.txt", zipped)
-            else:
-                np.savetxt(filename + "_no-bs.average.txt", zipped)
-
-            if self.parent().plotwid.smoothCheck.isChecked():
-                ynew = np.zeros(self.numProcessed())
-                tck = np.zeros(self.numProcessed())
-                tck = interpolate.splrep(model.m.energy, intensity, s=config.GraphicsScene_smoothSpline)
-                xnew = np.arange(model.m.energy[0], model.m.energy[-1],
-                                 (model.m.energy[1]-model.m.energy[0])*config.GraphicsScene_smoothPoints)
-                ynew = interpolate.splev(xnew, tck, der=0)
-                zipped = zip(xnew, ynew)
-                if config.Processing_backgroundSubstractionOn == True:
-                    np.savetxt(filename + "_bs.sm-average.txt", zipped)
-                else:
-                    np.savetxt(filename + "_no-bs.sm-average.txt", zipped)
+#        if config.Processing_backgroundSubstractionOn == True:
+#            np.savetxt(filename + "_bs.int.txt", zipped)
+#        else:
+#            np.savetxt(filename + "_no-bs.int.txt", zipped)
+#        
+#        x = [model.m.x for model, tracker \
+#                in six.itervalues(self.spots_map)]
+#        y = [model.m.y for model, tracker \
+#                in six.itervalues(self.spots_map)]
+#
+#        x.extend(y)
+#        zipped = zip(energy[0], *x)
+#        if config.Processing_backgroundSubstractionOn == True:
+#            np.savetxt(filename + "_bs.spot-coord.txt", zipped)
+#        else:
+#            np.savetxt(filename + "_no-bs.spot-coord.txt", zipped)
+#        
+#        # Save Average intensity (if checkbox selected)
+#        if self.parent().plotwid.averageCheck.isChecked() == True:
+#            intensity = np.zeros(self.numProcessed())
+#            for model, tracker in six.itervalues(self.spots_map):
+#                intensity += model.m.intensity
+#            intensity = [i/len(self.spots_map) for i in intensity]
+#            zipped = zip(energy[0], intensity)
+#            if config.Processing_backgroundSubstractionOn == True:
+#                np.savetxt(filename + "_bs.average.txt", zipped)
+#            else:
+#                np.savetxt(filename + "_no-bs.average.txt", zipped)
+#
+#            if self.parent().plotwid.smoothCheck.isChecked():
+#                ynew = np.zeros(self.numProcessed())
+#                tck = np.zeros(self.numProcessed())
+#                tck = interpolate.splrep(model.m.energy, intensity, s=config.GraphicsScene_smoothSpline)
+#                xnew = np.arange(model.m.energy[0], model.m.energy[-1],
+#                                 (model.m.energy[1]-model.m.energy[0])*config.GraphicsScene_smoothPoints)
+#                ynew = interpolate.splev(xnew, tck, der=0)
+#                zipped = zip(xnew, ynew)
+#                if config.Processing_backgroundSubstractionOn == True:
+#                    np.savetxt(filename + "_bs.sm-average.txt", zipped)
+#                else:
+#                    np.savetxt(filename + "_no-bs.sm-average.txt", zipped)
     
-    def saveloc(self, filename):
+    def saveLoc(self, filename):
         # model = QSpotModel object tracker = tracker
         # dict function .itervalues() = return an iterator over the mapping's values
         energy = [model.m.energy for model, tracker in six.itervalues(self.spots_map)]
