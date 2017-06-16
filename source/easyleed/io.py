@@ -11,6 +11,7 @@ from .qt import QtGui as qtgui
 
 # load regular expression package (for parsing of energy from file name)
 import re
+import collections
 
 from .base import logger
 
@@ -151,7 +152,7 @@ class ImgImageLoader(ImageLoader):
             # read in image
             content = f.read()
             # make numpy array from image
-            image = np.frombuffer(content, dtype = np.uint16)
+            image = np.frombuffer(content, dtype=np.uint16)
             # calculate size of image from header information
             size = (header["y2"]-header["y1"]+1, header["x2"]-header["x1"]+1)
             # reshape image as 2d array
@@ -159,7 +160,7 @@ class ImgImageLoader(ImageLoader):
             return image
 
 class FitsImageLoader(ImageLoader):
-    """ Load .fit image files (common format). """
+    """ Load .fits image files. """
     
     def get_image(self, image_path):
         hdulist = pyfits.open(image_path)
@@ -172,7 +173,7 @@ class PILImageLoader(ImageLoader):
 
     def get_image(self, image_path):
         im = Image.open(image_path)
-        data = np.asarray(im.convert('L'), dtype = np.uint16)
+        data = np.asarray(im.convert('L'), dtype=np.uint16)
         return data
 
 class ImageFormat:
@@ -190,10 +191,10 @@ class ImageFormat:
         return "{0}-Files ({1})".format(self.abbrev, " ".join(self.extensions))
 
 """ Dictionary of available ImageFormats. """
-IMAGE_FORMATS = dict([str(format_), format_] for format_ in \
-        [ImageFormat("FITS", ["*.fit", "*.fits"], FitsImageLoader),
-        ImageFormat("PIL", ["*.tif", "*.tiff", "*.png", "*.jpg"], PILImageLoader),
-        ImageFormat("IMG", ["*.img"], ImgImageLoader)] \
+IMAGE_FORMATS = collections.OrderedDict([str(format_), format_] for format_ in \
+        [ImageFormat("PIL", ["*.tif", "*.tiff", "*.png", "*.jpg", "*.bmp"], PILImageLoader),
+         ImageFormat("FITS", ["*.fit", "*.fits"], FitsImageLoader),
+         ImageFormat("IMG", ["*.img"], ImgImageLoader)] \
              if format_.abbrev in formats_available)
 
 def normalize255(array):
@@ -206,6 +207,9 @@ def normalize255(array):
         array = array * scale
     return array.astype("uint8")
 
+
+qtGreyColorTable = [qtgui.qRgb(i, i, i) for i in range(256)]
+
 def npimage2qimage(npimage):
     """ Converts numpy grayscale image to qimage."""
     h, w = npimage.shape
@@ -213,6 +217,5 @@ def npimage2qimage(npimage):
     # second w to avoid problems if image is not 32-bit aligned
     # --> indicates bytesPerLine
     qimage = qtgui.QImage(npimage.data, w, h, w, qtgui.QImage.Format_Indexed8)
-    for i in range(256):
-        qimage.setColor(i, qtgui.qRgb(i, i, i))
+    qimage.setColorTable(qtGreyColorTable)
     return qimage
