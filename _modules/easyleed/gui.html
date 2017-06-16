@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 2.2 documentation</title>
+    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 2.3 documentation</title>
     
     <link rel="stylesheet" href="../../_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.2',
+        VERSION:     '2.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -27,7 +27,7 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/theme_extras.js"></script>
     <link rel="shortcut icon" href="../../_static/icon.ico"/>
-    <link rel="top" title="EasyLEED 2.2 documentation" href="../../index.html" />
+    <link rel="top" title="EasyLEED 2.3 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body role="document">
@@ -57,6 +57,7 @@
 <span class="kn">import</span> <span class="nn">webbrowser</span>
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">six</span>
+<span class="kn">import</span> <span class="nn">time</span>
 
 <span class="kn">from</span> <span class="nn">.qt.QtCore</span> <span class="kn">import</span> <span class="p">(</span><span class="n">QPoint</span><span class="p">,</span> <span class="n">QRectF</span><span class="p">,</span> <span class="n">QPointF</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">SIGNAL</span><span class="p">,</span> <span class="n">QTimer</span><span class="p">,</span> <span class="n">QObject</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.qt.QtGui</span> <span class="kn">import</span> <span class="p">(</span><span class="n">QApplication</span><span class="p">,</span> <span class="n">QMainWindow</span><span class="p">,</span> <span class="n">QGraphicsView</span><span class="p">,</span>
@@ -66,18 +67,19 @@
     <span class="n">QPainter</span><span class="p">,</span> <span class="n">QKeySequence</span><span class="p">,</span> <span class="n">QAction</span><span class="p">,</span> <span class="n">QIcon</span><span class="p">,</span> <span class="n">QFileDialog</span><span class="p">,</span> <span class="n">QProgressBar</span><span class="p">,</span> <span class="n">QAbstractSlider</span><span class="p">,</span>
     <span class="n">QBrush</span><span class="p">,</span> <span class="n">QFrame</span><span class="p">,</span> <span class="n">QLabel</span><span class="p">,</span> <span class="n">QRadioButton</span><span class="p">,</span> <span class="n">QGridLayout</span><span class="p">,</span> <span class="n">QSpinBox</span><span class="p">,</span> <span class="n">QDoubleSpinBox</span><span class="p">,</span> <span class="n">QCheckBox</span><span class="p">,</span>
     <span class="n">QComboBox</span><span class="p">,</span> <span class="n">QLineEdit</span><span class="p">,</span> <span class="n">QMessageBox</span><span class="p">,</span> <span class="n">QPixmap</span><span class="p">)</span>
+
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
+
+<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_qt4agg</span> <span class="kn">import</span> <span class="n">FigureCanvasQTAgg</span> <span class="k">as</span> <span class="n">FigureCanvas</span>
+<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_qt4</span> <span class="kn">import</span> <span class="n">NavigationToolbar2QT</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">config</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">__version__</span>
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">__author__</span>
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="o">*</span>
 <span class="kn">from</span> <span class="nn">.io</span> <span class="kn">import</span> <span class="o">*</span>
-<span class="kn">from</span> <span class="nn">scipy</span> <span class="kn">import</span> <span class="n">interpolate</span>
-
-<span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="kn">import</span> <span class="n">Figure</span>
-<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_qt4agg</span> <span class="kn">import</span> <span class="n">FigureCanvasQTAgg</span> <span class="k">as</span> <span class="n">FigureCanvas</span>
-<span class="kn">from</span> <span class="nn">matplotlib.backends.backend_qt4</span> <span class="kn">import</span> <span class="n">NavigationToolbar2QT</span>
 
 <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">filename</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">loggingFilename</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">loggingLevel</span><span class="p">)</span>
 
@@ -202,7 +204,7 @@
 <span class="sd">    - radiusChanged</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span> <span class="o">=</span> <span class="bp">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">QSpotModel</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">m</span> <span class="o">=</span> <span class="n">SpotModel</span><span class="p">()</span>
     
@@ -229,7 +231,7 @@
 <span class="sd">              - instantiating a new Center (on right-click)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
     
-        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s2">&quot;image&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">itemAt</span><span class="p">(</span><span class="n">event</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()):</span>
                 <span class="nb">super</span><span class="p">(</span><span class="n">GraphicsScene</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">mousePressEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
             <span class="k">elif</span> <span class="n">event</span><span class="o">.</span><span class="n">button</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">LeftButton</span><span class="p">:</span>
@@ -273,9 +275,9 @@
             <span class="k">if</span> <span class="n">event</span><span class="o">.</span><span class="n">key</span><span class="p">()</span> <span class="o">==</span> <span class="n">Qt</span><span class="o">.</span><span class="n">Key_Delete</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">is</span> <span class="n">QGraphicsSpotItem</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">spots</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="bp">None</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">is</span> <span class="n">QGraphicsCenterItem</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">removeCenter</span><span class="p">()</span>
                 <span class="k">del</span> <span class="n">item</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="nb">super</span><span class="p">(</span><span class="n">GraphicsScene</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">keyPressEvent</span><span class="p">(</span><span class="n">event</span><span class="p">)</span>
@@ -303,13 +305,15 @@
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="n">QGraphicsSpotItem</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spots</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">removeCenter</span><span class="p">()</span>
 </div>
 <div class="viewcode-block" id="GraphicsScene.removeCenter"><a class="viewcode-back" href="../../api.html#easyleed.gui.GraphicsScene.removeCenter">[docs]</a>    <span class="k">def</span> <span class="nf">removeCenter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Remove all items from the scene (leaves background unchanged). &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-            <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="n">QGraphicsCenterItem</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
+            <span class="n">center</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">center</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">center</span><span class="p">)</span>
+            <span class="k">del</span> <span class="n">center</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="bp">None</span>
 </div></div>
 <div class="viewcode-block" id="GraphicsView"><a class="viewcode-back" href="../../api.html#easyleed.gui.GraphicsView">[docs]</a><span class="k">class</span> <span class="nc">GraphicsView</span><span class="p">(</span><span class="n">QGraphicsView</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Custom GraphicsView to display the scene. &quot;&quot;&quot;</span>
@@ -343,20 +347,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">gridLayout</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span> <span class="o">=</span> <span class="n">QVBoxLayout</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">gridLayout</span><span class="o">.</span><span class="n">addLayout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;&lt;qt&gt;&lt;b&gt;&lt;big&gt;&lt;a href = http://andim.github.io/easyleed/index.html&gt;EasyLEED </span><span class="si">%s</span><span class="s2">&lt;/a&gt;&lt;/b&gt;&lt;/big&gt;&lt;/qt&gt;&quot;</span> <span class="o">%</span> <span class="n">__version__</span><span class="p">,</span> <span class="bp">self</span><span class="p">);</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setOpenExternalLinks</span><span class="p">(</span><span class="bp">True</span><span class="p">);</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;by: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">__author__</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;&lt;qt&gt;Contacts: &lt;a href = mailto:andimscience@gmail.com&gt;andimscience@gmail.com&lt;/a&gt;, &lt;a href = mailto:feranick@hotmail.com&gt; feranick@hotmail.com&lt;/a&gt;&lt;/qt&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setOpenExternalLinks</span><span class="p">(</span><span class="bp">True</span><span class="p">);</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;More details: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">label</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;&lt;qt&gt;&lt;a href = http://dx.doi.org/10.1016/j.cpc.2012.02.019&gt;A Mayer, H Salopaasi, K Pussi, RD Diehl. Comput. Phys. Commun. 183, 1443-1447 (2012)&lt;/a&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setWordWrap</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="o">.</span><span class="n">setOpenExternalLinks</span><span class="p">(</span><span class="bp">True</span><span class="p">);</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelTitle</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;&lt;qt&gt;&lt;b&gt;&lt;big&gt;&lt;a href = http://andim.github.io/easyleed/index.html&gt;EasyLEED </span><span class="si">%s</span><span class="s2">&lt;/a&gt;&lt;/b&gt;&lt;/big&gt;&lt;/qt&gt;&quot;</span> <span class="o">%</span> <span class="n">__version__</span><span class="p">,</span> <span class="bp">self</span><span class="p">);</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelBy</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;by: </span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">__author__</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelContact</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;&lt;qt&gt;Contacts: &lt;a href = mailto:andimscience@gmail.com&gt;andimscience@gmail.com&lt;/a&gt;, &lt;a href = mailto:feranick@hotmail.com&gt; feranick@hotmail.com&lt;/a&gt;&lt;/qt&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelDetails</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;More details: &quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">labelPaper</span> <span class="o">=</span> <span class="n">QLabel</span><span class="p">(</span><span class="s2">&quot;&lt;qt&gt;&lt;a href = http://dx.doi.org/10.1016/j.cpc.2012.02.019&gt;A Mayer, H Salopaasi, K Pussi, RD Diehl. Comput. Phys. Commun. 183, 1443-1447 (2012)&lt;/a&gt;&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">labelTitle</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">labelBy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">labelContact</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">labelDetails</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">labelPaper</span><span class="p">]:</span>
+            <span class="n">label</span><span class="o">.</span><span class="n">setWordWrap</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="n">label</span><span class="o">.</span><span class="n">setOpenExternalLinks</span><span class="p">(</span><span class="bp">True</span><span class="p">);</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">verticalLayout</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="n">label</span><span class="p">)</span>
 </div>
 <span class="k">class</span> <span class="nc">CustomPlotToolbar</span><span class="p">(</span><span class="n">NavigationToolbar2QT</span><span class="p">):</span>
     <span class="c1"># only display the buttons we need</span>
@@ -430,7 +430,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Energy [eV]&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Frame&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Intensity&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Intensity [a.u.]&quot;</span><span class="p">)</span>
         <span class="c1"># removes the ticks from y-axis</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
 
@@ -444,12 +444,12 @@
             <span class="n">j</span><span class="o">+=</span><span class="mi">1</span>
         
         <span class="c1"># set up averageLine</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">averageLine</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">plot</span><span class="p">([],</span> <span class="p">[],</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">lw</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Average&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">averageLine</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">plot</span><span class="p">([],</span> <span class="p">[],</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Average&#39;</span><span class="p">)</span>
         <span class="c1"># set up averageSmoothLine</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">averageSmoothLine</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">plot</span><span class="p">([],</span> <span class="p">[],</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">lw</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">label</span> <span class="o">=</span> <span class="s1">&#39;Smooth Average&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">averageSmoothLine</span><span class="p">,</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">plot</span><span class="p">([],</span> <span class="p">[],</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="n">lw</span> <span class="o">=</span> <span class="mi">2</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s1">&#39;Smooth Average&#39;</span><span class="p">)</span>
         
         <span class="c1"># show dashed line at y = 0</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span> <span class="o">=</span> <span class="s1">&#39;--&#39;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;k&#39;</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s1">&#39;--&#39;</span><span class="p">)</span>
         <span class="c1"># try to auto-adjust plot margins (might not be available in all matplotlib versions)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
@@ -477,7 +477,6 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">averageCheck</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
             <span class="n">intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">numProcessed</span><span class="p">())</span>
             <span class="n">ynew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">numProcessed</span><span class="p">())</span>
-            <span class="n">tck</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">numProcessed</span><span class="p">())</span>
             
             <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">tracker</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">spots_map</span><span class="p">):</span>
                 <span class="n">intensity</span> <span class="o">+=</span> <span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">intensity</span>
@@ -497,7 +496,7 @@
 
         <span class="c1"># ... axes limits</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">relim</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">autoscale_view</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span><span class="bp">True</span><span class="p">,</span><span class="bp">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">autoscale_view</span><span class="p">(</span><span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">,</span> <span class="bp">True</span><span class="p">)</span>
         <span class="c1"># and show the new plot</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
 </div>
@@ -505,7 +504,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">cla</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initPlot</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">smoothCheck</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
 
 <div class="viewcode-block" id="PlotWidget.save"><a class="viewcode-back" href="../../api.html#easyleed.gui.PlotWidget.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Saving the plot &quot;&quot;&quot;</span>
@@ -959,7 +957,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_energy</span><span class="p">))</span>
     
 <div class="viewcode-block" id="MainWindow.custEnBtnClicked"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.custEnBtnClicked">[docs]</a>    <span class="k">def</span> <span class="nf">custEnBtnClicked</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Action when custom energy button is clicked&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot; Action when custom energy button is clicked&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">custEnergyButton</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">custEnergyText</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">custEnergyText</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_energy</span><span class="p">)</span>
@@ -968,13 +966,13 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">custEnergyText</span><span class="o">.</span><span class="n">hide</span><span class="p">()</span>
 </div>
 <div class="viewcode-block" id="MainWindow.setCustEnergy"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.setCustEnergy">[docs]</a>    <span class="k">def</span> <span class="nf">setCustEnergy</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Take energy from custom energy text and move the corresponding frame&#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot; Take energy from custom energy text and move the corresponding frame&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">worker</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">spots</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_energy</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">custEnergyText</span><span class="o">.</span><span class="n">text</span><span class="p">()))</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_energy</span><span class="p">))</span>
     </div>
 <div class="viewcode-block" id="MainWindow.liveSmoothParameters"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.liveSmoothParameters">[docs]</a>    <span class="k">def</span> <span class="nf">liveSmoothParameters</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&#39;&#39;&#39; Real time setting smoothing parameters from Parameter Settings panel into actual smoothed curve &#39;&#39;&#39;</span>
+        <span class="sd">&quot;&quot;&quot; Real time setting smoothing parameters from Parameter Settings panel into actual smoothed curve &quot;&quot;&quot;</span>
         <span class="n">config</span><span class="o">.</span><span class="n">GraphicsScene_smoothPoints</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parametersettingwid</span><span class="o">.</span><span class="n">smoothPoints</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
         <span class="n">config</span><span class="o">.</span><span class="n">GraphicsScene_smoothSpline</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parametersettingwid</span><span class="o">.</span><span class="n">smoothSpline</span><span class="o">.</span><span class="n">value</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">smoothCheck</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
@@ -1072,13 +1070,13 @@
     <span class="k">def</span> <span class="nf">saveIntensity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Save intensities to a file&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">saveIntensity</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
 <div class="viewcode-block" id="MainWindow.fileOpen"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.fileOpen">[docs]</a>    <span class="k">def</span> <span class="nf">fileOpen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Prompts the user to select input image files.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">removeAll</span><span class="p">()</span>
         <span class="n">dialog</span> <span class="o">=</span> <span class="n">FileDialog</span><span class="p">(</span><span class="n">parent</span> <span class="o">=</span> <span class="bp">self</span><span class="p">,</span>
-                <span class="n">caption</span> <span class="o">=</span> <span class="s2">&quot;Choose image files&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span> <span class="s2">&quot;;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">IMAGE_FORMATS</span><span class="p">))</span>
+                <span class="n">caption</span> <span class="o">=</span> <span class="s2">&quot;Choose image files&quot;</span><span class="p">,</span> <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">IMAGE_FORMATS</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">dialog</span><span class="o">.</span><span class="n">exec_</span><span class="p">():</span>
             <span class="n">files</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">selectedFiles</span><span class="p">();</span>
             <span class="n">filetype</span> <span class="o">=</span> <span class="n">IMAGE_FORMATS</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">dialog</span><span class="o">.</span><span class="n">selectedNameFilter</span><span class="p">())]</span>
@@ -1127,7 +1125,6 @@
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">spots</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">showMessage</span><span class="p">(</span><span class="s2">&quot;No integration window selected.&quot;</span><span class="p">,</span> <span class="mi">5000</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="kn">import</span> <span class="nn">time</span>
             <span class="n">time_before</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">initial_energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_energy</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span> <span class="o">=</span> <span class="bp">False</span>
@@ -1139,7 +1136,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveSpotsAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">clearPlotButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">GraphicsScene_livePlottingOn</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">GraphicsScene_livePlottingOn</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">goto</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">current_energy</span><span class="p">))</span>
             <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="p">:</span>
@@ -1149,7 +1146,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
                 <span class="n">QApplication</span><span class="o">.</span><span class="n">processEvents</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">GraphicsScene_livePlottingOn</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">GraphicsScene_livePlottingOn</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">updatePlot</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">sliderCurrentPos</span> <span class="o">+=</span> <span class="mi">1</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliderCurrentPos</span><span class="p">)</span>
@@ -1186,7 +1183,7 @@
         <span class="sd">&quot;&quot;&quot;Saves the spot locations to a file, uses workers saveloc-function&quot;&quot;&quot;</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Save the spot locations to a file&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">saveloc</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_energy</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;eV_pos.txt&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">saveLoc</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_energy</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;eV_pos.txt&quot;</span><span class="p">)</span>
 </div>
 <div class="viewcode-block" id="MainWindow.loadSpots"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.loadSpots">[docs]</a>    <span class="k">def</span> <span class="nf">loadSpots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Load saved spot positions&quot;&quot;&quot;</span>
@@ -1236,8 +1233,6 @@
             <span class="n">location</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pkl_file</span><span class="p">)</span>
             <span class="n">pkl_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="c1"># unzipping the &quot;location&quot;</span>
-            <span class="n">cLocx</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="n">cLocy</span> <span class="o">=</span> <span class="mi">0</span>
             <span class="n">cLocx</span><span class="p">,</span> <span class="n">cLocy</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">location</span><span class="p">)</span>
             <span class="n">point</span> <span class="o">=</span> <span class="n">QPointF</span><span class="p">(</span><span class="n">cLocx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cLocy</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="n">item</span> <span class="o">=</span> <span class="n">QGraphicsCenterItem</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">QGraphicsCenterItem_size</span><span class="p">)</span>
@@ -1290,57 +1285,42 @@
 
 <div class="viewcode-block" id="Worker.numProcessed"><a class="viewcode-back" href="../../api.html#easyleed.gui.Worker.numProcessed">[docs]</a>    <span class="k">def</span> <span class="nf">numProcessed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Return the number of processed images. &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">)</span><span class="o">.</span><span class="n">next</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span>
 </div>
-    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<div class="viewcode-block" id="Worker.saveIntensity"><a class="viewcode-back" href="../../api.html#easyleed.gui.Worker.saveIntensity">[docs]</a>    <span class="k">def</span> <span class="nf">saveIntensity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;save intensities&quot;&quot;&quot;</span>
+
+        <span class="c1">#save intensities</span>
         <span class="n">intensities</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">intensity</span> <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">tracker</span> \
                                 <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">)]</span>
         <span class="n">energy</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span> <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">tracker</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">)]</span>
-        <span class="n">zipped</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">intensities</span><span class="p">)</span>
-        
-        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">Processing_backgroundSubstractionOn</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;_bs.int.txt&quot;</span><span class="p">,</span> <span class="n">zipped</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;_no-bs.int.txt&quot;</span><span class="p">,</span> <span class="n">zipped</span><span class="p">)</span>
-        
-        <span class="n">x</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">x</span> <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">tracker</span> \
-                <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">)]</span>
-        <span class="n">y</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">y</span> <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">tracker</span> \
-                <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">)]</span>
+        <span class="n">zipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">intensities</span><span class="p">)))</span>
+        <span class="n">bs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">Processing_backgroundSubstractionOn</span>
+        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">zipped</span><span class="p">,</span>
+                   <span class="n">header</span><span class="o">=</span><span class="s1">&#39;energy, intensity 1, intensity 2, ..., [background substraction = </span><span class="si">%s</span><span class="s1">]&#39;</span><span class="o">%</span> <span class="n">bs</span><span class="p">)</span>
 
-        <span class="n">x</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
-        <span class="n">zipped</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="o">*</span><span class="n">x</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">Processing_backgroundSubstractionOn</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;_bs.spot-coord.txt&quot;</span><span class="p">,</span> <span class="n">zipped</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;_no-bs.spot-coord.txt&quot;</span><span class="p">,</span> <span class="n">zipped</span><span class="p">)</span>
-        
         <span class="c1"># Save Average intensity (if checkbox selected)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">averageCheck</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">averageCheck</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
             <span class="n">intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numProcessed</span><span class="p">())</span>
             <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">tracker</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">):</span>
                 <span class="n">intensity</span> <span class="o">+=</span> <span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">intensity</span>
             <span class="n">intensity</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">intensity</span><span class="p">]</span>
-            <span class="n">zipped</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">intensity</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">Processing_backgroundSubstractionOn</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;_bs.average.txt&quot;</span><span class="p">,</span> <span class="n">zipped</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;_no-bs.average.txt&quot;</span><span class="p">,</span> <span class="n">zipped</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">smoothCheck</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
-                <span class="n">ynew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numProcessed</span><span class="p">())</span>
-                <span class="n">tck</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numProcessed</span><span class="p">())</span>
-                <span class="n">tck</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">splrep</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span> <span class="n">intensity</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">GraphicsScene_smoothSpline</span><span class="p">)</span>
-                <span class="n">xnew</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span>
-                                 <span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">*</span><span class="n">config</span><span class="o">.</span><span class="n">GraphicsScene_smoothPoints</span><span class="p">)</span>
-                <span class="n">ynew</span> <span class="o">=</span> <span class="n">interpolate</span><span class="o">.</span><span class="n">splev</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">tck</span><span class="p">,</span> <span class="n">der</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                <span class="n">zipped</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="n">xnew</span><span class="p">,</span> <span class="n">ynew</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">Processing_backgroundSubstractionOn</span> <span class="o">==</span> <span class="bp">True</span><span class="p">:</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;_bs.sm-average.txt&quot;</span><span class="p">,</span> <span class="n">zipped</span><span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">filename</span> <span class="o">+</span> <span class="s2">&quot;_no-bs.sm-average.txt&quot;</span><span class="p">,</span> <span class="n">zipped</span><span class="p">)</span>
+            <span class="n">zipped</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">energy</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">intensity</span><span class="p">))</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">filename</span><span class="o">+</span><span class="s1">&#39;_avg&#39;</span><span class="p">,</span> <span class="n">zipped</span><span class="p">,</span>
+                   <span class="n">header</span><span class="o">=</span><span class="s1">&#39;energy, avg. intensity [background substraction = </span><span class="si">%s</span><span class="s1">]&#39;</span><span class="o">%</span> <span class="n">bs</span><span class="p">)</span>
     
-    <span class="k">def</span> <span class="nf">saveloc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+<span class="c1">#        # save positions</span>
+<span class="c1">#        x = [model.m.x for model, tracker \</span>
+<span class="c1">#                in six.itervalues(self.spots_map)]</span>
+<span class="c1">#        y = [model.m.y for model, tracker \</span>
+<span class="c1">#                in six.itervalues(self.spots_map)]</span>
+<span class="c1">#        x.extend(y)</span>
+<span class="c1">#        zipped = np.asarray(list(zip(energy[0], *x))</span>
+<span class="c1">#        np.savetxt(filename, zipped,</span>
+<span class="c1">#                   header=&#39;energy, x, y&#39;)</span>
+        </div>
+    <span class="k">def</span> <span class="nf">saveLoc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+
         <span class="c1"># model = QSpotModel object tracker = tracker</span>
         <span class="c1"># dict function .itervalues() = return an iterator over the mapping&#39;s values</span>
         <span class="n">energy</span> <span class="o">=</span> <span class="p">[</span><span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span> <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">tracker</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">)]</span>
@@ -1367,7 +1347,7 @@
 
     <div class="footer" role="contentinfo">
         &copy; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2017-06-01.
+      Last updated on 2017-06-16.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>

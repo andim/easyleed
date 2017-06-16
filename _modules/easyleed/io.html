@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 2.2 documentation</title>
+    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 2.3 documentation</title>
     
     <link rel="stylesheet" href="../../_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.2',
+        VERSION:     '2.3',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -27,7 +27,7 @@
     <script type="text/javascript" src="../../_static/doctools.js"></script>
     <script type="text/javascript" src="../../_static/theme_extras.js"></script>
     <link rel="shortcut icon" href="../../_static/icon.ico"/>
-    <link rel="top" title="EasyLEED 2.2 documentation" href="../../index.html" />
+    <link rel="top" title="EasyLEED 2.3 documentation" href="../../index.html" />
     <link rel="up" title="Module code" href="../index.html" /> 
   </head>
   <body role="document">
@@ -59,6 +59,7 @@
 
 <span class="c1"># load regular expression package (for parsing of energy from file name)</span>
 <span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">collections</span>
 
 <span class="kn">from</span> <span class="nn">.base</span> <span class="kn">import</span> <span class="n">logger</span>
 
@@ -199,7 +200,7 @@
             <span class="c1"># read in image</span>
             <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
             <span class="c1"># make numpy array from image</span>
-            <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+            <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
             <span class="c1"># calculate size of image from header information</span>
             <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;y2&quot;</span><span class="p">]</span><span class="o">-</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;y1&quot;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;x2&quot;</span><span class="p">]</span><span class="o">-</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;x1&quot;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="c1"># reshape image as 2d array</span>
@@ -207,7 +208,7 @@
             <span class="k">return</span> <span class="n">image</span>
 </div>
 <div class="viewcode-block" id="FitsImageLoader"><a class="viewcode-back" href="../../api.html#easyleed.io.FitsImageLoader">[docs]</a><span class="k">class</span> <span class="nc">FitsImageLoader</span><span class="p">(</span><span class="n">ImageLoader</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot; Load .fit image files (common format). &quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot; Load .fits image files. &quot;&quot;&quot;</span>
     
     <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
         <span class="n">hdulist</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
@@ -220,7 +221,7 @@
 
     <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
         <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">),</span> <span class="n">dtype</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
 </div>
 <div class="viewcode-block" id="ImageFormat"><a class="viewcode-back" href="../../api.html#easyleed.io.ImageFormat">[docs]</a><span class="k">class</span> <span class="nc">ImageFormat</span><span class="p">:</span>
@@ -238,10 +239,10 @@
         <span class="k">return</span> <span class="s2">&quot;{0}-Files ({1})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">abbrev</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extensions</span><span class="p">))</span>
 </div>
 <span class="sd">&quot;&quot;&quot; Dictionary of available ImageFormats. &quot;&quot;&quot;</span>
-<span class="n">IMAGE_FORMATS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">format_</span><span class="p">),</span> <span class="n">format_</span><span class="p">]</span> <span class="k">for</span> <span class="n">format_</span> <span class="ow">in</span> \
-        <span class="p">[</span><span class="n">ImageFormat</span><span class="p">(</span><span class="s2">&quot;FITS&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;*.fit&quot;</span><span class="p">,</span> <span class="s2">&quot;*.fits&quot;</span><span class="p">],</span> <span class="n">FitsImageLoader</span><span class="p">),</span>
-        <span class="n">ImageFormat</span><span class="p">(</span><span class="s2">&quot;PIL&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;*.tif&quot;</span><span class="p">,</span> <span class="s2">&quot;*.tiff&quot;</span><span class="p">,</span> <span class="s2">&quot;*.png&quot;</span><span class="p">,</span> <span class="s2">&quot;*.jpg&quot;</span><span class="p">],</span> <span class="n">PILImageLoader</span><span class="p">),</span>
-        <span class="n">ImageFormat</span><span class="p">(</span><span class="s2">&quot;IMG&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;*.img&quot;</span><span class="p">],</span> <span class="n">ImgImageLoader</span><span class="p">)]</span> \
+<span class="n">IMAGE_FORMATS</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">format_</span><span class="p">),</span> <span class="n">format_</span><span class="p">]</span> <span class="k">for</span> <span class="n">format_</span> <span class="ow">in</span> \
+        <span class="p">[</span><span class="n">ImageFormat</span><span class="p">(</span><span class="s2">&quot;PIL&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;*.tif&quot;</span><span class="p">,</span> <span class="s2">&quot;*.tiff&quot;</span><span class="p">,</span> <span class="s2">&quot;*.png&quot;</span><span class="p">,</span> <span class="s2">&quot;*.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;*.bmp&quot;</span><span class="p">],</span> <span class="n">PILImageLoader</span><span class="p">),</span>
+         <span class="n">ImageFormat</span><span class="p">(</span><span class="s2">&quot;FITS&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;*.fit&quot;</span><span class="p">,</span> <span class="s2">&quot;*.fits&quot;</span><span class="p">],</span> <span class="n">FitsImageLoader</span><span class="p">),</span>
+         <span class="n">ImageFormat</span><span class="p">(</span><span class="s2">&quot;IMG&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;*.img&quot;</span><span class="p">],</span> <span class="n">ImgImageLoader</span><span class="p">)]</span> \
              <span class="k">if</span> <span class="n">format_</span><span class="o">.</span><span class="n">abbrev</span> <span class="ow">in</span> <span class="n">formats_available</span><span class="p">)</span>
 
 <div class="viewcode-block" id="normalize255"><a class="viewcode-back" href="../../api.html#easyleed.io.normalize255">[docs]</a><span class="k">def</span> <span class="nf">normalize255</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
@@ -253,7 +254,10 @@
     <span class="k">if</span> <span class="n">scale</span> <span class="o">!=</span> <span class="mf">1.0</span><span class="p">:</span>
         <span class="n">array</span> <span class="o">=</span> <span class="n">array</span> <span class="o">*</span> <span class="n">scale</span>
     <span class="k">return</span> <span class="n">array</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="s2">&quot;uint8&quot;</span><span class="p">)</span>
+
 </div>
+<span class="n">qtGreyColorTable</span> <span class="o">=</span> <span class="p">[</span><span class="n">qtgui</span><span class="o">.</span><span class="n">qRgb</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">)]</span>
+
 <div class="viewcode-block" id="npimage2qimage"><a class="viewcode-back" href="../../api.html#easyleed.io.npimage2qimage">[docs]</a><span class="k">def</span> <span class="nf">npimage2qimage</span><span class="p">(</span><span class="n">npimage</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Converts numpy grayscale image to qimage.&quot;&quot;&quot;</span>
     <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">npimage</span><span class="o">.</span><span class="n">shape</span>
@@ -261,8 +265,7 @@
     <span class="c1"># second w to avoid problems if image is not 32-bit aligned</span>
     <span class="c1"># --&gt; indicates bytesPerLine</span>
     <span class="n">qimage</span> <span class="o">=</span> <span class="n">qtgui</span><span class="o">.</span><span class="n">QImage</span><span class="p">(</span><span class="n">npimage</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">,</span> <span class="n">qtgui</span><span class="o">.</span><span class="n">QImage</span><span class="o">.</span><span class="n">Format_Indexed8</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">256</span><span class="p">):</span>
-        <span class="n">qimage</span><span class="o">.</span><span class="n">setColor</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">qtgui</span><span class="o">.</span><span class="n">qRgb</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
+    <span class="n">qimage</span><span class="o">.</span><span class="n">setColorTable</span><span class="p">(</span><span class="n">qtGreyColorTable</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">qimage</span></div>
 </pre></div>
 
@@ -279,7 +282,7 @@
 
     <div class="footer" role="contentinfo">
         &copy; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2017-06-01.
+      Last updated on 2017-06-16.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
