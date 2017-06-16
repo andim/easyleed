@@ -9,6 +9,7 @@ import logging
 import webbrowser
 import pickle
 import six
+import time
 
 from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
 from .qt.QtGui import (QApplication, QMainWindow, QGraphicsView,
@@ -18,18 +19,19 @@ from .qt.QtGui import (QApplication, QMainWindow, QGraphicsView,
     QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
     QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox,
     QComboBox, QLineEdit, QMessageBox, QPixmap)
+
 import numpy as np
+from scipy import interpolate
+
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
 from . import config
 from . import __version__
 from . import __author__
 from .base import *
 from .io import *
-from scipy import interpolate
-
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
 logging.basicConfig(filename = config.loggingFilename, level=config.loggingLevel)
 
@@ -1075,7 +1077,6 @@ class MainWindow(QMainWindow):
         if len(self.scene.spots) == 0:
             self.statusBar().showMessage("No integration window selected.", 5000)
         else:
-            import time
             time_before = time.time()
             self.initial_energy = self.current_energy
             self.stopped = False
@@ -1087,7 +1088,7 @@ class MainWindow(QMainWindow):
             self.fileSaveAction.setEnabled(True)
             self.fileSaveSpotsAction.setEnabled(True)
             self.plotwid.clearPlotButton.setEnabled(False)
-            if config.GraphicsScene_livePlottingOn == True:
+            if config.GraphicsScene_livePlottingOn:
                 self.plot()
             self.worker.process(self.loader.goto(self.current_energy))
             for image in self.loader:
@@ -1097,7 +1098,7 @@ class MainWindow(QMainWindow):
                 self.setImage(image)
                 self.worker.process(image)
                 QApplication.processEvents()
-                if config.GraphicsScene_livePlottingOn == True:
+                if config.GraphicsScene_livePlottingOn:
                     self.plotwid.updatePlot()
                 self.sliderCurrentPos += 1
                 self.slider.setValue(self.sliderCurrentPos)
@@ -1240,55 +1241,38 @@ class Worker(QObject):
 
     def saveIntensity(self, filename):
         """save intensities"""
+
+        #save intensities
         intensities = [model.m.intensity for model, tracker \
                                 in six.itervalues(self.spots_map)]
         energy = [model.m.energy for model, tracker in six.itervalues(self.spots_map)]
         zipped = np.asarray(list(zip(energy[0], *intensities)))
-        np.savetxt(filename, zipped, header='energy, intensity 1, intensity 2, ...')
+        bs = config.Processing_backgroundSubstractionOn
+        np.savetxt(filename, zipped,
+                   header='energy, intensity 1, intensity 2, ..., [background substraction = %s]'% bs)
 
-#        if config.Processing_backgroundSubstractionOn == True:
-#            np.savetxt(filename + "_bs.int.txt", zipped)
-#        else:
-#            np.savetxt(filename + "_no-bs.int.txt", zipped)
-#        
+        # Save Average intensity (if checkbox selected)
+        if self.parent().plotwid.averageCheck.isChecked():
+            intensity = np.zeros(self.numProcessed())
+            for model, tracker in six.itervalues(self.spots_map):
+                intensity += model.m.intensity
+            intensity = [i/len(self.spots_map) for i in intensity]
+            zipped = list(zip(energy[0], intensity))
+            np.savetxt(filename+'_avg', zipped,
+                   header='energy, avg. intensity [background substraction = %s]'% bs)
+    
+#        # save positions
 #        x = [model.m.x for model, tracker \
 #                in six.itervalues(self.spots_map)]
 #        y = [model.m.y for model, tracker \
 #                in six.itervalues(self.spots_map)]
-#
 #        x.extend(y)
-#        zipped = zip(energy[0], *x)
-#        if config.Processing_backgroundSubstractionOn == True:
-#            np.savetxt(filename + "_bs.spot-coord.txt", zipped)
-#        else:
-#            np.savetxt(filename + "_no-bs.spot-coord.txt", zipped)
-#        
-#        # Save Average intensity (if checkbox selected)
-#        if self.parent().plotwid.averageCheck.isChecked() == True:
-#            intensity = np.zeros(self.numProcessed())
-#            for model, tracker in six.itervalues(self.spots_map):
-#                intensity += model.m.intensity
-#            intensity = [i/len(self.spots_map) for i in intensity]
-#            zipped = zip(energy[0], intensity)
-#            if config.Processing_backgroundSubstractionOn == True:
-#                np.savetxt(filename + "_bs.average.txt", zipped)
-#            else:
-#                np.savetxt(filename + "_no-bs.average.txt", zipped)
-#
-#            if self.parent().plotwid.smoothCheck.isChecked():
-#                ynew = np.zeros(self.numProcessed())
-#                tck = np.zeros(self.numProcessed())
-#                tck = interpolate.splrep(model.m.energy, intensity, s=config.GraphicsScene_smoothSpline)
-#                xnew = np.arange(model.m.energy[0], model.m.energy[-1],
-#                                 (model.m.energy[1]-model.m.energy[0])*config.GraphicsScene_smoothPoints)
-#                ynew = interpolate.splev(xnew, tck, der=0)
-#                zipped = zip(xnew, ynew)
-#                if config.Processing_backgroundSubstractionOn == True:
-#                    np.savetxt(filename + "_bs.sm-average.txt", zipped)
-#                else:
-#                    np.savetxt(filename + "_no-bs.sm-average.txt", zipped)
-    
+#        zipped = np.asarray(list(zip(energy[0], *x))
+#        np.savetxt(filename, zipped,
+#                   header='energy, x, y')
+        
     def saveLoc(self, filename):
+
         # model = QSpotModel object tracker = tracker
         # dict function .itervalues() = return an iterator over the mapping's values
         energy = [model.m.energy for model, tracker in six.itervalues(self.spots_map)]
