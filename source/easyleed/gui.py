@@ -18,7 +18,7 @@ from .qt.widgets import (QApplication, QMainWindow, QGraphicsView, QGraphicsScen
                              QPushButton, QToolButton, QAction, QFileDialog, QProgressBar,
                              QAbstractSlider, QFrame, QLabel, QRadioButton, QGridLayout,
                              QSpinBox, QDoubleSpinBox, QCheckBox, QComboBox, QLineEdit, QMessageBox)
-from .qt.QtGui import (QImage, QPen, QIcon, QTransform,
+from .qt.QtGui import (QImage, QPen, QIcon, QTransform, QImageWriter,
                        QPainter, QBrush, QKeySequence, QPixmap)
 import numpy as np
 
@@ -30,7 +30,7 @@ from .io import *
 from scipy import interpolate
 
 from matplotlib.figure import Figure
-from .qt import get_qt_binding_name
+from .qt import get_qt_binding_name, qt_filedialog_convert_to_str
 if get_qt_binding_name() == 'pyqt5':
     from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
     from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
@@ -472,8 +472,10 @@ class PlotWidget(QWidget):
 
     def save(self):
         """ Saving the plot """
-        # savefile prompt
-        filename = str(QFileDialog.getSaveFileName(self, "Save the plot to a file"))
+        filename = "plot.png"
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+                                                    "Save the plot to a file",
+                                                    filename))
         if filename:
             self.fig.savefig(filename)
 
@@ -696,7 +698,7 @@ class ParameterSettingWidget(QWidget):
 
     def saveValues(self):
         """ Basic saving of the set parameter values to a file """
-        filename = str(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
         if filename:
             output = open(filename, 'w')
             writelist = [self.inputPrecision.value(), self.integrationWindowRadiusNew.value(),
@@ -711,9 +713,9 @@ class ParameterSettingWidget(QWidget):
 
     def loadValues(self):
         """ Load a file of set parameter values that has been saved with the widget """
-        namefile = str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
+        filename = qt_filedialog_convert_to_str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         try:
-            loadput = open(namefile, 'r')
+            loadput = open(filename, 'r')
             loadlist = pickle.load(loadput)
             self.inputPrecision.setValue(loadlist[0])
             self.integrationWindowRadiusNew.setValue(loadlist[1])
@@ -1033,7 +1035,7 @@ class MainWindow(QMainWindow):
         self.current_energy = energy
 
     def saveIntensity(self):
-        filename = str(QFileDialog.getSaveFileName(self, "Save intensities to a file"))
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self, "Save intensities to a file"))
         if filename:
             self.worker.save(filename)
 
@@ -1134,10 +1136,13 @@ class MainWindow(QMainWindow):
     def saveScreenShot(self):
         """ Save Screenshot """
         # savefile prompt
-        filename = str(QFileDialog.getSaveFileName(self, "Save the image to a file"))
+        filename = "screenshot" + str(self.loader.energies[self.loader.index]) + "eV.png"
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+                                                    "Save the image to a file", filename,
+                                                    filter="Image files (*.png *.bmp, *.jpg)"))
         if filename:
-            pixMap = QWidget.grab(self.view)
-            pixMap.save(filename + "_" + str(self.loader.energies[self.loader.index]) + "eV.png")
+            pixMap = QWidget.grab(self.view) if get_qt_binding_name() == 'pyqt5' else QPixmap().grabWidget(self.view)
+            pixMap.save(filename)
 
     def fileQuit(self):
         """Special quit-function as the normal window closing might leave something on the background """
@@ -1147,14 +1152,16 @@ class MainWindow(QMainWindow):
 
     def saveSpots(self):
         """Saves the spot locations to a file, uses workers saveloc-function"""
-        filename = str(QFileDialog.getSaveFileName(self, "Save the spot locations to a file"))
+        filename = "loc_" + str(self.initial_energy) + "eV.csv"
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+                                                    "Save the spot locations to a file", filename))
         if filename:
-            self.worker.saveloc(filename + "_" + str(self.initial_energy) + "eV_pos.txt")
+            self.worker.saveloc(filename)
 
     def loadSpots(self):
         """Load saved spot positions"""
         # This can probably be done in a better way
-        filename = QFileDialog.getOpenFileName(self, 'Open spot location file')
+        filename = qt_filedialog_convert_to_str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         if filename:
             # pickle doesn't recognise the file opened by PyQt's openfile dialog as a file so 'normal' file processing
             pkl_file = open(filename, 'rb')
@@ -1179,17 +1186,21 @@ class MainWindow(QMainWindow):
 
     def saveCenter(self):
         """Saves the center locations to a file"""
-        filename = str(QFileDialog.getSaveFileName(self, "Save the center location to a file"))
+        filename = 'loc_center.pkl'
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+                                                    "Save the center location to a file",
+                                                    filename))
         if filename:
-            zipped = zip([self.scene.center.x()], [self.scene.center.y()])
-            output = open(filename + "_center.txt", 'wb')
+            zipped = list(zip([self.scene.center.x()], [self.scene.center.y()]))
+            output = open(filename, 'wb')
             pickle.dump(zipped, output)
             output.close()
 
     def loadCenter(self):
         """Load saved center position from file"""
         # This can probably be done in a better way
-        filename = QFileDialog.getOpenFileName(self, 'Open center location file')
+        filename = qt_filedialog_convert_to_str(QFileDialog.getOpenFileName(self,
+                                                    "Open center location file"))
         if filename:
             if hasattr (self.scene, "center"):
                 self.scene.removeCenter()
