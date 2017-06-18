@@ -19,17 +19,17 @@ from .base import logger
 formats_available = ['IMG']
 try:
     import pyfits
-    formats_available.append("FITS")    
+    formats_available.append("FITS")
 except:
     logger.warning("Warning: the pyfits package is not installed.")
 # try to import PIL in two possible ways (dependent on PIL version)
 try:
     from PIL import Image
-    formats_available.append("PIL")    
+    formats_available.append("PIL")
 except:
     try:
         import Image
-        formats_available.append("PIL")    
+        formats_available.append("PIL")
     except:
         logger.warning("Warning: the pillow package is not installed.")
 
@@ -74,9 +74,9 @@ class ImageLoader(object):
         if self.index == 0:
             raise StopIteration("there is no previous image")
         else:
-           self.index -= 1
-           energy = self.energies[self.index]
-           return self.get_image(self.files[energy]), energy
+            self.index -= 1
+            energy = self.energies[self.index]
+            return self.get_image(self.files[energy]), energy
 
     def __next__(self):
         """ Get image at next higher beam energy. """
@@ -103,6 +103,7 @@ class ImageLoader(object):
         for energy in energies:
             yield self.get_image(energy), energy
 
+
 class ImgImageLoader(ImageLoader):
     """ Load .img image files (HotLeed format). """
 
@@ -122,7 +123,9 @@ class ImgImageLoader(ImageLoader):
         header_raw = f.read(header_length)
         ## process header ##
         # dict containing names of all interesting entrys
-        header = {"Beam Voltage (eV)": 0, "Date": "", "Comment": "", "x1": 0, "y1": 0, "x2": 0, "y2": 0, "Number of frames": 0, 'length' : header_length}
+        header = {"Beam Voltage (eV)": 0, "Date": "", "Comment": "",
+                  "x1": 0, "y1": 0, "x2": 0, "y2": 0, "Number of frames": 0,
+                  'length' : header_length}
         headerlines = header_raw.split("\n")
         for line in headerlines:
             parts = line.split(": ")
@@ -150,14 +153,16 @@ class ImgImageLoader(ImageLoader):
             image = image.reshape((size))
             return image
 
+
 class FitsImageLoader(ImageLoader):
     """ Load .fits image files. """
-    
+
     def get_image(self, image_path):
         hdulist = pyfits.open(image_path)
         data = hdulist[0].data
         hdulist.close()
         return data
+
 
 class PILImageLoader(ImageLoader):
     """ Load image files supported by Python Imaging Library (PIL). """
@@ -166,6 +171,7 @@ class PILImageLoader(ImageLoader):
         im = Image.open(image_path)
         data = np.asarray(im.convert('L'), dtype=np.uint16)
         return data
+
 
 class ImageFormat:
     """ Class describing an image format. """

@@ -187,7 +187,7 @@ class GraphicsScene(QGraphicsScene):
         self.spotsLabel = []
     
     def mousePressEvent(self, event):
-        """ Processes mouse events through either            
+        """ Processes mouse events through either
               - propagating the event
             or 
               - instantiating a new Circle (on left-click)
@@ -227,7 +227,7 @@ class GraphicsScene(QGraphicsScene):
             self.parent().statusBar().showMessage("Spots require a loaded image", 5000)
 
     def keyPressEvent(self, event):
-        """ Processes key events through either            
+        """ Processes key events through either
               - deleting the focus item
             or   
               - propagating the event
@@ -309,7 +309,7 @@ class AboutWidget(QWidget):
         self.labelTitle = QLabel("<qt><b><big><a href = http://andim.github.io/easyleed/index.html>EasyLEED %s</a></b></big></qt>" % __version__, self);
         self.labelBy = QLabel("by: %s" % __author__, self)
         self.labelContact = QLabel("<qt>Contacts: <a href = mailto:andimscience@gmail.com>andimscience@gmail.com</a>, <a href = mailto:feranick@hotmail.com> feranick@hotmail.com</a></qt>", self)
-        self.labelDetails = QLabel("More details: ", self)
+        self.labelDetails = QLabel("If EasyLEED has been useful in your research please cite: ", self)
         self.labelPaper = QLabel("<qt><a href = http://dx.doi.org/10.1016/j.cpc.2012.02.019>A Mayer, H Salopaasi, K Pussi, RD Diehl. Comput. Phys. Commun. 183, 1443-1447 (2012)</a>", self)
         for label in [self.labelTitle, self.labelBy, self.labelContact, self.labelDetails, self.labelPaper]:
             label.setWordWrap(True)
@@ -371,23 +371,16 @@ class PlotWidget(QWidget):
         self.gridLayout.addWidget(self.legendCheck, 3, 1, 1, 1)
 
         # Define events for checkbox
-        self.averageCheck.clicked.connect(self.updatePlot)
-        self.smoothCheck.clicked.connect(self.updatePlot)
-        self.legendCheck.clicked.connect(self.updatePlot)
-        self.clearPlotButton.clicked.connect(self.clearPlot)
+        self.averageCheck.clicked.connect(self.onAverageCheck())
+        for button in [self.smoothCheck, self.legendCheck, self.clearPlotButton]:
+            button.clicked.connect(self.updatePlot)
         
-    def setAverageChecks(self):
-        if self.averageCheck.isChecked():
-            self.smoothCheck.setEnabled(True)
-        else:
-            self.smoothCheck.setEnabled(False)
-
     def initPlot(self):
         # Setup axis, labels, lines, ...
-        if config.GraphicsScene_intensTimeOn == False:
-            self.axes.set_xlabel("Energy [eV]")
-        else:
+        if config.GraphicsScene_intensTimeOn:
             self.axes.set_xlabel("Frame")
+        else:
+            self.axes.set_xlabel("Energy [eV]")
         self.axes.set_ylabel("Intensity [a.u.]")
         # removes the ticks from y-axis
         self.axes.set_yticks([])
@@ -404,7 +397,7 @@ class PlotWidget(QWidget):
         # set up averageLine
         self.averageLine, = self.axes.plot([], [], 'k', lw=2, label='Average')
         # set up averageSmoothLine
-        self.averageSmoothLine, = self.axes.plot([], [], 'b', lw = 2, label='Smooth Average')
+        self.averageSmoothLine, = self.axes.plot([], [], 'b', lw=2, label='Smooth Average')
         
         # show dashed line at y = 0
         self.axes.axhline(0.0, color='k', ls='--')
@@ -414,28 +407,23 @@ class PlotWidget(QWidget):
         except:
             pass
         self.updatePlot()
-        self.axes.legend()
-        self.axes.legend().set_visible(False)
+        self.axes.legend(fontsize=10)
+        self.axes.legend().set_visible(self.legendCheck.isChecked())
         self.show()
+
+    def onAverageCheck():
+        if self.averageCheck.isChecked():
+            self.smoothCheck.setEnabled(True)
+        else:
+            self.smoothCheck.setEnabled(False)
+        self.updatePlot()
 
     def updatePlot(self):
         """ Basic Matplotlib plotting I(E)-curve """
-        # update data
-        self.setAverageChecks()
-        # decide whether to show legend
-        if self.axes.legend() is not None:
-            # decide whether to show legend
-            if self.legendCheck.isChecked():
-                self.axes.legend(fontsize=10).set_visible(True)
-            else:
-                self.axes.legend().set_visible(False)
-            
         for spot, line in six.iteritems(self.lines_map):
             line.set_data(self.worker.spots_map[spot][0].m.energy, self.worker.spots_map[spot][0].m.intensity)
         if self.averageCheck.isChecked():
             intensity = np.zeros(self.worker.numProcessed())
-            ynew = np.zeros(self.worker.numProcessed())
-            
             for model, tracker in six.itervalues(self.worker.spots_map):
                 intensity += model.m.intensity
             intensity /= len(self.worker.spots_map)
@@ -452,6 +440,10 @@ class PlotWidget(QWidget):
         else:
             self.averageLine.set_data([], [])
 
+        if self.axes.legend() is not None:
+            # decide whether to show legend
+            self.axes.legend().set_visible(self.legendCheck.isChecked())
+            
         # ... axes limits
         self.axes.relim()
         self.axes.autoscale_view(True, True, True)
@@ -647,7 +639,7 @@ class ParameterSettingWidget(QWidget):
         self.gridLayout.addLayout(self.rh9Layout, 8, 2)
         
         self.gridLayout.addLayout(self.hLayout, 8, 0)
-        self.gridLayout.addLayout(self.vlineLayout, 0,1,9,1)
+        self.gridLayout.addLayout(self.vlineLayout, 0, 1, 9, 1)
 
         self.applyButton.clicked.connect(self.applyParameters)
         self.defaultButton.clicked.connect(self.defaultValues)
@@ -1019,10 +1011,10 @@ class MainWindow(QMainWindow):
         npimage, energy = image
         qimage = npimage2qimage(npimage)
         self.view.setSceneRect(QRectF(qimage.rect()))
-        if config.GraphicsScene_intensTimeOn == False:
-            labeltext = "Energy: %s eV" % energy
-        else:
+        if config.GraphicsScene_intensTimeOn:
             labeltext = "Frame: %s" % energy
+        else:
+            labeltext = "Energy: %s eV" % energy
         self.scene.setBackground(qimage, labeltext)
         self.current_energy = energy
 
@@ -1215,27 +1207,27 @@ class MainWindow(QMainWindow):
             self.fileSaveCenterAction.setEnabled(True)
 
 class Worker(QObject):
-    """ Worker that manages the spots."""
+    """ Worker that manages the spots.
+    
+        spots_map:
+        - key: spot
+        - value: SpotModel, Tracker
+    """
 
     def __init__(self, spots, center, energy, parent=None):
         super(Worker, self).__init__(parent)
-        #### setup widgets ####
-        self.plotwid = PlotWidget()
         
-        # spots_map:
-        # - key: spot
-        # - value: SpotModel, Tracker
         self.spots_map = {}
         for spot in spots:
             pos = spot.scenePos()
             if center:
                 tracker = Tracker(pos.x(), pos.y(), spot.radius(), energy, center.x(), center.y(),
-                            input_precision = config.Tracking_inputPrecision,
-                            window_scaling = config.Tracking_windowScalingOn)
+                            input_precision=config.Tracking_inputPrecision,
+                            window_scaling=config.Tracking_windowScalingOn)
             else:
                 tracker = Tracker(pos.x(), pos.y(), spot.radius(), energy,
-                            input_precision = config.Tracking_inputPrecision,
-                            window_scaling = config.Tracking_windowScalingOn)
+                            input_precision=config.Tracking_inputPrecision,
+                            window_scaling=config.Tracking_windowScalingOn)
             self.spots_map[spot] = (QSpotModel(self), tracker)
 
         for view, tup in six.iteritems(self.spots_map):
@@ -1244,10 +1236,10 @@ class Worker(QObject):
             tup[0].radiusChanged.connect(view.onRadiusChange)
 
     def process(self, image):
-        if config.GraphicsScene_intensTimeOn == False:
-            print("Current image energy: " + str(self.parent().current_energy) + "eV")
-        else:
+        if config.GraphicsScene_intensTimeOn:
             print("Current frame: " + str(self.parent().current_energy))
+        else:
+            print("Current image energy: " + str(self.parent().current_energy) + "eV")
         for model, tracker in six.itervalues(self.spots_map):
             tracker_result = tracker.feed_image(image)
             # feed_image returns x, y, intensity, energy and radius
@@ -1259,14 +1251,13 @@ class Worker(QObject):
 
     def saveIntensity(self, filename):
         """save intensities"""
-        #save intensities
         intensities = [model.m.intensity for model, tracker \
                                 in six.itervalues(self.spots_map)]
         energy = [model.m.energy for model, tracker in six.itervalues(self.spots_map)]
         zipped = np.asarray(list(zip(energy[0], *intensities)))
         bs = config.Processing_backgroundSubstractionOn
         np.savetxt(filename, zipped,
-                   header='energy, intensity 1, intensity 2, ..., [background substraction = %s]'% bs)
+                   header='energy, intensity 1, intensity 2, ..., [background substraction = %s]' % bs)
 
         # Save Average intensity (if checkbox selected)
         if self.parent().plotwid.averageCheck.isChecked():
@@ -1276,7 +1267,7 @@ class Worker(QObject):
             intensity = [i/len(self.spots_map) for i in intensity]
             zipped = list(zip(energy[0], intensity))
             np.savetxt(filename+'_avg', zipped,
-                   header='energy, avg. intensity [background substraction = %s]'% bs)
+                   header='energy, avg. intensity [background substraction = %s]' % bs)
 
 #        # save positions
 #        x = [model.m.x for model, tracker \

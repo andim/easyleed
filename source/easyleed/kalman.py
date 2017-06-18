@@ -30,7 +30,7 @@ class AbstractKalmanFilter(object):
         # identity matrix of state vector size
         self._1 = np.asmatrix(np.identity(max(self.x.shape)))
 
-    def predict(self, F, Q = np.zeros((4, 4))):
+    def predict(self, F, Q=np.zeros((4, 4))):
         """ Predict next state.
 
         F: state transition matrix
@@ -81,7 +81,7 @@ class AbstractKalmanFilter(object):
 
 class AbstractPVKalmanFilter(AbstractKalmanFilter):
     """ Kalman filter for 2d-tracking using position and velocity as state variables."""
-    def __init__(self, x_in, y_in, P, time, vx_in = 0, vy_in = 0):
+    def __init__(self, x_in, y_in, P, time, vx_in=0, vy_in=0):
         self.old_time = time
         x = [x_in, y_in, vx_in, vy_in]
         H = [[1, 0, 0, 0], [0, 1, 0, 0]]
@@ -91,7 +91,7 @@ class AbstractPVKalmanFilter(AbstractKalmanFilter):
         return float(self.x[0]), float(self.x[1])
 
     def get_position_err(self):
-        return float(self.P[0,0])**0.5, float(self.P[1,1])**0.5
+        return float(self.P[0, 0])**0.5, float(self.P[1, 1])**0.5
 
 class PVKalmanFilter0(AbstractPVKalmanFilter):
     def predict(self, time, *args, **kwargs):
