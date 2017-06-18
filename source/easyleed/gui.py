@@ -11,27 +11,34 @@ import pickle
 import six
 import time
 
-from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
-from .qt.QtGui import (QApplication, QMainWindow, QGraphicsView,
-    QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
-    QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsRectItem, QGraphicsItem,
-    QGraphicsSimpleTextItem, QToolButton,
-    QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
-    QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox,
-    QComboBox, QLineEdit, QMessageBox, QPixmap)
-
-import numpy as np
-from scipy import interpolate
-
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
+from .qt import get_qt_binding_name, qt_filedialog_convert_to_str
+from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, QTimer, QObject)
+from .qt.QtCore import pyqtSignal as Signal
+from .qt.widgets import (QApplication, QMainWindow, QGraphicsView, QGraphicsScene,
+                             QWidget, QHBoxLayout, QGraphicsEllipseItem, QGraphicsRectItem,
+                             QGraphicsItem,QGraphicsSimpleTextItem, QSlider, QVBoxLayout,
+                             QPushButton, QToolButton, QAction, QFileDialog, QProgressBar,
+                             QAbstractSlider, QFrame, QLabel, QRadioButton, QGridLayout,
+                             QSpinBox, QDoubleSpinBox, QCheckBox, QComboBox, QLineEdit, QMessageBox)
+from .qt.QtGui import (QImage, QPen, QIcon, QTransform, QImageWriter,
+                       QPainter, QBrush, QKeySequence, QPixmap)
 
 from . import config
 from . import __version__
 from . import __author__
 from .base import *
 from .io import *
+
+import numpy as np
+from scipy import interpolate
+
+from matplotlib.figure import Figure
+if get_qt_binding_name() == 'pyqt5':
+    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+    from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
+else:
+    from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+    from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
 logging.basicConfig(filename=config.loggingFilename, level=config.loggingLevel)
 
@@ -156,15 +163,19 @@ class QSpotModel(QObject):
     - radiusChanged
     """
 
+    intensityChanged = Signal(object)
+    positionChanged = Signal(object)
+    radiusChanged = Signal(object)
+
     def __init__(self, parent=None):
         super(QSpotModel, self).__init__(parent)
         self.m = SpotModel()
-    
+
     def update(self, x, y, intensity, energy, radius):
         self.m.update(x, y, intensity, energy, radius)
-        QObject.emit(self, SIGNAL("positionChanged"), QPointF(x, y))
-        QObject.emit(self, SIGNAL("radiusChanged"), radius)
-        QObject.emit(self, SIGNAL("intensityChanged"), intensity)
+        self.intensityChanged.emit(intensity)
+        self.positionChanged.emit(QPointF(x, y))
+        self.radiusChanged.emit(radius)
 
 class GraphicsScene(QGraphicsScene):
     """ Custom GraphicScene having all the main content."""
@@ -182,9 +193,9 @@ class GraphicsScene(QGraphicsScene):
               - instantiating a new Circle (on left-click)
               - instantiating a new Center (on right-click)
         """
-    
+        transform = QTransform()
         if hasattr(self, "image"):
-            if self.itemAt(event.scenePos()):
+            if self.itemAt(event.scenePos(), transform):
                 super(GraphicsScene, self).mousePressEvent(event)
             elif event.button() == Qt.LeftButton:
                 item = QGraphicsSpotItem(event.scenePos(),
@@ -360,10 +371,10 @@ class PlotWidget(QWidget):
         self.gridLayout.addWidget(self.legendCheck, 3, 1, 1, 1)
 
         # Define events for checkbox
-        QObject.connect(self.averageCheck, SIGNAL("clicked()"), self.updatePlot)
-        QObject.connect(self.smoothCheck, SIGNAL("clicked()"), self.updatePlot)
-        QObject.connect(self.legendCheck, SIGNAL("clicked()"), self.updatePlot)
-        QObject.connect(self.clearPlotButton, SIGNAL("clicked()"), self.clearPlot)
+        self.averageCheck.clicked.connect(self.updatePlot)
+        self.smoothCheck.clicked.connect(self.updatePlot)
+        self.legendCheck.clicked.connect(self.updatePlot)
+        self.clearPlotButton.clicked.connect(self.clearPlot)
         
     def setAverageChecks(self):
         if self.averageCheck.isChecked():
@@ -454,8 +465,10 @@ class PlotWidget(QWidget):
 
     def save(self):
         """ Saving the plot """
-        # savefile prompt
-        filename = str(QFileDialog.getSaveFileName(self, "Save the plot to a file"))
+        filename = "plot.png"
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+                                                    "Save the plot to a file",
+                                                    filename))
         if filename:
             self.fig.savefig(filename)
 
@@ -636,10 +649,10 @@ class ParameterSettingWidget(QWidget):
         self.gridLayout.addLayout(self.hLayout, 8, 0)
         self.gridLayout.addLayout(self.vlineLayout, 0,1,9,1)
 
-        QObject.connect(self.applyButton, SIGNAL("clicked()"), self.applyParameters)
-        QObject.connect(self.defaultButton, SIGNAL("clicked()"), self.defaultValues)
-        QObject.connect(self.saveButton, SIGNAL("clicked()"), self.saveValues)
-        QObject.connect(self.loadButton, SIGNAL("clicked()"), self.loadValues)
+        self.applyButton.clicked.connect(self.applyParameters)
+        self.defaultButton.clicked.connect(self.defaultValues)
+        self.saveButton.clicked.connect(self.saveValues)
+        self.loadButton.clicked.connect(self.loadValues)
     
     def applyParameters(self):
         """Parameter setting control"""
@@ -678,7 +691,7 @@ class ParameterSettingWidget(QWidget):
 
     def saveValues(self):
         """ Basic saving of the set parameter values to a file """
-        filename = str(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
         if filename:
             output = open(filename, 'w')
             writelist = [self.inputPrecision.value(), self.integrationWindowRadiusNew.value(),
@@ -693,9 +706,9 @@ class ParameterSettingWidget(QWidget):
 
     def loadValues(self):
         """ Load a file of set parameter values that has been saved with the widget """
-        namefile = str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
+        filename = qt_filedialog_convert_to_str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         try:
-            loadput = open(namefile, 'r')
+            loadput = open(filename, 'r')
             loadlist = pickle.load(loadput)
             self.inputPrecision.setValue(loadlist[0])
             self.integrationWindowRadiusNew.setValue(loadlist[1])
@@ -867,15 +880,15 @@ class MainWindow(QMainWindow):
         self.statusBar().addPermanentWidget(self.custEnergyButton)
 
         ### Create event connector for slider and buttons in statusbar
-        QObject.connect(self.slider, SIGNAL("sliderMoved(int)"), self.slider_moved)
-        QObject.connect(self.prevButton, SIGNAL("clicked()"), self.prevBtnClicked)
-        QObject.connect(self.nextButton, SIGNAL("clicked()"), self.nextBtnClicked)
-        QObject.connect(self.custEnergyButton, SIGNAL("clicked()"), self.custEnBtnClicked)
-        QObject.connect(self.custEnergyText, SIGNAL("returnPressed()"), self.setCustEnergy)
+        self.slider.sliderMoved.connect(self.slider_moved)
+        self.prevButton.clicked.connect(self.prevBtnClicked)
+        self.nextButton.clicked.connect(self.nextBtnClicked)
+        self.custEnergyButton.clicked.connect(self.custEnBtnClicked)
+        self.custEnergyText.returnPressed.connect(self.setCustEnergy)
     
         ### Create event connector for enabling fast changes to smoothing parameters
-        QObject.connect(self.parametersettingwid.smoothPoints, SIGNAL("editingFinished()"), self.liveSmoothParameters)
-        QObject.connect(self.parametersettingwid.smoothSpline, SIGNAL("editingFinished()"), self.liveSmoothParameters)
+        self.parametersettingwid.smoothPoints.editingFinished.connect(self.liveSmoothParameters)
+        self.parametersettingwid.smoothSpline.editingFinished.connect(self.liveSmoothParameters)
 
     def slider_moved(self, sliderNewPos):
         """
@@ -949,7 +962,7 @@ class MainWindow(QMainWindow):
             action.setToolTip(tip)
             action.setStatusTip(tip)
         if slot is not None:
-            self.connect(action, SIGNAL(signal), slot)
+            action.triggered.connect(slot)
         if checkable:
             action.setCheckable(True)
         return action
@@ -1015,7 +1028,7 @@ class MainWindow(QMainWindow):
         self.current_energy = energy
 
     def saveIntensity(self):
-        filename = str(QFileDialog.getSaveFileName(self, "Save intensities to a file"))
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self, "Save intensities to a file"))
         if filename:
             self.worker.saveIntensity(filename)
 
@@ -1116,10 +1129,13 @@ class MainWindow(QMainWindow):
     def saveScreenShot(self):
         """ Save Screenshot """
         # savefile prompt
-        filename = str(QFileDialog.getSaveFileName(self, "Save the image to a file"))
+        filename = "screenshot" + str(self.loader.energies[self.loader.index]) + "eV.png"
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+                                                    "Save the image to a file", filename,
+                                                    filter="Image files (*.png *.bmp, *.jpg)"))
         if filename:
-            pixMap = QPixmap().grabWidget(self.view)
-            pixMap.save(filename + "_" + str(self.loader.energies[self.loader.index]) + "eV.png")
+            pixMap = QWidget.grab(self.view) if get_qt_binding_name() == 'pyqt5' else QPixmap().grabWidget(self.view)
+            pixMap.save(filename)
 
     def fileQuit(self):
         """Special quit-function as the normal window closing might leave something on the background """
@@ -1129,14 +1145,16 @@ class MainWindow(QMainWindow):
 
     def saveSpots(self):
         """Saves the spot locations to a file, uses workers saveloc-function"""
-        filename = str(QFileDialog.getSaveFileName(self, "Save the spot locations to a file"))
+        filename = "loc_" + str(self.initial_energy) + "eV.csv"
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+                                                    "Save the spot locations to a file", filename))
         if filename:
-            self.worker.saveLoc(filename + "_" + str(self.initial_energy) + "eV_pos.txt")
+            self.worker.saveloc(filename)
 
     def loadSpots(self):
         """Load saved spot positions"""
         # This can probably be done in a better way
-        filename = QFileDialog.getOpenFileName(self, 'Open spot location file')
+        filename = qt_filedialog_convert_to_str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         if filename:
             # pickle doesn't recognise the file opened by PyQt's openfile dialog as a file so 'normal' file processing
             pkl_file = open(filename, 'rb')
@@ -1161,17 +1179,21 @@ class MainWindow(QMainWindow):
 
     def saveCenter(self):
         """Saves the center locations to a file"""
-        filename = str(QFileDialog.getSaveFileName(self, "Save the center location to a file"))
+        filename = 'loc_center.pkl'
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+                                                    "Save the center location to a file",
+                                                    filename))
         if filename:
-            zipped = zip([self.scene.center.x()], [self.scene.center.y()])
-            output = open(filename + "_center.txt", 'wb')
+            zipped = list(zip([self.scene.center.x()], [self.scene.center.y()]))
+            output = open(filename, 'wb')
             pickle.dump(zipped, output)
             output.close()
 
     def loadCenter(self):
         """Load saved center position from file"""
         # This can probably be done in a better way
-        filename = QFileDialog.getOpenFileName(self, 'Open center location file')
+        filename = qt_filedialog_convert_to_str(QFileDialog.getOpenFileName(self,
+                                                    "Open center location file"))
         if filename:
             if hasattr (self.scene, "center"):
                 self.scene.removeCenter()
@@ -1218,8 +1240,8 @@ class Worker(QObject):
 
         for view, tup in six.iteritems(self.spots_map):
             # view = QGraphicsSpotItem, tup = (QSpotModel, tracker) -> tup[0] = QSpotModel
-            self.connect(tup[0], SIGNAL("positionChanged"), view.onPositionChange)
-            self.connect(tup[0], SIGNAL("radiusChanged"), view.onRadiusChange)
+            tup[0].positionChanged.connect(view.onPositionChange)
+            tup[0].radiusChanged.connect(view.onRadiusChange)
 
     def process(self, image):
         if config.GraphicsScene_intensTimeOn == False:
@@ -1237,7 +1259,6 @@ class Worker(QObject):
 
     def saveIntensity(self, filename):
         """save intensities"""
-
         #save intensities
         intensities = [model.m.intensity for model, tracker \
                                 in six.itervalues(self.spots_map)]
@@ -1256,7 +1277,7 @@ class Worker(QObject):
             zipped = list(zip(energy[0], intensity))
             np.savetxt(filename+'_avg', zipped,
                    header='energy, avg. intensity [background substraction = %s]'% bs)
-    
+
 #        # save positions
 #        x = [model.m.x for model, tracker \
 #                in six.itervalues(self.spots_map)]
@@ -1276,7 +1297,7 @@ class Worker(QObject):
         locationy = [model.m.y for model, tracker in six.itervalues(self.spots_map)]
         radius = [model.m.radius for model, tracker in six.itervalues(self.spots_map)]
         locations = [locationx, locationy, radius]
-        zipped = zip(energy, *locations)
+        zipped = list(zip(energy, *locations))
         output = open(filename, 'wb')
         pickle.dump(zipped, output)
         output.close()

@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 import sys
-from .qt.QtGui import QApplication
+from .qt.widgets import QApplication
 from .gui import MainWindow
 
 def main():
