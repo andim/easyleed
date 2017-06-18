@@ -1264,13 +1264,13 @@ class Worker(QObject):
 
     def numProcessed(self):
         """ Return the number of processed images. """
-        return len(six.itervalues(self.spots_map).next()[0].m.energy)
+        return len(next(six.itervalues(self.spots_map))[0].m.energy)
 
     def save(self, filename):
         intensities = [model.m.intensity for model, tracker \
                                 in six.itervalues(self.spots_map)]
         energy = [model.m.energy for model, tracker in six.itervalues(self.spots_map)]
-        zipped = zip(energy[0], *intensities)
+        zipped = list(zip(energy[0], *intensities))
         
         if config.Processing_backgroundSubstractionOn == True:
             np.savetxt(filename + "_bs.int.txt", zipped)
@@ -1283,7 +1283,7 @@ class Worker(QObject):
                 in six.itervalues(self.spots_map)]
 
         x.extend(y)
-        zipped = zip(energy[0], *x)
+        zipped = list(zip(energy[0], *x))
         if config.Processing_backgroundSubstractionOn == True:
             np.savetxt(filename + "_bs.spot-coord.txt", zipped)
         else:
@@ -1295,7 +1295,7 @@ class Worker(QObject):
             for model, tracker in six.itervalues(self.spots_map):
                 intensity += model.m.intensity
             intensity = [i/len(self.spots_map) for i in intensity]
-            zipped = zip(energy[0], intensity)
+            zipped = list(zip(energy[0], intensity))
             if config.Processing_backgroundSubstractionOn == True:
                 np.savetxt(filename + "_bs.average.txt", zipped)
             else:
@@ -1308,7 +1308,7 @@ class Worker(QObject):
                 xnew = np.arange(model.m.energy[0], model.m.energy[-1],
                                  (model.m.energy[1]-model.m.energy[0])*config.GraphicsScene_smoothPoints)
                 ynew = interpolate.splev(xnew, tck, der=0)
-                zipped = zip(xnew, ynew)
+                zipped = list(zip(xnew, ynew))
                 if config.Processing_backgroundSubstractionOn == True:
                     np.savetxt(filename + "_bs.sm-average.txt", zipped)
                 else:
@@ -1322,7 +1322,7 @@ class Worker(QObject):
         locationy = [model.m.y for model, tracker in six.itervalues(self.spots_map)]
         radius = [model.m.radius for model, tracker in six.itervalues(self.spots_map)]
         locations = [locationx, locationy, radius]
-        zipped = zip(energy, *locations)
+        zipped = list(zip(energy, *locations))
         output = open(filename, 'wb')
         pickle.dump(zipped, output)
         output.close()
