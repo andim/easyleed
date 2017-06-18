@@ -33,7 +33,7 @@ from . import __author__
 from .base import *
 from .io import *
 
-logging.basicConfig(filename = config.loggingFilename, level=config.loggingLevel)
+logging.basicConfig(filename=config.loggingFilename, level=config.loggingLevel)
 
 class QGraphicsMovableItem(QGraphicsItem):
     """ Provides an QGraphicsItem that can be moved with the arrow keys.
@@ -279,11 +279,6 @@ class GraphicsView(QGraphicsView):
     def drawBackground(self, painter, rect):
         painter.fillRect(rect, QBrush(Qt.lightGray))
         self.scene().drawBackground(painter, rect)
-
-class FileDialog(QFileDialog):
-    def __init__(self, **kwargs):
-        super(FileDialog, self).__init__(**kwargs)
-        self.setFileMode(QFileDialog.ExistingFiles)
 
 class AboutWidget(QWidget):
     """ PyQt widget for About Box Panel """
@@ -1027,12 +1022,13 @@ class MainWindow(QMainWindow):
     def fileOpen(self):
         """ Prompts the user to select input image files."""
         self.scene.removeAll()
-        dialog = FileDialog(parent = self,
-                caption = "Choose image files", filter=";;".join(IMAGE_FORMATS))
+        dialog = QFileDialog(parent=self, caption="Open image files",
+                             filter=";;".join(IMAGE_FORMATS))
+        dialog.setFileMode(QFileDialog.ExistingFiles)
         if dialog.exec_():
             files = dialog.selectedFiles();
             filetype = IMAGE_FORMATS[str(dialog.selectedNameFilter())]
-            files = [str(file_) for file_ in files]
+            files = [str(f) for f in files]
             # Set Slider boundaries.
             self.slider.setRange(1, len(files)+1)
             try:
