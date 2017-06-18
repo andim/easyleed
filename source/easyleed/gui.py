@@ -154,15 +154,19 @@ class QSpotModel(QObject):
     - radiusChanged
     """
 
+    positionChanged = pyqtSignal(object)
+    radiusChanged = pyqtSignal(object)
+    intensityChanged = pyqtSignal(object)
+
     def __init__(self, parent = None):
         super(QSpotModel, self).__init__(parent)
         self.m = SpotModel()
-    
+
     def update(self, x, y, intensity, energy, radius):
         self.m.update(x, y, intensity, energy, radius)
-        QObject.emit(self, SIGNAL("positionChanged"), QPointF(x, y))
-        QObject.emit(self, SIGNAL("radiusChanged"), radius)
-        QObject.emit(self, SIGNAL("intensityChanged"), intensity)
+        self.positionChanged.emit(QPointF(x, y))
+        self.radiusChanged.emit(radius)
+        self.intensityChanged.emit(intensity)
 
 class GraphicsScene(QGraphicsScene):
     """ Custom GraphicScene having all the main content."""
@@ -365,10 +369,10 @@ class PlotWidget(QWidget):
         self.gridLayout.addWidget(self.legendCheck, 3, 1, 1, 1)
 
         # Define events for checkbox
-        QObject.connect(self.averageCheck, SIGNAL("clicked()"), self.updatePlot)
-        QObject.connect(self.smoothCheck, SIGNAL("clicked()"), self.updatePlot)
-        QObject.connect(self.legendCheck, SIGNAL("clicked()"), self.updatePlot)
-        QObject.connect(self.clearPlotButton, SIGNAL("clicked()"), self.clearPlot)
+        self.averageCheck.clicked.connect(self.updatePlot)
+        self.smoothCheck.clicked.connect(self.updatePlot)
+        self.legendCheck.clicked.connect(self.updatePlot)
+        self.clearPlotButton.clicked.connect(self.clearPlot)
         
     def setAverageChecks(self):
         if self.averageCheck.isChecked():
@@ -643,10 +647,10 @@ class ParameterSettingWidget(QWidget):
         self.gridLayout.addLayout(self.hLayout, 8, 0)
         self.gridLayout.addLayout(self.vlineLayout, 0,1,9,1)
 
-        QObject.connect(self.applyButton, SIGNAL("clicked()"), self.applyParameters)
-        QObject.connect(self.defaultButton, SIGNAL("clicked()"), self.defaultValues)
-        QObject.connect(self.saveButton, SIGNAL("clicked()"), self.saveValues)
-        QObject.connect(self.loadButton, SIGNAL("clicked()"), self.loadValues)
+        self.applyButton.clicked.connect(self.applyParameters)
+        self.defaultButton.clicked.connect(self.defaultValues)
+        self.saveButton.clicked.connect(self.saveValues)
+        self.loadButton.clicked.connect(self.loadValues)
     
     def applyParameters(self):
         """Parameter setting control"""
@@ -874,15 +878,15 @@ class MainWindow(QMainWindow):
         self.statusBar().addPermanentWidget(self.custEnergyButton)
 
         ### Create event connector for slider and buttons in statusbar
-        QObject.connect(self.slider, SIGNAL("sliderMoved(int)"), self.slider_moved)
-        QObject.connect(self.prevButton, SIGNAL("clicked()"), self.prevBtnClicked)
-        QObject.connect(self.nextButton, SIGNAL("clicked()"), self.nextBtnClicked)
-        QObject.connect(self.custEnergyButton, SIGNAL("clicked()"), self.custEnBtnClicked)
-        QObject.connect(self.custEnergyText, SIGNAL("returnPressed()"), self.setCustEnergy)
+        self.slider.sliderMoved.connect(self.slider_moved)
+        self.prevButton.clicked.connect(self.prevBtnClicked)
+        self.nextButton.clicked.connect(self.nextBtnClicked)
+        self.custEnergyButton.clicked.connect(self.custEnBtnClicked)
+        self.custEnergyText.returnPressed.connect(self.setCustEnergy)
     
         ### Create event connector for enabling fast changes to smoothing parameters
-        QObject.connect(self.parametersettingwid.smoothPoints, SIGNAL("editingFinished()"), self.liveSmoothParameters)
-        QObject.connect(self.parametersettingwid.smoothSpline, SIGNAL("editingFinished()"), self.liveSmoothParameters)
+        self.parametersettingwid.smoothPoints.editingFinished.connect(self.liveSmoothParameters)
+        self.parametersettingwid.smoothSpline.editingFinished.connect(self.liveSmoothParameters)
 
     def slider_moved(self, sliderNewPos):
         """
@@ -956,7 +960,7 @@ class MainWindow(QMainWindow):
             action.setToolTip(tip)
             action.setStatusTip(tip)
         if slot is not None:
-            self.connect(action, SIGNAL(signal), slot)
+            action.triggered.connect(slot)
         if checkable:
             action.setCheckable(True)
         return action
@@ -1227,8 +1231,8 @@ class Worker(QObject):
 
         for view, tup in six.iteritems(self.spots_map):
             # view = QGraphicsSpotItem, tup = (QSpotModel, tracker) -> tup[0] = QSpotModel
-            self.connect(tup[0], SIGNAL("positionChanged"), view.onPositionChange)
-            self.connect(tup[0], SIGNAL("radiusChanged"), view.onRadiusChange)
+            tup[0].positionChanged.connect(view.onPositionChange)
+            tup[0].radiusChanged.connect(view.onRadiusChange)
 
     def process(self, image):
         if config.GraphicsScene_intensTimeOn == False:
