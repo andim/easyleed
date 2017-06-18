@@ -14,7 +14,9 @@ env_api = os.environ.get('QT_API', 'pyqt')
 if '--pyside' in sys.argv:
     variant = 'pyside'
 elif '--pyqt4' in sys.argv:
-    variant = 'pyqt'
+    variant = 'pyqt4'
+elif '--pyqt5' in sys.argv:
+    variant = 'pyqt5'
 elif env_api in ['pyside', 'pyqt']:
     variant = env_api 
 else:
@@ -23,61 +25,29 @@ else:
 os.environ['QT_API'] = variant
 
 if variant == 'pyside':
-    from PySide import QtCore, QtGui, QtNetwork, QtSvg
-    sys.modules[__name__ + '.QtCore'] = QtCore
-    sys.modules[__name__ + '.QtGui'] = QtGui
-    sys.modules[__name__ + '.QtNetwork'] = QtNetwork
-    sys.modules[__name__ + '.QtSvg'] = QtSvg
-    try:
-        from PySide import QtOpenGL
-        sys.modules[__name__ + '.QtOpenGL'] = QtOpenGL
-    except ImportError:
-        pass
-    try:
-        from PySide import QtWebKit
-        sys.modules[__name__ + '.QtWebKit'] = QtWebKit
-    except ImportError:
-        pass
+    from PySide import QtCore, QtGui
     QtCore.QT_VERSION_STR = QtCore.__version__
     QtCore.QT_VERSION = tuple(int(c) for c in QtCore.__version__.split('.'))    
-    for attr in ['pyqtSignal', 'pyqtSlot', 'pyqtProperty']:
-        if not hasattr(QtCore, attr):
-            eval("QtCore.{} = QtCore.{}".format(attr[4:], attr))
-    def QtLoadUI(uifile, obj=None):
-        from PySide import QtUiTools
-        loader = QtUiTools.QUiLoader()
-        uif = QtCore.QFile(uifile)
-        uif.open(QtCore.QFile.ReadOnly)
-        result = loader.load(uif, obj)
-        uif.close()
-        return result
+elif variant == 'pyqt4':
+    from PyQt4 import QtCore, QtGui
+elif variant == 'pyqt5': 
+    from PyQt5 import QtCore, QtGuiQtWidgets
 elif variant == 'pyqt':
-    from PyQt4 import QtCore, QtGui, QtNetwork, QtSvg
-    sys.modules[__name__ + '.QtCore'] = QtCore
-    sys.modules[__name__ + '.QtGui'] = QtGui
-    sys.modules[__name__ + '.QtNetwork'] = QtNetwork
-    sys.modules[__name__ + '.QtSvg'] = QtSvg
     try:
-        from PyQt4 import QtOpenGL
-        sys.modules[__name__ + '.QtOpenGL'] = QtOpenGL
-    except ImportError:
-        pass
-    try:
-        from PyQt4 import QtWebKit
-        sys.modules[__name__ + '.QtWebKit'] = QtWebKit
-    except ImportError:
-        pass
-    QtCore.Signal = QtCore.pyqtSignal
-    QtCore.Slot = QtCore.pyqtSlot
-    QtCore.Property = QtCore.pyqtProperty
-    QtCore.QString = str
-    def QtLoadUI(uifile, obj=None):
-        from PyQt4 import uic
-        return uic.loadUi(uifile, obj)
+        from PyQt5 import QtCore, QtGui, QtWidgets
+        variant = 'pyqt5'
+    except:
+        from PyQt4 import QtCore, QtGui
+        variant = 'pyqt4'
 else:
     raise ImportError("Qt variant not specified")
+
+sys.modules[__name__ + '.QtCore'] = QtCore
+sys.modules[__name__ + '.QtGui'] = QtGui
+sys.modules[__name__ + '.widgets'] = QtGui if variant == 'pyqt4' else QtWidgets
+QtCore.QString = str
 
 def get_qt_binding_name():
     return variant
 
-__all__ = [QtGui, QtCore, QtLoadUI, get_qt_binding_name]
+__all__ = [QtGui, QtCore, get_qt_binding_name]

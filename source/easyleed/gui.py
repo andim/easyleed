@@ -10,14 +10,16 @@ import webbrowser
 import pickle
 import six
 
-from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
-from .qt.QtGui import (QApplication, QMainWindow, QGraphicsView,
-    QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
-    QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsRectItem, QGraphicsItem,
-    QGraphicsSimpleTextItem, QToolButton,
-    QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
-    QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox,
-    QComboBox, QLineEdit, QMessageBox, QPixmap)
+from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, QTimer, QObject)
+from .qt.QtCore import pyqtSignal as Signal
+from .qt.widgets import (QApplication, QMainWindow, QGraphicsView, QGraphicsScene,
+                             QWidget, QHBoxLayout, QGraphicsEllipseItem, QGraphicsRectItem,
+                             QGraphicsItem,QGraphicsSimpleTextItem, QSlider, QVBoxLayout,
+                             QPushButton, QToolButton, QAction, QFileDialog, QProgressBar,
+                             QAbstractSlider, QFrame, QLabel, QRadioButton, QGridLayout,
+                             QSpinBox, QDoubleSpinBox, QCheckBox, QComboBox, QLineEdit, QMessageBox)
+from .qt.QtGui import (QImage, QPen, QIcon, QTransform,
+                       QPainter, QBrush, QKeySequence, QPixmap)
 import numpy as np
 
 from . import config
@@ -28,8 +30,13 @@ from .io import *
 from scipy import interpolate
 
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
+from .qt import get_qt_binding_name
+if get_qt_binding_name() == 'pyqt5':
+    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+    from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
+else:
+    from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+    from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
 logging.basicConfig(filename = config.loggingFilename, level=config.loggingLevel)
 
@@ -154,9 +161,9 @@ class QSpotModel(QObject):
     - radiusChanged
     """
 
-    positionChanged = pyqtSignal(object)
-    radiusChanged = pyqtSignal(object)
-    intensityChanged = pyqtSignal(object)
+    positionChanged = Signal(object)
+    radiusChanged = Signal(object)
+    intensityChanged = Signal(object)
 
     def __init__(self, parent = None):
         super(QSpotModel, self).__init__(parent)
@@ -184,9 +191,9 @@ class GraphicsScene(QGraphicsScene):
               - instantiating a new Circle (on left-click)
               - instantiating a new Center (on right-click)
         """
-    
+        transform = QTransform()
         if hasattr(self,"image"):
-            if self.itemAt(event.scenePos()):
+            if self.itemAt(event.scenePos(), transform):
                 super(GraphicsScene, self).mousePressEvent(event)
             elif event.button() == Qt.LeftButton:
                 item = QGraphicsSpotItem(event.scenePos(),
@@ -1129,7 +1136,7 @@ class MainWindow(QMainWindow):
         # savefile prompt
         filename = str(QFileDialog.getSaveFileName(self, "Save the image to a file"))
         if filename:
-            pixMap = QPixmap().grabWidget(self.view)
+            pixMap = QWidget.grab(self.view)
             pixMap.save(filename + "_" + str(self.loader.energies[self.loader.index]) + "eV.png")
 
     def fileQuit(self):
