@@ -371,7 +371,7 @@ class PlotWidget(QWidget):
         self.gridLayout.addWidget(self.legendCheck, 3, 1, 1, 1)
 
         # Define events for checkbox
-        self.averageCheck.clicked.connect(self.onAverageCheck())
+        self.averageCheck.clicked.connect(self.onAverageCheck)
         for button in [self.smoothCheck, self.legendCheck, self.clearPlotButton]:
             button.clicked.connect(self.updatePlot)
         
@@ -411,7 +411,7 @@ class PlotWidget(QWidget):
         self.axes.legend().set_visible(self.legendCheck.isChecked())
         self.show()
 
-    def onAverageCheck():
+    def onAverageCheck(self):
         if self.averageCheck.isChecked():
             self.smoothCheck.setEnabled(True)
         else:
