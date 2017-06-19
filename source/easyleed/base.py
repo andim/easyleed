@@ -6,15 +6,13 @@ Base class providing common functionality for analyzing Leed patterns.
 
 """
 
-import logging
-logger = logging.getLogger("leedbase")
-
 import numpy as np
 from scipy import optimize
 import math
 
 from . import config
 from . import kalman
+from . import logger
 
 
 class SpotModel:

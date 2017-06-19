@@ -9,6 +9,7 @@ Thanks to Liam Deacon for this workaround.
 
 import sys
 import os
+from . import logger
 
 env_api = os.environ.get('QT_API', 'pyqt')
 if '--pyside' in sys.argv:
@@ -23,6 +24,7 @@ else:
     raise ImportError('unrecognized python Qt bindings')
 # This will be passed on to new versions of matplotlib
 os.environ['QT_API'] = variant
+logger.info("The chosen qt variant is %s." % variant)
 
 if variant == 'pyside':
     from PySide import QtCore, QtGui
@@ -39,6 +41,7 @@ elif variant == 'pyqt':
     except:
         from PyQt4 import QtCore, QtGui
         variant = 'pyqt4'
+    logger.info("Qt variant specified as pyqt, using %s." % variant)
 else:
     raise ImportError("Qt variant not specified")
 

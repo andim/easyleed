@@ -5,7 +5,6 @@ easyleed.gui
 Various classes for providing a graphical user interface.
 """
 
-import logging
 import webbrowser
 import pickle
 import six
@@ -39,8 +38,6 @@ if get_qt_binding_name() == 'pyqt5':
 else:
     from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
     from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
-
-logging.basicConfig(filename=config.loggingFilename, level=config.loggingLevel)
 
 class QGraphicsMovableItem(QGraphicsItem):
     """ Provides an QGraphicsItem that can be moved with the arrow keys.

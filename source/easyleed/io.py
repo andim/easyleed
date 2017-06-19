@@ -13,7 +13,7 @@ from .qt import QtGui as qtgui
 import re
 import collections
 
-from .base import logger
+from . import logger
 
 #### load packages for available file types ####
 formats_available = ['IMG']
@@ -21,7 +21,7 @@ try:
     import pyfits
     formats_available.append("FITS")
 except:
-    logger.warning("Warning: the pyfits package is not installed.")
+    logger.warning("The pyfits package is not installed.")
 # try to import PIL in two possible ways (dependent on PIL version)
 try:
     from PIL import Image
@@ -31,7 +31,7 @@ except:
         import Image
         formats_available.append("PIL")
     except:
-        logger.warning("Warning: the pillow package is not installed.")
+        logger.warning("The pillow package is not installed.")
 
 class ImageLoader(object):
     """ Abstract base class for a class loading LEED images.

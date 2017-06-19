@@ -31,6 +31,11 @@ try:
     import config
 except:
     from . import defaultconfig as config
+
+import logging
+logging.basicConfig(filename=config.loggingFilename, level=config.loggingLevel)
+logger = logging.getLogger()
+
 from . import kalman
 from . import io
 from . import base
