@@ -1,10 +1,17 @@
 Changelog
 ==========
 
+Version 2.3.1
+-------------
+
+- added support for Qt5
+- added filename defaults for the saving procedures
+- fixes to logging mechanism
+
 Version 2.3
 -----------
 
-- GUI bug fixes
+- GUI bug fixes for Python 3
 - added header to intensity save file
 
 Version 2.2
