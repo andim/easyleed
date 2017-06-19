@@ -737,6 +737,8 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(self.view)
         
         #### define actions ####
+
+        ## actions for "Process" menu
         processRunAction = self.createAction("&Run", self.run,
                 QKeySequence("Ctrl+r"), None,
                 "Run the analysis of the images.")
@@ -765,24 +767,19 @@ class MainWindow(QMainWindow):
 
         self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotOptions, None, self.processRemoveSpot]
         
-        fileOpenAction = self.createAction("&Open...", self.fileOpen,
+        # actions for "File" menu
+        self.fileOpenAction = self.createAction("&Open...", self.fileOpen,
                 QKeySequence.Open, None,
                 "Open a directory containing the image files.")
         self.fileSaveAction = self.createAction("&Save intensities...", self.saveIntensity,
                 QKeySequence.Save, None,
                 "Save the calculated intensities to a text file.")
-                
-        # actions to "File" menu
         self.fileSavePlotAction = self.createAction("&Save plot...", self.plotwid.save,
                 QKeySequence("Ctrl+a"), None,
                 "Save the plot to a pdf file.")
-
-        # Will only enable plot saving after there is a plot to be saved
-        self.fileSavePlotAction.setEnabled(False)
         self.fileSaveScreenAction = self.createAction("&Save screenshot...", self.saveScreenShot,
                 QKeySequence("Ctrl+d"), None,
                 "Save image to a file.")
-        self.fileSaveScreenAction.setEnabled(False)
         self.fileQuitAction = self.createAction("&Quit", self.fileQuit,
                 QKeySequence("Ctrl+q"), None,
                 "Close the application.")
@@ -799,12 +796,23 @@ class MainWindow(QMainWindow):
                 QKeySequence("Ctrl+m"), None,
                 "Load center from a file.")
                 
-        # Disable when program starts.
-        self.fileSaveSpotsAction.setEnabled(False)
-        self.fileLoadSpotsAction.setEnabled(False)
-        self.fileSaveCenterAction.setEnabled(False)
-        self.fileLoadCenterAction.setEnabled(False)
+        # Disable actions that are not immediately available
+        for action in [self.fileSaveAction,
+                       self.fileSavePlotAction,
+                       self.fileSaveScreenAction,
+                       self.fileSaveSpotsAction,
+                       self.fileLoadSpotsAction,
+                       self.fileSaveCenterAction,
+                       self.fileLoadCenterAction]:
+            action.setEnabled(False)
+            
+        self.fileActions = [self.fileOpenAction, None,
+                            self.fileLoadSpotsAction, self.fileLoadCenterAction, None,
+                            self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction,
+                            self.fileSaveSpotsAction, self.fileSaveCenterAction, 
+                            None, self.fileQuitAction]
         
+        # actions for "Help" menu
         self.helpAction = self.createAction("&Help", self.helpBoxShow,
                 None, None,
                 "Show help")
@@ -812,19 +820,9 @@ class MainWindow(QMainWindow):
                 None, None,
                 "About EasyLEED")
         self.helpActions = [None, self.helpAction, None, self.aboutAction]
-        
-        #self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction, None,
-        #        self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileSaveCenterAction, self.fileLoadCenterAction,
-        #        None, self.fileQuitAction]
-        
-        self.fileActions = [fileOpenAction, None, self.fileLoadSpotsAction, self.fileLoadCenterAction, None,
-                            self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction,
-                            self.fileSaveSpotsAction, self.fileSaveCenterAction, 
-                            None, self.fileQuitAction]
 
         #### Create menu bar ####
         fileMenu = self.menuBar().addMenu("&File")
-        self.fileSaveAction.setEnabled(False)
         self.addActions(fileMenu, self.fileActions)
         processMenu = self.menuBar().addMenu("&Process")
         self.addActions(processMenu, self.processActions)
@@ -835,7 +833,10 @@ class MainWindow(QMainWindow):
         #### Create tool bar ####
         toolBar = self.addToolBar("&Toolbar")
         # adding actions to the toolbar, addActions-function creates a separator with "None"
-        self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processPlotOptions, None, processSetParameters, None, self.processRemoveSpot, None, processRestartAction]
+        self.toolBarActions = [self.fileQuitAction, None, self.fileOpenAction, None,
+                               processRunAction, None, processStopAction, None,
+                               processPlotOptions, None, processSetParameters, None,
+                               self.processRemoveSpot, None, processRestartAction]
         self.addActions(toolBar, self.toolBarActions)
         
         #### Create status bar ####
@@ -850,7 +851,7 @@ class MainWindow(QMainWindow):
         self.nextButton.setArrowType(Qt.RightArrow)
         self.nextButton.setEnabled(False)
         self.nextButton.setToolTip("Next image")
-        self.custEnergyButton = QPushButton("eV", self)
+        self.custEnergyButton = QPushButton("Set eV", self)
         self.custEnergyButton.setCheckable(True)
         self.custEnergyButton.setEnabled(False)
         self.custEnergyButton.setToolTip("Push to set custom energy")
@@ -862,11 +863,11 @@ class MainWindow(QMainWindow):
         self.slider.setEnabled(False)
         
         ### Add buttons, slider and custom energy button and text in statusbar
-        self.statusBar().addWidget(self.custEnergyText)
         self.statusBar().addPermanentWidget(self.prevButton)
         self.statusBar().addPermanentWidget(self.nextButton)
         self.statusBar().addPermanentWidget(self.slider)
         self.statusBar().addPermanentWidget(self.custEnergyButton)
+        self.statusBar().addWidget(self.custEnergyText)
 
         ### Create event connector for slider and buttons in statusbar
         self.slider.sliderMoved.connect(self.slider_moved)
