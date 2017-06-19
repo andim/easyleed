@@ -31,7 +31,7 @@ if variant == 'pyside':
 elif variant == 'pyqt4':
     from PyQt4 import QtCore, QtGui
 elif variant == 'pyqt5': 
-    from PyQt5 import QtCore, QtGuiQtWidgets
+    from PyQt5 import QtCore, QtGui, QtWidgets
 elif variant == 'pyqt':
     try:
         from PyQt5 import QtCore, QtGui, QtWidgets
