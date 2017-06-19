@@ -7,7 +7,7 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     
-    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 2.3 documentation</title>
+    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 2.3.1 documentation</title>
     
     <link rel="stylesheet" href="_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
@@ -16,7 +16,7 @@
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.3',
+        VERSION:     '2.3.1',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true
@@ -27,7 +27,7 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/theme_extras.js"></script>
     <link rel="shortcut icon" href="_static/icon.ico"/>
-    <link rel="top" title="EasyLEED 2.3 documentation" href="index.html" />
+    <link rel="top" title="EasyLEED 2.3.1 documentation" href="index.html" />
     <link rel="prev" title="User’s Guide" href="userdoc.html" /> 
   </head>
   <body role="document">
@@ -219,15 +219,9 @@ R: measurement covariance matrix</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="easyleed.io.ImageLoader.energySteps">
-<code class="descname">energySteps</code><span class="sig-paren">(</span><em>energy</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader.energySteps"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader.energySteps" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get # frame steps for custom beam energy.</p>
-</dd></dl>
-
-<dl class="method">
 <dt id="easyleed.io.ImageLoader.goto">
 <code class="descname">goto</code><span class="sig-paren">(</span><em>energy</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/io.html#ImageLoader.goto"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.io.ImageLoader.goto" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get image custom beam energy.</p>
+<dd><p>Get image at given beam energy.</p>
 </dd></dl>
 
 <dl class="method">
@@ -298,7 +292,7 @@ R: measurement covariance matrix</p>
 <dt id="easyleed.gui.GraphicsScene.keyPressEvent">
 <code class="descname">keyPressEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#GraphicsScene.keyPressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.GraphicsScene.keyPressEvent" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
-<dt>Processes key events through either            </dt>
+<dt>Processes key events through either</dt>
 <dd><ul class="first last simple">
 <li>deleting the focus item</li>
 </ul>
@@ -315,7 +309,7 @@ R: measurement covariance matrix</p>
 <dt id="easyleed.gui.GraphicsScene.mousePressEvent">
 <code class="descname">mousePressEvent</code><span class="sig-paren">(</span><em>event</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#GraphicsScene.mousePressEvent"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.GraphicsScene.mousePressEvent" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="docutils">
-<dt>Processes mouse events through either            </dt>
+<dt>Processes mouse events through either</dt>
 <dd><ul class="first last simple">
 <li>propagating the event</li>
 </ul>
@@ -429,7 +423,7 @@ If an action is None a separator will be added.</p>
 <dl class="method">
 <dt id="easyleed.gui.MainWindow.saveSpots">
 <code class="descname">saveSpots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.saveSpots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.saveSpots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Saves the spot locations to a file, uses workers saveloc-function</p>
+<dd><p>Saves the spot locations to a file, uses workers saveLoc-function</p>
 </dd></dl>
 
 <dl class="method">
@@ -592,6 +586,9 @@ inc &lt; 0: decrease</p>
 <dt id="easyleed.gui.Worker">
 <em class="property">class </em><code class="descclassname">easyleed.gui.</code><code class="descname">Worker</code><span class="sig-paren">(</span><em>spots</em>, <em>center</em>, <em>energy</em>, <em>parent=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#Worker"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Worker" title="Permalink to this definition">¶</a></dt>
 <dd><p>Worker that manages the spots.</p>
+<p>spots_map:
+- key: spot
+- value: SpotModel, Tracker</p>
 <dl class="method">
 <dt id="easyleed.gui.Worker.numProcessed">
 <code class="descname">numProcessed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#Worker.numProcessed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Worker.numProcessed" title="Permalink to this definition">¶</a></dt>
@@ -623,7 +620,7 @@ inc &lt; 0: decrease</p>
 
     <div class="footer" role="contentinfo">
         &copy; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2017-06-16.
+      Last updated on 2017-06-19.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
