@@ -1016,7 +1016,10 @@ class MainWindow(QMainWindow):
         self.current_energy = energy
 
     def saveIntensity(self):
-        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self, "Save intensities to a file"))
+        filename = 'intensities.csv'
+        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+                                                    "Save intensities to a file",
+                                                    filename))
         if filename:
             self.worker.saveIntensity(filename)
 
@@ -1133,12 +1136,12 @@ class MainWindow(QMainWindow):
         self.plotwid.canvas.close()
 
     def saveSpots(self):
-        """Saves the spot locations to a file, uses workers saveloc-function"""
+        """Saves the spot locations to a file, uses workers saveLoc-function"""
         filename = "loc_" + str(self.initial_energy) + "eV.csv"
         filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
                                                     "Save the spot locations to a file", filename))
         if filename:
-            self.worker.saveloc(filename)
+            self.worker.saveLoc(filename)
 
     def loadSpots(self):
         """Load saved spot positions"""
