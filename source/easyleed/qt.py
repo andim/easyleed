@@ -5,6 +5,8 @@ easyleed.qt
 A Qt API selector that can be used to switch between PyQt and PySide wrappers.
 
 Thanks to Liam Deacon for this workaround.
+
+See also https://github.com/matplotlib/matplotlib/blob/master/lib/matplotlib/backends/qt_compat.py
 """
 
 import sys
@@ -22,8 +24,8 @@ elif env_api in ['pyside', 'pyqt']:
     variant = env_api 
 else:
     raise ImportError('unrecognized python Qt bindings')
-# This will be passed on to new versions of matplotlib
-os.environ['QT_API'] = variant
+# This will be passed on to new versions of matplotlib (name for pyqt4 is simply pyqt)
+os.environ['QT_API'] = 'pyqt' if variant == 'pyqt4' else variant
 logger.info("The chosen qt variant is %s." % variant)
 
 if variant == 'pyside':
