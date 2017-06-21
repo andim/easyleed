@@ -1,6 +1,11 @@
 Changelog
 ==========
 
+Version 2.3.2
+-------------
+
+- file loading now without needing to choose the file type
+
 Version 2.3.1
 -------------
 
