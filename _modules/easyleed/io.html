@@ -59,7 +59,7 @@
 
 <span class="c1"># load regular expression package (for parsing of energy from file name)</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">collections</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">logger</span>
 
@@ -155,28 +155,31 @@
 <div class="viewcode-block" id="ImgImageLoader"><a class="viewcode-back" href="../../api.html#easyleed.io.ImgImageLoader">[docs]</a><span class="k">class</span> <span class="nc">ImgImageLoader</span><span class="p">(</span><span class="n">ImageLoader</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Load .img image files (HotLeed format). &quot;&quot;&quot;</span>
 
+    <span class="n">extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;img&quot;</span><span class="p">]</span>
+
     <span class="k">def</span> <span class="nf">get_energy</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_header</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="s2">&quot;Beam Voltage (eV)&quot;</span><span class="p">]</span>
     
-    <span class="k">def</span> <span class="nf">load_header</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">load_header</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
         <span class="c1"># find header length</span>
         <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="k">while</span> <span class="ow">not</span> <span class="s2">&quot;Header length:&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
+        <span class="k">while</span> <span class="ow">not</span> <span class="n">b</span><span class="s2">&quot;Header length:&quot;</span> <span class="ow">in</span> <span class="n">line</span><span class="p">:</span>
             <span class="n">line</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
-        <span class="n">header_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+        <span class="n">header_length</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">b</span><span class="s2">&quot;: &quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
         <span class="c1"># jump back to beginning</span>
         <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="c1"># read in header</span>
         <span class="n">header_raw</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">header_length</span><span class="p">)</span>
         <span class="c1">## process header ##</span>
         <span class="c1"># dict containing names of all interesting entrys</span>
-        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Beam Voltage (eV)&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Date&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;Comment&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
-                  <span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;y1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;x2&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;y2&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Number of frames&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
-                  <span class="s1">&#39;length&#39;</span> <span class="p">:</span> <span class="n">header_length</span><span class="p">}</span>
-        <span class="n">headerlines</span> <span class="o">=</span> <span class="n">header_raw</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">{</span><span class="n">b</span><span class="s2">&quot;Beam Voltage (eV)&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="s2">&quot;Date&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">b</span><span class="s2">&quot;Comment&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                  <span class="n">b</span><span class="s2">&quot;x1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="s2">&quot;y1&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="s2">&quot;x2&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="s2">&quot;y2&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="n">b</span><span class="s2">&quot;Number of frames&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+                  <span class="n">b</span><span class="s1">&#39;length&#39;</span> <span class="p">:</span> <span class="n">header_length</span><span class="p">}</span>
+        <span class="n">headerlines</span> <span class="o">=</span> <span class="n">header_raw</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">b</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">headerlines</span><span class="p">:</span>
-            <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
+            <span class="n">parts</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">b</span><span class="s2">&quot;: &quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="n">header</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
                 <span class="c1"># convert int entrys</span>
                 <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]])</span> <span class="o">==</span> <span class="nb">type</span><span class="p">(</span><span class="mi">1</span><span class="p">):</span>
@@ -186,17 +189,18 @@
                     <span class="n">header</span><span class="p">[</span><span class="n">parts</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">return</span> <span class="n">header</span>
 
-    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="n">image_path</span><span class="p">):</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">header</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">load_header</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> 
+            <span class="n">header</span> <span class="o">=</span> <span class="n">ImgImageLoader</span><span class="o">.</span><span class="n">load_header</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> 
             <span class="c1"># jump to begin of image</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="n">b</span><span class="s1">&#39;length&#39;</span><span class="p">])</span>
             <span class="c1"># read in image</span>
             <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
             <span class="c1"># make numpy array from image</span>
             <span class="n">image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">frombuffer</span><span class="p">(</span><span class="n">content</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
             <span class="c1"># calculate size of image from header information</span>
-            <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;y2&quot;</span><span class="p">]</span><span class="o">-</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;y1&quot;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">header</span><span class="p">[</span><span class="s2">&quot;x2&quot;</span><span class="p">]</span><span class="o">-</span><span class="n">header</span><span class="p">[</span><span class="s2">&quot;x1&quot;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">size</span> <span class="o">=</span> <span class="p">(</span><span class="n">header</span><span class="p">[</span><span class="n">b</span><span class="s2">&quot;y2&quot;</span><span class="p">]</span><span class="o">-</span><span class="n">header</span><span class="p">[</span><span class="n">b</span><span class="s2">&quot;y1&quot;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="n">header</span><span class="p">[</span><span class="n">b</span><span class="s2">&quot;x2&quot;</span><span class="p">]</span><span class="o">-</span><span class="n">header</span><span class="p">[</span><span class="n">b</span><span class="s2">&quot;x1&quot;</span><span class="p">]</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="c1"># reshape image as 2d array</span>
             <span class="n">image</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">size</span><span class="p">))</span>
             <span class="k">return</span> <span class="n">image</span>
@@ -205,7 +209,10 @@
 <div class="viewcode-block" id="FitsImageLoader"><a class="viewcode-back" href="../../api.html#easyleed.io.FitsImageLoader">[docs]</a><span class="k">class</span> <span class="nc">FitsImageLoader</span><span class="p">(</span><span class="n">ImageLoader</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Load .fits image files. &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
+    <span class="n">extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;fit&quot;</span><span class="p">,</span> <span class="s2">&quot;fits&quot;</span><span class="p">]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="n">image_path</span><span class="p">):</span>
         <span class="n">hdulist</span> <span class="o">=</span> <span class="n">pyfits</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">hdulist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">data</span>
         <span class="n">hdulist</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -215,32 +222,55 @@
 <div class="viewcode-block" id="PILImageLoader"><a class="viewcode-back" href="../../api.html#easyleed.io.PILImageLoader">[docs]</a><span class="k">class</span> <span class="nc">PILImageLoader</span><span class="p">(</span><span class="n">ImageLoader</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Load image files supported by Python Imaging Library (PIL). &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
+    <span class="n">extensions</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;tif&quot;</span><span class="p">,</span> <span class="s2">&quot;tiff&quot;</span><span class="p">,</span> <span class="s2">&quot;png&quot;</span><span class="p">,</span> <span class="s2">&quot;jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;bmp&quot;</span><span class="p">]</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="n">image_path</span><span class="p">):</span>
         <span class="n">im</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">im</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint16</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">data</span>
-
 </div>
 <div class="viewcode-block" id="ImageFormat"><a class="viewcode-back" href="../../api.html#easyleed.io.ImageFormat">[docs]</a><span class="k">class</span> <span class="nc">ImageFormat</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot; Class describing an image format. &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abbrev</span><span class="p">,</span> <span class="n">extensions</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">abbrev</span><span class="p">,</span> <span class="n">loader</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        abbrev: abbreviation (e.g. FITS)</span>
-<span class="sd">        extensions: list of corresponding file extensions (e.g. .fit, .fits)</span>
 <span class="sd">        loader: ImageLoader subclass for this format</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">abbrev</span> <span class="o">=</span> <span class="n">abbrev</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">extensions</span> <span class="o">=</span> <span class="n">extensions</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">loader</span> <span class="o">=</span> <span class="n">loader</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">extensions</span> <span class="o">=</span> <span class="n">loader</span><span class="o">.</span><span class="n">extensions</span>
+
     <span class="k">def</span> <span class="nf">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="s2">&quot;{0}-Files ({1})&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">abbrev</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">extensions</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">extensions_wildcard</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="s1">&#39;*.</span><span class="si">%s</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="n">ext</span> <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">extensions</span><span class="p">]</span>
 </div>
 <span class="sd">&quot;&quot;&quot; Dictionary of available ImageFormats. &quot;&quot;&quot;</span>
-<span class="n">IMAGE_FORMATS</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">OrderedDict</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">format_</span><span class="p">),</span> <span class="n">format_</span><span class="p">]</span> <span class="k">for</span> <span class="n">format_</span> <span class="ow">in</span> \
-        <span class="p">[</span><span class="n">ImageFormat</span><span class="p">(</span><span class="s2">&quot;PIL&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;*.tif&quot;</span><span class="p">,</span> <span class="s2">&quot;*.tiff&quot;</span><span class="p">,</span> <span class="s2">&quot;*.png&quot;</span><span class="p">,</span> <span class="s2">&quot;*.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;*.bmp&quot;</span><span class="p">],</span> <span class="n">PILImageLoader</span><span class="p">),</span>
-         <span class="n">ImageFormat</span><span class="p">(</span><span class="s2">&quot;FITS&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;*.fit&quot;</span><span class="p">,</span> <span class="s2">&quot;*.fits&quot;</span><span class="p">],</span> <span class="n">FitsImageLoader</span><span class="p">),</span>
-         <span class="n">ImageFormat</span><span class="p">(</span><span class="s2">&quot;IMG&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;*.img&quot;</span><span class="p">],</span> <span class="n">ImgImageLoader</span><span class="p">)]</span> \
-             <span class="k">if</span> <span class="n">format_</span><span class="o">.</span><span class="n">abbrev</span> <span class="ow">in</span> <span class="n">formats_available</span><span class="p">)</span>
+<span class="n">IMAGE_FORMATS</span> <span class="o">=</span> <span class="p">[</span><span class="n">format_</span> <span class="k">for</span> <span class="n">format_</span> <span class="ow">in</span> \
+                    <span class="p">[</span><span class="n">ImageFormat</span><span class="p">(</span><span class="s2">&quot;PIL&quot;</span><span class="p">,</span> <span class="n">PILImageLoader</span><span class="p">),</span>
+                     <span class="n">ImageFormat</span><span class="p">(</span><span class="s2">&quot;FITS&quot;</span><span class="p">,</span> <span class="n">FitsImageLoader</span><span class="p">),</span>
+                     <span class="n">ImageFormat</span><span class="p">(</span><span class="s2">&quot;IMG&quot;</span><span class="p">,</span> <span class="n">ImgImageLoader</span><span class="p">)]</span> \
+                         <span class="k">if</span> <span class="n">format_</span><span class="o">.</span><span class="n">abbrev</span> <span class="ow">in</span> <span class="n">formats_available</span><span class="p">]</span>
+
+<span class="k">class</span> <span class="nc">AllImageLoader</span><span class="p">(</span><span class="n">ImageLoader</span><span class="p">):</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">supported_extensions</span><span class="p">():</span>
+        <span class="n">extensions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">image_format</span> <span class="ow">in</span> <span class="n">IMAGE_FORMATS</span><span class="p">:</span>
+            <span class="n">extensions</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">image_format</span><span class="o">.</span><span class="n">extensions_wildcard</span><span class="p">())</span>
+        <span class="k">return</span> <span class="n">extensions</span>
+
+    <span class="k">def</span> <span class="nf">get_image</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image_path</span><span class="p">):</span>
+        <span class="n">extension</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">image_path</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="k">for</span> <span class="n">image_format</span> <span class="ow">in</span> <span class="n">IMAGE_FORMATS</span><span class="p">:</span>
+            <span class="n">loader</span> <span class="o">=</span> <span class="n">image_format</span><span class="o">.</span><span class="n">loader</span>
+            <span class="k">if</span> <span class="n">extension</span> <span class="ow">in</span> <span class="n">loader</span><span class="o">.</span><span class="n">extensions</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">loader</span><span class="o">.</span><span class="n">get_image</span><span class="p">(</span><span class="n">image_path</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">IOError</span><span class="p">(</span><span class="s1">&#39;The filetype is not supported&#39;</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="normalize255"><a class="viewcode-back" href="../../api.html#easyleed.io.normalize255">[docs]</a><span class="k">def</span> <span class="nf">normalize255</span><span class="p">(</span><span class="n">array</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Returns a normalized array of uint8.&quot;&quot;&quot;</span>
@@ -279,7 +309,7 @@
 
     <div class="footer" role="contentinfo">
         &copy; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2017-06-19.
+      Last updated on 2017-06-21.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>

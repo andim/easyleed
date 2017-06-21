@@ -58,7 +58,7 @@
 <span class="kn">import</span> <span class="nn">six</span>
 <span class="kn">import</span> <span class="nn">time</span>
 
-<span class="kn">from</span> <span class="nn">.qt</span> <span class="kn">import</span> <span class="n">get_qt_binding_name</span><span class="p">,</span> <span class="n">qt_filedialog_convert_to_str</span>
+<span class="kn">from</span> <span class="nn">.qt</span> <span class="kn">import</span> <span class="n">get_qt_binding_name</span><span class="p">,</span> <span class="n">qt_filedialog_convert</span>
 <span class="kn">from</span> <span class="nn">.qt.QtCore</span> <span class="kn">import</span> <span class="p">(</span><span class="n">QPoint</span><span class="p">,</span> <span class="n">QRectF</span><span class="p">,</span> <span class="n">QPointF</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QTimer</span><span class="p">,</span> <span class="n">QObject</span><span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.qt.QtCore</span> <span class="kn">import</span> <span class="n">pyqtSignal</span> <span class="k">as</span> <span class="n">Signal</span>
 <span class="kn">from</span> <span class="nn">.qt.widgets</span> <span class="kn">import</span> <span class="p">(</span><span class="n">QApplication</span><span class="p">,</span> <span class="n">QMainWindow</span><span class="p">,</span> <span class="n">QGraphicsView</span><span class="p">,</span> <span class="n">QGraphicsScene</span><span class="p">,</span>
@@ -503,7 +503,7 @@
 <div class="viewcode-block" id="PlotWidget.save"><a class="viewcode-back" href="../../api.html#easyleed.gui.PlotWidget.save">[docs]</a>    <span class="k">def</span> <span class="nf">save</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Saving the plot &quot;&quot;&quot;</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;plot.png&quot;</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert_to_str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                     <span class="s2">&quot;Save the plot to a file&quot;</span><span class="p">,</span>
                                                     <span class="n">filename</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
@@ -728,7 +728,7 @@
 </div>
 <div class="viewcode-block" id="ParameterSettingWidget.saveValues"><a class="viewcode-back" href="../../api.html#easyleed.gui.ParameterSettingWidget.saveValues">[docs]</a>    <span class="k">def</span> <span class="nf">saveValues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Basic saving of the set parameter values to a file &quot;&quot;&quot;</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert_to_str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Save the parameter configuration to a file&quot;</span><span class="p">))</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;Save the parameter configuration to a file&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
             <span class="n">output</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span>
             <span class="n">writelist</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inputPrecision</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">integrationWindowRadiusNew</span><span class="o">.</span><span class="n">value</span><span class="p">(),</span>
@@ -743,7 +743,7 @@
 </div>
 <div class="viewcode-block" id="ParameterSettingWidget.loadValues"><a class="viewcode-back" href="../../api.html#easyleed.gui.ParameterSettingWidget.loadValues">[docs]</a>    <span class="k">def</span> <span class="nf">loadValues</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Load a file of set parameter values that has been saved with the widget &quot;&quot;&quot;</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert_to_str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Open spot location file&#39;</span><span class="p">))</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Open spot location file&#39;</span><span class="p">))</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">loadput</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span>
             <span class="n">loadlist</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">loadput</span><span class="p">)</span>
@@ -785,6 +785,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">setCentralWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="p">)</span>
         
         <span class="c1">#### define actions ####</span>
+
+        <span class="c1">## actions for &quot;Process&quot; menu</span>
         <span class="n">processRunAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Run&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">,</span>
                 <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+r&quot;</span><span class="p">),</span> <span class="bp">None</span><span class="p">,</span>
                 <span class="s2">&quot;Run the analysis of the images.&quot;</span><span class="p">)</span>
@@ -813,24 +815,19 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">processActions</span> <span class="o">=</span> <span class="p">[</span><span class="n">processNextAction</span><span class="p">,</span> <span class="n">processPreviousAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">processRunAction</span><span class="p">,</span> <span class="n">processStopAction</span><span class="p">,</span> <span class="n">processRestartAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">processPlotOptions</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">processRemoveSpot</span><span class="p">]</span>
         
-        <span class="n">fileOpenAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Open...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileOpen</span><span class="p">,</span>
+        <span class="c1"># actions for &quot;File&quot; menu</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileOpenAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Open...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileOpen</span><span class="p">,</span>
                 <span class="n">QKeySequence</span><span class="o">.</span><span class="n">Open</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
                 <span class="s2">&quot;Open a directory containing the image files.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Save intensities...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveIntensity</span><span class="p">,</span>
                 <span class="n">QKeySequence</span><span class="o">.</span><span class="n">Save</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
                 <span class="s2">&quot;Save the calculated intensities to a text file.&quot;</span><span class="p">)</span>
-                
-        <span class="c1"># actions to &quot;File&quot; menu</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileSavePlotAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Save plot...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">save</span><span class="p">,</span>
                 <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+a&quot;</span><span class="p">),</span> <span class="bp">None</span><span class="p">,</span>
                 <span class="s2">&quot;Save the plot to a pdf file.&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Will only enable plot saving after there is a plot to be saved</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fileSavePlotAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveScreenAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Save screenshot...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveScreenShot</span><span class="p">,</span>
                 <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+d&quot;</span><span class="p">),</span> <span class="bp">None</span><span class="p">,</span>
                 <span class="s2">&quot;Save image to a file.&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveScreenAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileQuitAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Quit&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileQuit</span><span class="p">,</span>
                 <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+q&quot;</span><span class="p">),</span> <span class="bp">None</span><span class="p">,</span>
                 <span class="s2">&quot;Close the application.&quot;</span><span class="p">)</span>
@@ -847,12 +844,23 @@
                 <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+m&quot;</span><span class="p">),</span> <span class="bp">None</span><span class="p">,</span>
                 <span class="s2">&quot;Load center from a file.&quot;</span><span class="p">)</span>
                 
-        <span class="c1"># Disable when program starts.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveSpotsAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadSpotsAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveCenterAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadCenterAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+        <span class="c1"># Disable actions that are not immediately available</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fileSaveAction</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">fileSavePlotAction</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveScreenAction</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveSpotsAction</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadSpotsAction</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveCenterAction</span><span class="p">,</span>
+                       <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadCenterAction</span><span class="p">]:</span>
+            <span class="n">action</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+            
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileActions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fileOpenAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadSpotsAction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadCenterAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveAction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSavePlotAction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveScreenAction</span><span class="p">,</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveSpotsAction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveCenterAction</span><span class="p">,</span> 
+                            <span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileQuitAction</span><span class="p">]</span>
         
+        <span class="c1"># actions for &quot;Help&quot; menu</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">helpAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Help&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">helpBoxShow</span><span class="p">,</span>
                 <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
                 <span class="s2">&quot;Show help&quot;</span><span class="p">)</span>
@@ -860,19 +868,9 @@
                 <span class="bp">None</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
                 <span class="s2">&quot;About EasyLEED&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">helpActions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">helpAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">aboutAction</span><span class="p">]</span>
-        
-        <span class="c1">#self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction, None,</span>
-        <span class="c1">#        self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileSaveCenterAction, self.fileLoadCenterAction,</span>
-        <span class="c1">#        None, self.fileQuitAction]</span>
-        
-        <span class="bp">self</span><span class="o">.</span><span class="n">fileActions</span> <span class="o">=</span> <span class="p">[</span><span class="n">fileOpenAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadSpotsAction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadCenterAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveAction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSavePlotAction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveScreenAction</span><span class="p">,</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveSpotsAction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveCenterAction</span><span class="p">,</span> 
-                            <span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileQuitAction</span><span class="p">]</span>
 
         <span class="c1">#### Create menu bar ####</span>
         <span class="n">fileMenu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menuBar</span><span class="p">()</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="s2">&quot;&amp;File&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addActions</span><span class="p">(</span><span class="n">fileMenu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileActions</span><span class="p">)</span>
         <span class="n">processMenu</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">menuBar</span><span class="p">()</span><span class="o">.</span><span class="n">addMenu</span><span class="p">(</span><span class="s2">&quot;&amp;Process&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addActions</span><span class="p">(</span><span class="n">processMenu</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">processActions</span><span class="p">)</span>
@@ -883,7 +881,10 @@
         <span class="c1">#### Create tool bar ####</span>
         <span class="n">toolBar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addToolBar</span><span class="p">(</span><span class="s2">&quot;&amp;Toolbar&quot;</span><span class="p">)</span>
         <span class="c1"># adding actions to the toolbar, addActions-function creates a separator with &quot;None&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">toolBarActions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fileQuitAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">fileOpenAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">processRunAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">processStopAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">processPlotOptions</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">processSetParameters</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">processRemoveSpot</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">processRestartAction</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">toolBarActions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fileQuitAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileOpenAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
+                               <span class="n">processRunAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">processStopAction</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
+                               <span class="n">processPlotOptions</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">processSetParameters</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">processRemoveSpot</span><span class="p">,</span> <span class="bp">None</span><span class="p">,</span> <span class="n">processRestartAction</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addActions</span><span class="p">(</span><span class="n">toolBar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolBarActions</span><span class="p">)</span>
         
         <span class="c1">#### Create status bar ####</span>
@@ -898,7 +899,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">nextButton</span><span class="o">.</span><span class="n">setArrowType</span><span class="p">(</span><span class="n">Qt</span><span class="o">.</span><span class="n">RightArrow</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nextButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nextButton</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="s2">&quot;Next image&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">custEnergyButton</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;eV&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">custEnergyButton</span> <span class="o">=</span> <span class="n">QPushButton</span><span class="p">(</span><span class="s2">&quot;Set eV&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">custEnergyButton</span><span class="o">.</span><span class="n">setCheckable</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">custEnergyButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">custEnergyButton</span><span class="o">.</span><span class="n">setToolTip</span><span class="p">(</span><span class="s2">&quot;Push to set custom energy&quot;</span><span class="p">)</span>
@@ -910,11 +911,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
         
         <span class="c1">### Add buttons, slider and custom energy button and text in statusbar</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">custEnergyText</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">addPermanentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">prevButton</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">addPermanentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">nextButton</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">addPermanentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">addPermanentWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">custEnergyButton</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">addWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">custEnergyText</span><span class="p">)</span>
 
         <span class="c1">### Create event connector for slider and buttons in statusbar</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">sliderMoved</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">slider_moved</span><span class="p">)</span>
@@ -1065,7 +1066,7 @@
 
     <span class="k">def</span> <span class="nf">saveIntensity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;intensities.csv&#39;</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert_to_str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                     <span class="s2">&quot;Save intensities to a file&quot;</span><span class="p">,</span>
                                                     <span class="n">filename</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
@@ -1074,30 +1075,26 @@
 <div class="viewcode-block" id="MainWindow.fileOpen"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.fileOpen">[docs]</a>    <span class="k">def</span> <span class="nf">fileOpen</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot; Prompts the user to select input image files.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">removeAll</span><span class="p">()</span>
-        <span class="n">dialog</span> <span class="o">=</span> <span class="n">QFileDialog</span><span class="p">(</span><span class="n">parent</span><span class="o">=</span><span class="bp">self</span><span class="p">,</span> <span class="n">caption</span><span class="o">=</span><span class="s2">&quot;Open image files&quot;</span><span class="p">,</span>
-                             <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;;;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">IMAGE_FORMATS</span><span class="p">))</span>
-        <span class="n">dialog</span><span class="o">.</span><span class="n">setFileMode</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">ExistingFiles</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">dialog</span><span class="o">.</span><span class="n">exec_</span><span class="p">():</span>
-            <span class="n">files</span> <span class="o">=</span> <span class="n">dialog</span><span class="o">.</span><span class="n">selectedFiles</span><span class="p">();</span>
-            <span class="n">filetype</span> <span class="o">=</span> <span class="n">IMAGE_FORMATS</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">dialog</span><span class="o">.</span><span class="n">selectedNameFilter</span><span class="p">())]</span>
-            <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">]</span>
-            <span class="c1"># Set Slider boundaries.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">loader</span> <span class="o">=</span> <span class="n">filetype</span><span class="o">.</span><span class="n">loader</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">IO_energyRegex</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">enableProcessActions</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">prevButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">nextButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">custEnergyButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveScreenAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadSpotsAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadCenterAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sliderCurrentPos</span> <span class="o">=</span> <span class="mi">1</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliderCurrentPos</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">showMessage</span><span class="p">(</span><span class="s1">&#39;IOError: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">),</span> <span class="mi">5000</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileNames</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                             <span class="s2">&quot;Open LEED images&quot;</span><span class="p">,</span>
+                                             <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;Image files (</span><span class="si">%s</span><span class="s2">)&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">AllImageLoader</span><span class="o">.</span><span class="n">supported_extensions</span><span class="p">()))))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setRange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">loader</span> <span class="o">=</span> <span class="n">AllImageLoader</span><span class="p">(</span><span class="n">files</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">IO_energyRegex</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">next</span><span class="p">())</span>
+        <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">statusBar</span><span class="p">()</span><span class="o">.</span><span class="n">showMessage</span><span class="p">(</span><span class="s1">&#39;IOError: &#39;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">err</span><span class="p">),</span> <span class="mi">5000</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">enableProcessActions</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">prevButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">nextButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">custEnergyButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveScreenAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadSpotsAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadCenterAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="bp">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sliderCurrentPos</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliderCurrentPos</span><span class="p">)</span>
 </div>
     <span class="k">def</span> <span class="nf">removeLastSpot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
@@ -1170,7 +1167,7 @@
         <span class="sd">&quot;&quot;&quot; Save Screenshot &quot;&quot;&quot;</span>
         <span class="c1"># savefile prompt</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;screenshot&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">energies</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="o">.</span><span class="n">index</span><span class="p">])</span> <span class="o">+</span> <span class="s2">&quot;eV.png&quot;</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert_to_str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                     <span class="s2">&quot;Save the image to a file&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">,</span>
                                                     <span class="nb">filter</span><span class="o">=</span><span class="s2">&quot;Image files (*.png *.bmp, *.jpg)&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
@@ -1186,7 +1183,7 @@
 <div class="viewcode-block" id="MainWindow.saveSpots"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.saveSpots">[docs]</a>    <span class="k">def</span> <span class="nf">saveSpots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Saves the spot locations to a file, uses workers saveLoc-function&quot;&quot;&quot;</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;loc_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_energy</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;eV.csv&quot;</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert_to_str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                     <span class="s2">&quot;Save the spot locations to a file&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">saveLoc</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
@@ -1194,7 +1191,7 @@
 <div class="viewcode-block" id="MainWindow.loadSpots"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.loadSpots">[docs]</a>    <span class="k">def</span> <span class="nf">loadSpots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Load saved spot positions&quot;&quot;&quot;</span>
         <span class="c1"># This can probably be done in a better way</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert_to_str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Open spot location file&#39;</span><span class="p">))</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Open spot location file&#39;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
             <span class="c1"># pickle doesn&#39;t recognise the file opened by PyQt&#39;s openfile dialog as a file so &#39;normal&#39; file processing</span>
             <span class="n">pkl_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
@@ -1220,7 +1217,7 @@
 <div class="viewcode-block" id="MainWindow.saveCenter"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.saveCenter">[docs]</a>    <span class="k">def</span> <span class="nf">saveCenter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Saves the center locations to a file&quot;&quot;&quot;</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;loc_center.pkl&#39;</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert_to_str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                     <span class="s2">&quot;Save the center location to a file&quot;</span><span class="p">,</span>
                                                     <span class="n">filename</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
@@ -1232,7 +1229,7 @@
 <div class="viewcode-block" id="MainWindow.loadCenter"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.loadCenter">[docs]</a>    <span class="k">def</span> <span class="nf">loadCenter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Load saved center position from file&quot;&quot;&quot;</span>
         <span class="c1"># This can probably be done in a better way</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert_to_str</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                     <span class="s2">&quot;Open center location file&quot;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">hasattr</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">):</span>
@@ -1355,7 +1352,7 @@
 
     <div class="footer" role="contentinfo">
         &copy; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2017-06-19.
+      Last updated on 2017-06-21.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
     </div>
   </body>
