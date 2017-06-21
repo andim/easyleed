@@ -10,7 +10,7 @@ import pickle
 import six
 import time
 
-from .qt import get_qt_binding_name, qt_filedialog_convert_to_str
+from .qt import get_qt_binding_name, qt_filedialog_convert
 from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, QTimer, QObject)
 from .qt.QtCore import pyqtSignal as Signal
 from .qt.widgets import (QApplication, QMainWindow, QGraphicsView, QGraphicsScene,
@@ -455,7 +455,7 @@ class PlotWidget(QWidget):
     def save(self):
         """ Saving the plot """
         filename = "plot.png"
-        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save the plot to a file",
                                                     filename))
         if filename:
@@ -680,7 +680,7 @@ class ParameterSettingWidget(QWidget):
 
     def saveValues(self):
         """ Basic saving of the set parameter values to a file """
-        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
+        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
         if filename:
             output = open(filename, 'w')
             writelist = [self.inputPrecision.value(), self.integrationWindowRadiusNew.value(),
@@ -695,7 +695,7 @@ class ParameterSettingWidget(QWidget):
 
     def loadValues(self):
         """ Load a file of set parameter values that has been saved with the widget """
-        filename = qt_filedialog_convert_to_str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
+        filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         try:
             loadput = open(filename, 'r')
             loadlist = pickle.load(loadput)
@@ -1018,7 +1018,7 @@ class MainWindow(QMainWindow):
 
     def saveIntensity(self):
         filename = 'intensities.csv'
-        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save intensities to a file",
                                                     filename))
         if filename:
@@ -1027,30 +1027,26 @@ class MainWindow(QMainWindow):
     def fileOpen(self):
         """ Prompts the user to select input image files."""
         self.scene.removeAll()
-        dialog = QFileDialog(parent=self, caption="Open image files",
-                             filter=";;".join(IMAGE_FORMATS))
-        dialog.setFileMode(QFileDialog.ExistingFiles)
-        if dialog.exec_():
-            files = dialog.selectedFiles();
-            filetype = IMAGE_FORMATS[str(dialog.selectedNameFilter())]
-            files = [str(f) for f in files]
-            # Set Slider boundaries.
-            self.slider.setRange(1, len(files)+1)
-            try:
-                self.loader = filetype.loader(files, config.IO_energyRegex)
-                self.setImage(self.loader.next())
-                self.enableProcessActions(True)
-                self.prevButton.setEnabled(True)
-                self.nextButton.setEnabled(True)
-                self.slider.setEnabled(True)
-                self.custEnergyButton.setEnabled(True)
-                self.fileSaveScreenAction.setEnabled(True)
-                self.fileLoadSpotsAction.setEnabled(True)
-                self.fileLoadCenterAction.setEnabled(True)
-                self.sliderCurrentPos = 1
-                self.slider.setValue(self.sliderCurrentPos)
-            except IOError as err:
-                self.statusBar().showMessage('IOError: ' + str(err), 5000)
+        files = qt_filedialog_convert(QFileDialog.getOpenFileNames(self,
+                                             "Open LEED images",
+                                             filter="Image files (%s)" % (" ".join(AllImageLoader.supported_extensions()))))
+        self.slider.setRange(1, len(files)+1)
+        try:
+            self.loader = AllImageLoader(files, config.IO_energyRegex)
+            self.setImage(self.loader.next())
+        except IOError as err:
+            self.statusBar().showMessage('IOError: ' + str(err), 5000)
+        else:
+            self.enableProcessActions(True)
+            self.prevButton.setEnabled(True)
+            self.nextButton.setEnabled(True)
+            self.slider.setEnabled(True)
+            self.custEnergyButton.setEnabled(True)
+            self.fileSaveScreenAction.setEnabled(True)
+            self.fileLoadSpotsAction.setEnabled(True)
+            self.fileLoadCenterAction.setEnabled(True)
+            self.sliderCurrentPos = 1
+            self.slider.setValue(self.sliderCurrentPos)
 
     def removeLastSpot(self):
         for item in self.scene.items():
@@ -1123,7 +1119,7 @@ class MainWindow(QMainWindow):
         """ Save Screenshot """
         # savefile prompt
         filename = "screenshot" + str(self.loader.energies[self.loader.index]) + "eV.png"
-        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save the image to a file", filename,
                                                     filter="Image files (*.png *.bmp, *.jpg)"))
         if filename:
@@ -1139,7 +1135,7 @@ class MainWindow(QMainWindow):
     def saveSpots(self):
         """Saves the spot locations to a file, uses workers saveLoc-function"""
         filename = "loc_" + str(self.initial_energy) + "eV.csv"
-        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save the spot locations to a file", filename))
         if filename:
             self.worker.saveLoc(filename)
@@ -1147,7 +1143,7 @@ class MainWindow(QMainWindow):
     def loadSpots(self):
         """Load saved spot positions"""
         # This can probably be done in a better way
-        filename = qt_filedialog_convert_to_str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
+        filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         if filename:
             # pickle doesn't recognise the file opened by PyQt's openfile dialog as a file so 'normal' file processing
             pkl_file = open(filename, 'rb')
@@ -1173,7 +1169,7 @@ class MainWindow(QMainWindow):
     def saveCenter(self):
         """Saves the center locations to a file"""
         filename = 'loc_center.pkl'
-        filename = qt_filedialog_convert_to_str(QFileDialog.getSaveFileName(self,
+        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save the center location to a file",
                                                     filename))
         if filename:
@@ -1185,7 +1181,7 @@ class MainWindow(QMainWindow):
     def loadCenter(self):
         """Load saved center position from file"""
         # This can probably be done in a better way
-        filename = qt_filedialog_convert_to_str(QFileDialog.getOpenFileName(self,
+        filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self,
                                                     "Open center location file"))
         if filename:
             if hasattr (self.scene, "center"):

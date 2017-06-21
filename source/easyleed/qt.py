@@ -55,13 +55,14 @@ QtCore.QString = str
 def get_qt_binding_name():
     return variant
 
-def qt_filedialog_convert_to_str(output):
+
+def qt_filedialog_convert(output):
     try:
         # in qt5 returns are filename and filetype
         filename, filetype = output
     except ValueError:
         # in qt4 returns are filename only
         filename = output
-    return str(filename)
+    return filename if isinstance(filename, list) else str(filename)
 
-__all__ = [QtGui, QtCore, get_qt_binding_name, qt_filedialog_convert_to_str]
+__all__ = [QtGui, QtCore, get_qt_binding_name, qt_filedialog_convert]

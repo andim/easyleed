@@ -11,7 +11,7 @@ from .qt import QtGui as qtgui
 
 # load regular expression package (for parsing of energy from file name)
 import re
-import collections
+import os.path
 
 from . import logger
 
@@ -107,28 +107,31 @@ class ImageLoader(object):
 class ImgImageLoader(ImageLoader):
     """ Load .img image files (HotLeed format). """
 
+    extensions = ["img"]
+
     def get_energy(self, image_path):
         with open(image_path, "rb") as f:
             return self.load_header(f)["Beam Voltage (eV)"]
     
-    def load_header(self, f):
+    @staticmethod
+    def load_header(f):
         # find header length
         line = f.readline()
-        while not "Header length:" in line:
+        while not b"Header length:" in line:
             line = f.readline()
-        header_length = int(line.split(": ")[1].strip())
+        header_length = int(line.split(b": ")[1].strip())
         # jump back to beginning
         f.seek(0)
         # read in header
         header_raw = f.read(header_length)
         ## process header ##
         # dict containing names of all interesting entrys
-        header = {"Beam Voltage (eV)": 0, "Date": "", "Comment": "",
-                  "x1": 0, "y1": 0, "x2": 0, "y2": 0, "Number of frames": 0,
-                  'length' : header_length}
-        headerlines = header_raw.split("\n")
+        header = {b"Beam Voltage (eV)": 0, b"Date": "", b"Comment": "",
+                  b"x1": 0, b"y1": 0, b"x2": 0, b"y2": 0, b"Number of frames": 0,
+                  b'length' : header_length}
+        headerlines = header_raw.split(b"\n")
         for line in headerlines:
-            parts = line.split(": ")
+            parts = line.split(b": ")
             if parts[0] in header.keys():
                 # convert int entrys
                 if type(header[parts[0]]) == type(1):
@@ -138,17 +141,18 @@ class ImgImageLoader(ImageLoader):
                     header[parts[0]] = parts[1].strip()
         return header
 
-    def get_image(self, image_path):
+    @staticmethod
+    def get_image(image_path):
         with open(image_path, "rb") as f:
-            header = self.load_header(f) 
+            header = ImgImageLoader.load_header(f) 
             # jump to begin of image
-            f.seek(header['length'])
+            f.seek(header[b'length'])
             # read in image
             content = f.read()
             # make numpy array from image
             image = np.frombuffer(content, dtype=np.uint16)
             # calculate size of image from header information
-            size = (header["y2"]-header["y1"]+1, header["x2"]-header["x1"]+1)
+            size = (header[b"y2"]-header[b"y1"]+1, header[b"x2"]-header[b"x1"]+1)
             # reshape image as 2d array
             image = image.reshape((size))
             return image
@@ -157,7 +161,10 @@ class ImgImageLoader(ImageLoader):
 class FitsImageLoader(ImageLoader):
     """ Load .fits image files. """
 
-    def get_image(self, image_path):
+    extensions = ["fit", "fits"]
+
+    @staticmethod
+    def get_image(image_path):
         hdulist = pyfits.open(image_path)
         data = hdulist[0].data
         hdulist.close()
@@ -167,32 +174,55 @@ class FitsImageLoader(ImageLoader):
 class PILImageLoader(ImageLoader):
     """ Load image files supported by Python Imaging Library (PIL). """
 
-    def get_image(self, image_path):
+    extensions = ["tif", "tiff", "png", "jpg", "bmp"]
+
+    @staticmethod
+    def get_image(image_path):
         im = Image.open(image_path)
         data = np.asarray(im.convert('L'), dtype=np.uint16)
         return data
 
-
 class ImageFormat:
     """ Class describing an image format. """
-    def __init__(self, abbrev, extensions, loader):
+    def __init__(self, abbrev, loader):
         """
         abbrev: abbreviation (e.g. FITS)
-        extensions: list of corresponding file extensions (e.g. .fit, .fits)
         loader: ImageLoader subclass for this format
         """
         self.abbrev = abbrev
-        self.extensions = extensions
         self.loader = loader
+        self.extensions = loader.extensions
+
     def __str__(self):
         return "{0}-Files ({1})".format(self.abbrev, " ".join(self.extensions))
 
+    def extensions_wildcard(self):
+        return ['*.%s' % ext for ext in self.extensions]
+
 """ Dictionary of available ImageFormats. """
-IMAGE_FORMATS = collections.OrderedDict([str(format_), format_] for format_ in \
-        [ImageFormat("PIL", ["*.tif", "*.tiff", "*.png", "*.jpg", "*.bmp"], PILImageLoader),
-         ImageFormat("FITS", ["*.fit", "*.fits"], FitsImageLoader),
-         ImageFormat("IMG", ["*.img"], ImgImageLoader)] \
-             if format_.abbrev in formats_available)
+IMAGE_FORMATS = [format_ for format_ in \
+                    [ImageFormat("PIL", PILImageLoader),
+                     ImageFormat("FITS", FitsImageLoader),
+                     ImageFormat("IMG", ImgImageLoader)] \
+                         if format_.abbrev in formats_available]
+
+class AllImageLoader(ImageLoader):
+
+    @staticmethod
+    def supported_extensions():
+        extensions = []
+        for image_format in IMAGE_FORMATS:
+            extensions.extend(image_format.extensions_wildcard())
+        return extensions
+
+    def get_image(self, image_path):
+        extension = os.path.splitext(image_path)[1][1:]
+        for image_format in IMAGE_FORMATS:
+            loader = image_format.loader
+            if extension in loader.extensions:
+                return loader.get_image(image_path)
+        raise IOError('The filetype is not supported')
+
 
 def normalize255(array):
     """ Returns a normalized array of uint8."""
