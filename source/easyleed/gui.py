@@ -682,7 +682,7 @@ class ParameterSettingWidget(QWidget):
         """ Basic saving of the set parameter values to a file """
         filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
         if filename:
-            output = open(filename, 'w')
+            output = open(filename, 'wb')
             writelist = [self.inputPrecision.value(), self.integrationWindowRadiusNew.value(),
                          self.integrationWindowRadius.value(), self.validationRegionSize.value(),
                          self.determinationCoefficient.value(), self.smoothPoints.value(),
@@ -697,7 +697,7 @@ class ParameterSettingWidget(QWidget):
         """ Load a file of set parameter values that has been saved with the widget """
         filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         try:
-            loadput = open(filename, 'r')
+            loadput = open(filename, 'rb')
             loadlist = pickle.load(loadput)
             self.inputPrecision.setValue(loadlist[0])
             self.integrationWindowRadiusNew.setValue(loadlist[1])
