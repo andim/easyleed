@@ -448,7 +448,7 @@ class PlotWidget(QWidget):
         self.canvas.draw()
 
     def clearPlot(self):
-        self.axes.cla()
+        self.axes.clear()
         self.initPlot()
         self.canvas.draw()
 
