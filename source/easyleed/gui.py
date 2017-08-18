@@ -386,15 +386,8 @@ class PlotWidget(QWidget):
         self.initPlot()
         self.worker = worker
         self.lines_map = {}
-        j = 0
-        for spot in self.worker.spots_map:
-            self.lines_map[spot], = self.axes.plot([], [], label= str(j))
-            j+=1
-        
-        # set up averageLine
-        self.averageLine, = self.axes.plot([], [], 'k', lw=2, label='Average')
-        # set up averageSmoothLine
-        self.averageSmoothLine, = self.axes.plot([], [], 'b', lw=2, label='Smooth Average')
+        for i, spot in enumerate(self.worker.spots_map):
+            self.lines_map[spot], = self.axes.plot([], [], label=str(i+1))
         
         # show dashed line at y = 0
         self.axes.axhline(0.0, color='k', ls='--')
@@ -424,18 +417,30 @@ class PlotWidget(QWidget):
             for model, tracker in six.itervalues(self.worker.spots_map):
                 intensity += model.m.intensity
             intensity /= len(self.worker.spots_map)
-            self.averageLine.set_data(model.m.energy, intensity)
+            if hasattr(self, "averageLine"):
+                self.averageLine.set_data(model.m.energy, intensity)
+            else:
+                # set up averageLine
+                self.averageLine, = self.axes.plot(model.m.energy, intensity, 'k', lw=2, label='Average')
             
             if self.smoothCheck.isChecked():
                 tck = interpolate.splrep(model.m.energy, intensity, s=config.GraphicsScene_smoothSpline)
                 xnew = np.arange(model.m.energy[0], model.m.energy[-1],
                                  (model.m.energy[1]-model.m.energy[0])*config.GraphicsScene_smoothPoints)
                 ynew = interpolate.splev(xnew, tck, der=0)
-                self.averageSmoothLine.set_data(xnew, ynew)
+                if hasattr(self, "averageSmoothLine"):
+                    self.averageSmoothLine.set_data(xnew, ynew)
+                else:
+                    # set up averageSmoothLine
+                    self.averageSmoothLine, = self.axes.plot(xnew, ynew, 'b', lw=2, label='Smooth Average')
             else:
-                self.averageSmoothLine.set_data([], [])
+                if hasattr(self, "averageSmoothLine"):
+                    self.averageSmoothLine.remove()
+                    del self.averageSmoothLine
         else:
-            self.averageLine.set_data([], [])
+            if hasattr(self, "averageLine"):
+                self.averageLine.remove()
+                del self.averageLine
 
         if self.axes.legend() is not None:
             # decide whether to show legend
