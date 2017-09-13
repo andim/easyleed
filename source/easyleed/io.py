@@ -57,7 +57,7 @@ class ImageLoader(object):
         if m is None:
             raise IOError('Invalid filename. Check naming policy.')
         return float(m.group())
-   
+
     def current_energy(self):
         """ Get current energy. """
         return self.energies[self.index]
@@ -112,7 +112,7 @@ class ImgImageLoader(ImageLoader):
     def get_energy(self, image_path):
         with open(image_path, "rb") as f:
             return self.load_header(f)["Beam Voltage (eV)"]
-    
+
     @staticmethod
     def load_header(f):
         # find header length
@@ -144,7 +144,7 @@ class ImgImageLoader(ImageLoader):
     @staticmethod
     def get_image(image_path):
         with open(image_path, "rb") as f:
-            header = ImgImageLoader.load_header(f) 
+            header = ImgImageLoader.load_header(f)
             # jump to begin of image
             f.seek(header[b'length'])
             # read in image
@@ -179,8 +179,8 @@ class PILImageLoader(ImageLoader):
     @staticmethod
     def get_image(image_path):
         im = Image.open(image_path)
-        data = np.asarray(im.convert('L'), dtype=np.uint16)
-        return data
+        sc = len(im.mode) == 1 or im.mode.find(';') == 1  # is the image single-channel?
+        return np.asarray(im if sc else im.convert('L'))
 
 class ImageFormat:
     """ Class describing an image format. """
