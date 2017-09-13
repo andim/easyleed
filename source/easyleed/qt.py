@@ -21,7 +21,7 @@ elif '--pyqt4' in sys.argv:
 elif '--pyqt5' in sys.argv:
     variant = 'pyqt5'
 elif env_api in ['pyside', 'pyqt']:
-    variant = env_api 
+    variant = env_api
 else:
     raise ImportError('unrecognized python Qt bindings')
 # This will be passed on to new versions of matplotlib (name for pyqt4 is simply pyqt)
@@ -31,10 +31,10 @@ logger.info("The chosen qt variant is %s." % variant)
 if variant == 'pyside':
     from PySide import QtCore, QtGui
     QtCore.QT_VERSION_STR = QtCore.__version__
-    QtCore.QT_VERSION = tuple(int(c) for c in QtCore.__version__.split('.'))    
+    QtCore.QT_VERSION = tuple(int(c) for c in QtCore.__version__.split('.'))
 elif variant == 'pyqt4':
     from PyQt4 import QtCore, QtGui
-elif variant == 'pyqt5': 
+elif variant == 'pyqt5':
     from PyQt5 import QtCore, QtGui, QtWidgets
 elif variant == 'pyqt':
     try:
@@ -63,6 +63,10 @@ def qt_filedialog_convert(output):
     except ValueError:
         # in qt4 returns are filename only
         filename = output
-    return filename if isinstance(filename, list) else str(filename)
+    if isinstance(filename, (list,str)):  # qt5
+        return filename
+    if isinstance(filename, QtCore.QStringList):  # qt4
+        return [str(item) for item in filename]
+    return str(filename)  # also qt4
 
 __all__ = [QtGui, QtCore, get_qt_binding_name, qt_filedialog_convert]
