@@ -1,6 +1,13 @@
 Changelog
 ==========
 
+Version 2.3.4
+-------------
+
+(Jan Lachnitt):
+- preserve order and numbering of spots everywhere
+- load config from current directory
+
 Version 2.3.3
 -------------
 
@@ -8,8 +15,9 @@ Version 2.3.3
 - fix to open/save with Qt4
 - fix for 16-bit images
 - more robust default regex for energy in filename
-- preserve order and numbering of spots everywhere
-- load config from current directory
+
+(AM):
+- bug fixes to plotting and parameter import/export
 
 Version 2.3.2
 -------------
