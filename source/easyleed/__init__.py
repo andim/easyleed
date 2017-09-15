@@ -1,4 +1,4 @@
-""" 
+"""
 The EasyLEED package is divided into several subpackages:
 
 - base: Core functionality (fitting procedures, Tracker class, etc.)
@@ -25,12 +25,16 @@ __author__ = "Andreas Mayer, Hanna Salopaasi, Nicola Ferralis"
 
 # import packages
 # order of loading is important and should not be changed
+import sys
+sys.path.append('.')
 try:
-    import sys
-    sys.path.append('..')
     import config
 except:
-    from . import defaultconfig as config
+    sys.path.append('..')
+    try:
+        import config
+    except:
+        from . import defaultconfig as config
 
 import logging
 logging.basicConfig(filename=config.loggingFilename, level=config.loggingLevel)
