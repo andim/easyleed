@@ -6,7 +6,9 @@ Version 2.3.4
 
 (Jan Lachnitt):
 - preserve order and numbering of spots everywhere
-- load config from current directory
+
+(AM):
+- load config from anywhere on the path as "easyleedconfig"
 
 Version 2.3.3
 -------------
