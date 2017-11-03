@@ -9,6 +9,7 @@ import webbrowser
 import pickle
 import six
 import time
+import imp
 
 from .qt import get_qt_binding_name, qt_filedialog_convert
 from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, QTimer, QObject)
@@ -671,7 +672,7 @@ class ParameterSettingWidget(QWidget):
 
     def defaultValues(self):
         """Reload config-module and get the default values"""
-        reload(config)
+        imp.reload(config)
         self.inputPrecision.setValue(config.Tracking_inputPrecision)
         self.integrationWindowRadiusNew.setValue(config.GraphicsScene_defaultRadius)
         self.integrationWindowRadius.setValue(config.Tracking_minWindowSize)
