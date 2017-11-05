@@ -9,7 +9,6 @@ import webbrowser
 import pickle
 import six
 import time
-import imp
 
 from .qt import get_qt_binding_name, qt_filedialog_convert
 from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, QTimer, QObject)
@@ -652,7 +651,7 @@ class ParameterSettingWidget(QWidget):
         self.saveButton.clicked.connect(self.saveValues)
         self.loadButton.clicked.connect(self.loadValues)
 
-    def applyParameters(self):
+    def collectParameters(self):
         """Parameter setting control"""
         config.Tracking_inputPrecision = self.inputPrecision.value()
         config.Tracking_windowScalingOn = self.integrationWindowScale.isChecked()
@@ -669,10 +668,17 @@ class ParameterSettingWidget(QWidget):
         config.Tracking_processNoiseVelocity = self.processNoiseVelocity.value()
         config.GraphicsScene_smoothPoints = self.smoothPoints.value()
         config.GraphicsScene_smoothSpline = self.smoothSpline.value()
+    
+    def applyParameters(self):
+        """Parameter setting control"""
+        self.collectParameters()
+        config.saveConfig(config.configFile)
 
     def defaultValues(self):
-        """Reload config-module and get the default values"""
-        imp.reload(config)
+        # Set default acquisition parameters from configuration ini
+        config.createConfig()
+        config.readConfig(config.configFile)
+        
         self.inputPrecision.setValue(config.Tracking_inputPrecision)
         self.integrationWindowRadiusNew.setValue(config.GraphicsScene_defaultRadius)
         self.integrationWindowRadius.setValue(config.Tracking_minWindowSize)
@@ -686,43 +692,27 @@ class ParameterSettingWidget(QWidget):
         self.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
         self.processNoisePosition.setValue(config.Tracking_processNoisePosition)
         self.processNoiseVelocity.setValue(config.Tracking_processNoiseVelocity)
+        logger.info("Default acquisition parameters restored")
 
     def saveValues(self):
         """ Basic saving of the set parameter values to a file """
-        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
-        if filename:
-            output = open(filename, 'wb')
-            writelist = [self.inputPrecision.value(), self.integrationWindowRadiusNew.value(),
-                         self.integrationWindowRadius.value(), self.validationRegionSize.value(),
-                         self.determinationCoefficient.value(), self.smoothPoints.value(),
-                         self.smoothSpline.value(), self.intensTime.isChecked(),
-                         self.integrationWindowScale.isChecked() , self.backgroundSubstraction.isChecked(),
-                         self.livePlotting.isChecked(), self.spotIdentification.currentIndex(),
-                         self.processNoisePosition.value(), self.processNoiseVelocity.value()]
-            pickle.dump(writelist, output)
-            print("Custom settings saved.")
+        
+        filename = QFileDialog.getSaveFileName(self,
+                        "Save INI config file", "","*.ini")
+        self.collectParameters()
+        config.saveConfig(filename[0])
+        print("Confguration parameters saved to:",filename[0])
+        logger.info("Confguration parameters saved to:"+filename[0])
 
     def loadValues(self):
         """ Load a file of set parameter values that has been saved with the widget """
-        filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self, 'Open spot location file'))
+        
+        filename = QFileDialog.getOpenFileName(self,
+                        "Open INI config file", "","*.ini")
         try:
-            loadput = open(filename, 'rb')
-            loadlist = pickle.load(loadput)
-            self.inputPrecision.setValue(loadlist[0])
-            self.integrationWindowRadiusNew.setValue(loadlist[1])
-            self.integrationWindowRadius.setValue(loadlist[2])
-            self.validationRegionSize.setValue(loadlist[3])
-            self.determinationCoefficient.setValue(loadlist[4])
-            self.smoothPoints.setValue(loadlist[5])
-            self.smoothSpline.setValue(loadlist[6])
-            self.intensTime.setChecked(loadlist[7])
-            self.integrationWindowScale.setChecked(loadlist[8])
-            self.backgroundSubstraction.setChecked(loadlist[9])
-            self.livePlotting.setChecked(loadlist[10])
-            self.spotIdentification.setCurrentIndex(loadlist[11])
-            self.processNoisePosition.setValue(loadlist[12])
-            self.processNoiseVelocity.setValue(loadlist[13])
-            print("Custom settings restored.")
+            config.readConfig(filename)
+            print("Confguration parameters loaded from:",filename[0])
+            logger.info("Confguration parameters loaded from:"+filename[0])
         except:
             print("Invalid file")
 
