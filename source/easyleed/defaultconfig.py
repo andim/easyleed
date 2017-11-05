@@ -170,8 +170,8 @@ class Configuration():
 
     # Save current parameters in configuration file
     def saveConfig(self, configFile):
-        #try:
-        with open(configFile, 'w') as configfile:
-            self.conf.write(configfile)
-        #except:
-        #    print("Error in saving parameters")
+        try:
+            with open(configFile, 'w') as configfile:
+                self.conf.write(configfile)
+        except:
+            print("Error in saving parameters")

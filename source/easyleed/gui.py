@@ -653,22 +653,40 @@ class ParameterSettingWidget(QWidget):
 
     def collectParameters(self):
         """Parameter setting control"""
+        config.GraphicsScene_defaultRadius = self.integrationWindowRadiusNew.value()
+        config.GraphicsScene_livePlottingOn = self.livePlotting.isChecked()
+        config.GraphicsScene_intensTimeOn = self.intensTime.isChecked()
+        config.GraphicsScene_smoothPoints = self.smoothPoints.value()
+        config.GraphicsScene_smoothSpline = self.smoothSpline.value()
+        
         config.Tracking_inputPrecision = self.inputPrecision.value()
         config.Tracking_windowScalingOn = self.integrationWindowScale.isChecked()
         config.Tracking_minWindowSize = self.integrationWindowRadius.value()
-        config.GraphicsScene_defaultRadius = self.integrationWindowRadiusNew.value()
-        config.Tracking_minWindowSize = self.integrationWindowRadius.value()
         config.Tracking_guessFunc = self.spotIdentification.currentText()
-        config.Tracking_gamma = self.validationRegionSize.value()
-        config.Tracking_minRsq = self.determinationCoefficient.value()
-        config.Processing_backgroundSubstractionOn = self.backgroundSubstraction.isChecked()
-        config.GraphicsScene_livePlottingOn = self.livePlotting.isChecked()
-        config.GraphicsScene_intensTimeOn = self.intensTime.isChecked()
         config.Tracking_processNoisePosition = self.processNoisePosition.value()
         config.Tracking_processNoiseVelocity = self.processNoiseVelocity.value()
-        config.GraphicsScene_smoothPoints = self.smoothPoints.value()
-        config.GraphicsScene_smoothSpline = self.smoothSpline.value()
+        config.Tracking_gamma = self.validationRegionSize.value()
+        config.Tracking_minRsq = self.determinationCoefficient.value()
+
+        config.Processing_backgroundSubstractionOn = self.backgroundSubstraction.isChecked()
+
+        config.conf['GUI']['GraphicsScene_defaultRadius'] = str(config.GraphicsScene_defaultRadius)
+        config.conf['GUI']['GraphicsScene_livePlottingOn'] = str(config.GraphicsScene_livePlottingOn)
+        config.conf['GUI']['GraphicsScene_intensTimeOn'] = str(config.GraphicsScene_intensTimeOn)
+        config.conf['GUI']['GraphicsScene_smoothPoints'] = str(config.GraphicsScene_smoothPoints)
+        config.conf['GUI']['GraphicsScene_smoothSpline'] = str(config.GraphicsScene_smoothSpline)
+
+        config.conf['Tracking']['Tracking_inputPrecision'] = str(config.Tracking_inputPrecision)
+        config.conf['Tracking']['Tracking_windowScalingOn'] = str(config.Tracking_windowScalingOn)
+        config.conf['Tracking']['Tracking_minWindowSize'] = str(config.Tracking_minWindowSize)
+        config.conf['Tracking']['Tracking_guessFunc'] = str(config.Tracking_guessFunc)
+        config.conf['Tracking']['Tracking_processNoisePosition'] = str(config.Tracking_processNoisePosition)
+        config.conf['Tracking']['Tracking_processNoiseVelocity'] = str(config.Tracking_processNoiseVelocity)
+        config.conf['Tracking']['Tracking_gamma'] = str(config.Tracking_gamma)
+        config.conf['Tracking']['Tracking_minRsq'] = str(config.Tracking_minRsq)
     
+        config.conf['Processing']['Processing_backgroundSubstractionOn'] = str(config.Processing_backgroundSubstractionOn)
+
     def applyParameters(self):
         """Parameter setting control"""
         self.collectParameters()
