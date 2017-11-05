@@ -27,7 +27,16 @@ Here is a short step-by-step guide:
 - Parameter settings can also be saved/loaded
 - The selected spot and center positions can also be saved and reloaded for further intensity acquisitions.
 
+Parameter settings
+------------------
+
 It might be useful to get a rough understanding of the underlying algorithm for intuition into how to set parameters. We recommend you read our paper for an introduction to the ideas behind EasyLEED.
+
+Broadly in the algorithm there is a trade-off between how much to rely on the fitted vs predicted positions. Fitted positions are roughly the maxima of intensity of the spots. The prediction comes from a simple dynamical model of the spots moving towards the center as beam energy is increased. How much the algorithm relies on one over the other depends on an assumed variance of both predictions. The variance of predictions increases if there is more "process noise", i.e. the larger you set those parameters the more the algorithm is going to rely on its fitted position.
+
+The algorithm also uses the user input of initial spot positions (and if set center position). The weight put on this information is controlled by the parameter "User input precision". Larger values of this parameter lead to less weight being put on this prior information.
+
+Sometimes spots vanish so they cannot be fit accurately. The algorithm should then purely rely on the prediction. The "Minimal R^2 to accept fit" specifies the quality of fit below which to reject the position from the fit. Similarly the fit might go awry and converge to a different spot. The parameter "Size of the validation region" sets a cutoff on how much the fitted position can differ from the predicted position, before it is discarded.
 
 File naming policy
 ------------------
@@ -45,9 +54,9 @@ You can change the regular expression that is used for parsing energies from fil
 Custom configuration
 --------------------
 
-Most of the default parameters of the algorithm as well as many UI tweaks are controlled via a config file. Copy `easyleed/default-config.py` to `config.py` and edit this file (it takes precedence over the former file) for customization.
+Most of the default parameters of the algorithm as well as many UI tweaks are controlled via a config file. Copy `easyleed/default-config.py` to a file named `easyleedconfig.py` on your PYTHONPATH and edit this file for customization. 
 
 Qt Wrapper
 ----------
 
-There exist to different python wrappers for the `Qt` library (`PyQt4` and `PySide`). Both can be used with EasyLEED. To select which one to use set the `QT_API` environment variable to either `pyqt` or `pyside`.
+There exist two different python wrappers for the `Qt` library (`PyQt4` and `PySide`). Both can be used with EasyLEED. To select which one to use set the `QT_API` environment variable to either `pyqt` or `pyside`.

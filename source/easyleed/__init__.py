@@ -1,4 +1,4 @@
-""" 
+"""
 The EasyLEED package is divided into several subpackages:
 
 - base: Core functionality (fitting procedures, Tracker class, etc.)
@@ -20,17 +20,19 @@ The EasyLEED package is divided into several subpackages:
 
 """
 
-__version__ = "2.1"
+__version__ = "2.3.4"
 __author__ = "Andreas Mayer, Hanna Salopaasi, Nicola Ferralis"
 
 # import packages
-# order of loading is important and should not be changed
 try:
-    import sys
-    sys.path.append('..')
-    import config
+    import easyleedconfig as config
 except:
     from . import defaultconfig as config
+
+import logging
+logging.basicConfig(filename=config.loggingFilename, level=config.loggingLevel)
+logger = logging.getLogger()
+
 from . import kalman
 from . import io
 from . import base

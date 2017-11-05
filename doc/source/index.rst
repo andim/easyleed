@@ -21,7 +21,7 @@ Once installed you can launch the program with the command
 
 ::
 
-    $ easyleed.pyw
+    $ easyleed
 
 Open a series of diffraction images at successive energies and click on a diffraction spot you want to track. Click run and of you go! 
 
@@ -39,7 +39,7 @@ Documentation
 Support & Contributing
 ======================
 
-If you have problems or have suggestions of how to improve the software, please write us an `email <mailto:andisspam@gmail.com>`_ or `open an issue on Github <https://github.com/andim/easyleed/issues>`_.
+If you have problems or have suggestions of how to improve the software, please write us an `email <mailto:andimscience@gmail.com>`_ or `open an issue on Github <https://github.com/andim/easyleed/issues>`_.
 
 We would also be very happy about direct contributions that enhance and extend the functionality of EasyLEED. Simply fork the project on Github, hack away, and then open a pull request. 
 

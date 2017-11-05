@@ -1,0 +1,12 @@
+name: easyleed
+dependencies:
+    - python=3.*
+    - numpy
+    - scipy
+    - matplotlib
+    - pillow
+    - pyqt=4.*
+    - pip:
+        - pyfits
+        - easyleed
+

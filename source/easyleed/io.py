@@ -11,26 +11,27 @@ from .qt import QtGui as qtgui
 
 # load regular expression package (for parsing of energy from file name)
 import re
+import os.path
 
-from .base import logger
+from . import logger
 
 #### load packages for available file types ####
 formats_available = ['IMG']
 try:
     import pyfits
-    formats_available.append("FITS")    
+    formats_available.append("FITS")
 except:
-    logger.warning("The pyfits package is not properly installed.")
+    logger.warning("The pyfits package is not installed.")
 # try to import PIL in two possible ways (dependent on PIL version)
 try:
     from PIL import Image
-    formats_available.append("PIL")    
+    formats_available.append("PIL")
 except:
     try:
         import Image
-        formats_available.append("PIL")    
+        formats_available.append("PIL")
     except:
-        logger.warning("The Image package (Python Imaging Library) is not properly installed.")
+        logger.warning("The pillow package is not installed.")
 
 class ImageLoader(object):
     """ Abstract base class for a class loading LEED images.
@@ -56,7 +57,7 @@ class ImageLoader(object):
         if m is None:
             raise IOError('Invalid filename. Check naming policy.')
         return float(m.group())
-   
+
     def current_energy(self):
         """ Get current energy. """
         return self.energies[self.index]
@@ -73,11 +74,11 @@ class ImageLoader(object):
         if self.index == 0:
             raise StopIteration("there is no previous image")
         else:
-           self.index -= 1
-           energy = self.energies[self.index]
-           return self.get_image(self.files[energy]), energy
+            self.index -= 1
+            energy = self.energies[self.index]
+            return self.get_image(self.files[energy]), energy
 
-    def next(self):
+    def __next__(self):
         """ Get image at next higher beam energy. """
         if self.index < len(self.energies)-1:
             self.index += 1
@@ -86,19 +87,12 @@ class ImageLoader(object):
         else:
             raise StopIteration()
 
-    def goto(self, energy):
-        """ Get image custom beam energy. """
-        stepsGoto = self.energySteps(energy)
-        if self.index < len(self.energies)-stepsGoto:
-            self.index += stepsGoto
-            newEnergy = self.energies[self.index]
-            return self.get_image(self.files[newEnergy]), newEnergy
-        else:
-            raise StopIteration()
+    next = __next__
 
-    def energySteps(self, energy):
-        """ Get # frame steps for custom beam energy. """
-        return int((energy - self.energies[self.index])/(self.energies[1]-self.energies[0]))
+    def goto(self, energy):
+        """ Get image at given beam energy. """
+        self.index = self.energies.index(energy)
+        return self.get_image(self.files[energy]), energy
 
     # FIXME: untested
     def custom_iter(self, energies):
@@ -109,29 +103,35 @@ class ImageLoader(object):
         for energy in energies:
             yield self.get_image(energy), energy
 
+
 class ImgImageLoader(ImageLoader):
     """ Load .img image files (HotLeed format). """
+
+    extensions = ["img"]
 
     def get_energy(self, image_path):
         with open(image_path, "rb") as f:
             return self.load_header(f)["Beam Voltage (eV)"]
-    
-    def load_header(self, f):
+
+    @staticmethod
+    def load_header(f):
         # find header length
         line = f.readline()
-        while not "Header length:" in line:
+        while not b"Header length:" in line:
             line = f.readline()
-        header_length = int(line.split(": ")[1].strip())
+        header_length = int(line.split(b": ")[1].strip())
         # jump back to beginning
         f.seek(0)
         # read in header
         header_raw = f.read(header_length)
         ## process header ##
         # dict containing names of all interesting entrys
-        header = {"Beam Voltage (eV)": 0, "Date": "", "Comment": "", "x1": 0, "y1": 0, "x2": 0, "y2": 0, "Number of frames": 0, 'length' : header_length}
-        headerlines = header_raw.split("\n")
+        header = {b"Beam Voltage (eV)": 0, b"Date": "", b"Comment": "",
+                  b"x1": 0, b"y1": 0, b"x2": 0, b"y2": 0, b"Number of frames": 0,
+                  b'length' : header_length}
+        headerlines = header_raw.split(b"\n")
         for line in headerlines:
-            parts = line.split(": ")
+            parts = line.split(b": ")
             if parts[0] in header.keys():
                 # convert int entrys
                 if type(header[parts[0]]) == type(1):
@@ -141,58 +141,88 @@ class ImgImageLoader(ImageLoader):
                     header[parts[0]] = parts[1].strip()
         return header
 
-    def get_image(self, image_path):
+    @staticmethod
+    def get_image(image_path):
         with open(image_path, "rb") as f:
-            header = self.load_header(f) 
+            header = ImgImageLoader.load_header(f)
             # jump to begin of image
-            f.seek(header['length'])
+            f.seek(header[b'length'])
             # read in image
             content = f.read()
             # make numpy array from image
-            image = np.frombuffer(content, dtype = np.uint16)
+            image = np.frombuffer(content, dtype=np.uint16)
             # calculate size of image from header information
-            size = (header["y2"]-header["y1"]+1, header["x2"]-header["x1"]+1)
+            size = (header[b"y2"]-header[b"y1"]+1, header[b"x2"]-header[b"x1"]+1)
             # reshape image as 2d array
             image = image.reshape((size))
             return image
 
+
 class FitsImageLoader(ImageLoader):
-    """ Load .fit image files (common format). """
-    
-    def get_image(self, image_path):
+    """ Load .fits image files. """
+
+    extensions = ["fit", "fits"]
+
+    @staticmethod
+    def get_image(image_path):
         hdulist = pyfits.open(image_path)
         data = hdulist[0].data
         hdulist.close()
         return data
 
+
 class PILImageLoader(ImageLoader):
     """ Load image files supported by Python Imaging Library (PIL). """
 
-    def get_image(self, image_path):
+    extensions = ["tif", "tiff", "png", "jpg", "bmp"]
+
+    @staticmethod
+    def get_image(image_path):
         im = Image.open(image_path)
-        data = np.asarray(im.convert('L'), dtype = np.uint16)
-        return data
+        sc = len(im.mode) == 1 or im.mode.find(';') == 1  # is the image single-channel?
+        return np.asarray(im if sc else im.convert('L'))
 
 class ImageFormat:
     """ Class describing an image format. """
-    def __init__(self, abbrev, extensions, loader):
+    def __init__(self, abbrev, loader):
         """
         abbrev: abbreviation (e.g. FITS)
-        extensions: list of corresponding file extensions (e.g. .fit, .fits)
         loader: ImageLoader subclass for this format
         """
         self.abbrev = abbrev
-        self.extensions = extensions
         self.loader = loader
+        self.extensions = loader.extensions
+
     def __str__(self):
         return "{0}-Files ({1})".format(self.abbrev, " ".join(self.extensions))
 
+    def extensions_wildcard(self):
+        return ['*.%s' % ext for ext in self.extensions]
+
 """ Dictionary of available ImageFormats. """
-IMAGE_FORMATS = dict([str(format_), format_] for format_ in \
-        [ImageFormat("FITS", ["*.fit", "*.fits"], FitsImageLoader),
-        ImageFormat("PIL", ["*.tif", "*.tiff", "*.png", "*.jpg"], PILImageLoader),
-        ImageFormat("IMG", ["*.img"], ImgImageLoader)] \
-             if format_.abbrev in formats_available)
+IMAGE_FORMATS = [format_ for format_ in \
+                    [ImageFormat("PIL", PILImageLoader),
+                     ImageFormat("FITS", FitsImageLoader),
+                     ImageFormat("IMG", ImgImageLoader)] \
+                         if format_.abbrev in formats_available]
+
+class AllImageLoader(ImageLoader):
+
+    @staticmethod
+    def supported_extensions():
+        extensions = []
+        for image_format in IMAGE_FORMATS:
+            extensions.extend(image_format.extensions_wildcard())
+        return extensions
+
+    def get_image(self, image_path):
+        extension = os.path.splitext(image_path)[1][1:]
+        for image_format in IMAGE_FORMATS:
+            loader = image_format.loader
+            if extension in loader.extensions:
+                return loader.get_image(image_path)
+        raise IOError('The filetype is not supported')
+
 
 def normalize255(array):
     """ Returns a normalized array of uint8."""
@@ -204,6 +234,9 @@ def normalize255(array):
         array = array * scale
     return array.astype("uint8")
 
+
+qtGreyColorTable = [qtgui.qRgb(i, i, i) for i in range(256)]
+
 def npimage2qimage(npimage):
     """ Converts numpy grayscale image to qimage."""
     h, w = npimage.shape
@@ -211,6 +244,5 @@ def npimage2qimage(npimage):
     # second w to avoid problems if image is not 32-bit aligned
     # --> indicates bytesPerLine
     qimage = qtgui.QImage(npimage.data, w, h, w, qtgui.QImage.Format_Indexed8)
-    for i in range(256):
-        qimage.setColor(i, qtgui.qRgb(i, i, i))
+    qimage.setColorTable(qtGreyColorTable)
     return qimage

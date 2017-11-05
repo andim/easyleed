@@ -5,32 +5,40 @@ easyleed.gui
 Various classes for providing a graphical user interface.
 """
 
-import logging
 import webbrowser
 import pickle
+import six
+import time
+import imp
 
-from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, SIGNAL, QTimer, QObject)
-from .qt.QtGui import (QApplication, QMainWindow, QGraphicsView,
-    QGraphicsScene, QImage, QWidget, QHBoxLayout, QPen, QSlider,
-    QVBoxLayout, QPushButton, QGraphicsEllipseItem, QGraphicsRectItem, QGraphicsItem,
-    QGraphicsSimpleTextItem, QToolButton,
-    QPainter, QKeySequence, QAction, QIcon, QFileDialog, QProgressBar, QAbstractSlider,
-    QBrush, QFrame, QLabel, QRadioButton, QGridLayout, QSpinBox, QDoubleSpinBox, QCheckBox,
-    QComboBox, QLineEdit, QMessageBox, QPixmap)
-import numpy as np
+from .qt import get_qt_binding_name, qt_filedialog_convert
+from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, QTimer, QObject)
+from .qt.QtCore import pyqtSignal as Signal
+from .qt.widgets import (QApplication, QMainWindow, QGraphicsView, QGraphicsScene,
+                             QWidget, QHBoxLayout, QGraphicsEllipseItem, QGraphicsRectItem,
+                             QGraphicsItem,QGraphicsSimpleTextItem, QSlider, QVBoxLayout,
+                             QPushButton, QToolButton, QAction, QFileDialog, QProgressBar,
+                             QAbstractSlider, QFrame, QLabel, QRadioButton, QGridLayout,
+                             QSpinBox, QDoubleSpinBox, QCheckBox, QComboBox, QLineEdit, QMessageBox)
+from .qt.QtGui import (QImage, QPen, QIcon, QTransform, QImageWriter,
+                       QPainter, QBrush, QKeySequence, QPixmap)
 
 from . import config
 from . import __version__
 from . import __author__
 from .base import *
 from .io import *
+
+import numpy as np
 from scipy import interpolate
 
 from matplotlib.figure import Figure
-from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
-from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
-
-logging.basicConfig(filename = config.loggingFilename, level=config.loggingLevel)
+if get_qt_binding_name() == 'pyqt5':
+    from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
+    from matplotlib.backends.backend_qt5 import NavigationToolbar2QT
+else:
+    from matplotlib.backends.backend_qt4agg import FigureCanvasQTAgg as FigureCanvas
+    from matplotlib.backends.backend_qt4 import NavigationToolbar2QT
 
 class QGraphicsMovableItem(QGraphicsItem):
     """ Provides an QGraphicsItem that can be moved with the arrow keys.
@@ -103,7 +111,7 @@ class QGraphicsSpotItem(QGraphicsEllipseItem, QGraphicsMovableItem):
 
     def keyPressEvent(self, event):
         """ Handles keyPressEvents.
-            
+
             The circles radius can be changed using the plus and minus keys.
         """
 
@@ -123,17 +131,17 @@ class QGraphicsSpotItem(QGraphicsEllipseItem, QGraphicsMovableItem):
 
     def changeSize(self, inc):
         """ Change radius by inc.
-        
+
             inc > 0: increase
             inc < 0: decrease
         """
 
-        inc /= 2**0.5 
+        inc /= 2**0.5
         self.setRect(self.rect().adjusted(-inc, -inc, +inc, +inc))
 
 class QGraphicsCenterItem(QGraphicsRectItem, QGraphicsMovableItem):
     """ Provides an QGraphicsItem to display the center position on a QGraphicsScene. """
-    
+
     def __init__(self, point, size, parent=None):
         super(QGraphicsCenterItem, self).__init__(parent)
         offset = QPointF(size, size)
@@ -153,15 +161,19 @@ class QSpotModel(QObject):
     - radiusChanged
     """
 
-    def __init__(self, parent = None):
+    intensityChanged = Signal(object)
+    positionChanged = Signal(object)
+    radiusChanged = Signal(object)
+
+    def __init__(self, parent=None):
         super(QSpotModel, self).__init__(parent)
         self.m = SpotModel()
-    
+
     def update(self, x, y, intensity, energy, radius):
         self.m.update(x, y, intensity, energy, radius)
-        QObject.emit(self, SIGNAL("positionChanged"), QPointF(x, y))
-        QObject.emit(self, SIGNAL("radiusChanged"), radius)
-        QObject.emit(self, SIGNAL("intensityChanged"), intensity)
+        self.intensityChanged.emit(intensity)
+        self.positionChanged.emit(QPointF(x, y))
+        self.radiusChanged.emit(radius)
 
 class GraphicsScene(QGraphicsScene):
     """ Custom GraphicScene having all the main content."""
@@ -171,28 +183,34 @@ class GraphicsScene(QGraphicsScene):
         self.spots = []
         self.center = None
         self.spotsLabel = []
-    
+
+    def addSpot(self, item):
+        self.clearSelection()
+        self.addItem(item)
+        item.setSelected(True)
+        self.setFocusItem(item)
+        self.spots.append(item)
+        self.spotsLabel.append(str(len(self.spots)))
+        item.setToolTip(self.spotsLabel[-1])
+
     def mousePressEvent(self, event):
-        """ Processes mouse events through either            
+        """ Processes mouse events through either
               - propagating the event
-            or 
+            or
               - instantiating a new Circle (on left-click)
               - instantiating a new Center (on right-click)
         """
-    
-        if hasattr(self,"image"):
-            if self.itemAt(event.scenePos()):
+        transform = QTransform()
+        if hasattr(self, "image"):
+            if self.itemAt(event.scenePos(), transform):
                 super(GraphicsScene, self).mousePressEvent(event)
             elif event.button() == Qt.LeftButton:
                 item = QGraphicsSpotItem(event.scenePos(),
                         config.GraphicsScene_defaultRadius)
-                self.clearSelection()
-                self.addItem(item)
-                item.setSelected(True)
-                self.setFocusItem(item)
-                self.spots.append(item)
-                self.spotsLabel.append(str(len(self.spots)-1))
-                item.setToolTip(self.spotsLabel[-1])
+                self.addSpot(item)
+                # Enable spots to be saved when present on the image
+                #if len(self.spots) > 0:
+                #    self.parent().fileSaveSpotsAction.setEnabled(True)
 
             elif event.button() == Qt.RightButton:
                 if self.center is None:
@@ -210,9 +228,9 @@ class GraphicsScene(QGraphicsScene):
             self.parent().statusBar().showMessage("Spots require a loaded image", 5000)
 
     def keyPressEvent(self, event):
-        """ Processes key events through either            
+        """ Processes key events through either
               - deleting the focus item
-            or   
+            or
               - propagating the event
         """
 
@@ -221,9 +239,9 @@ class GraphicsScene(QGraphicsScene):
             if event.key() == Qt.Key_Delete:
                 if type(item) is QGraphicsSpotItem:
                     self.spots.remove(item)
-                else:
-                    self.center = None
-                self.removeItem(item)
+                    self.removeItem(item)
+                elif type(item) is QGraphicsCenterItem:
+                    self.removeCenter()
                 del item
             else:
                 super(GraphicsScene, self).keyPressEvent(event)
@@ -244,46 +262,43 @@ class GraphicsScene(QGraphicsScene):
         self.imlabel.setText(labeltext)
         self.image = image
         self.update()
-    
+
     def removeAll(self):
-        """ Remove all items from the scene (leaves background unchanged). """
+        """ Remove all spots from the scene (leaves background unchanged). """
         for item in self.items():
             if type(item) == QGraphicsSpotItem:
                 self.removeItem(item)
         self.spots = []
+        self.removeCenter()
 
     def removeCenter(self):
-        """ Remove all items from the scene (leaves background unchanged). """
-        for item in self.items():
-            if type(item) == QGraphicsCenterItem:
-                self.removeItem(item)
-        self.center = []
+        """ Remove center from the scene (leaves background unchanged). """
+        if self.center is not None:
+            center = self.center
+            self.removeItem(center)
+            del center
+        self.center = None
 
 class GraphicsView(QGraphicsView):
     """ Custom GraphicsView to display the scene. """
     def __init__(self, parent=None):
         super(GraphicsView, self).__init__(parent)
         self.setRenderHints(QPainter.Antialiasing)
-    
+
     def resizeEvent(self, event):
         self.fitInView(self.sceneRect(), Qt.KeepAspectRatio)
-    
+
     def drawBackground(self, painter, rect):
         painter.fillRect(rect, QBrush(Qt.lightGray))
         self.scene().drawBackground(painter, rect)
 
-class FileDialog(QFileDialog):
-    def __init__(self, **kwargs):
-        super(FileDialog, self).__init__(**kwargs)
-        self.setFileMode(QFileDialog.ExistingFiles)
-
 class AboutWidget(QWidget):
     """ PyQt widget for About Box Panel """
-    
+
     def __init__(self):
         super(AboutWidget, self).__init__()
         self.initUI()
-    
+
     def initUI(self):
         self.setGeometry(100, 200, 400, 200)
         self.setWindowTitle('About EasyLEED')
@@ -291,26 +306,22 @@ class AboutWidget(QWidget):
         self.setLayout(self.gridLayout)
         self.verticalLayout = QVBoxLayout()
         self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
-        self.label = QLabel("<qt><b><big><a href = http://andim.github.io/easyleed/index.html>EasyLEED %s</a></b></big></qt>" % __version__, self);
-        self.label.setOpenExternalLinks(True);
-        self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("by: %s" % __author__, self)
-        self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("<qt>Contacts: <a href = mailto:andisspam@gmail.com>andisspam@gmail.com</a>, <a href = mailto:feranick@hotmail.com> feranick@hotmail.com</a></qt>", self)
-        self.label.setOpenExternalLinks(True);
-        self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("More details: ", self)
-        self.verticalLayout.addWidget(self.label)
-        self.label = QLabel("<qt><a href = http://dx.doi.org/10.1016/j.cpc.2012.02.019>A Mayer, H Salopaasi, K Pussi, RD Diehl. Comput. Phys. Commun. 183, 1443-1447 (2012)</a>", self)
-        self.label.setWordWrap(True)
-        self.label.setOpenExternalLinks(True);
-        self.verticalLayout.addWidget(self.label)
+
+        self.labelTitle = QLabel("<qt><b><big><a href = http://andim.github.io/easyleed/index.html>EasyLEED %s</a></b></big></qt>" % __version__, self);
+        self.labelBy = QLabel("by: %s" % __author__, self)
+        self.labelContact = QLabel("<qt>Contacts: <a href = mailto:andimscience@gmail.com>andimscience@gmail.com</a>, <a href = mailto:feranick@hotmail.com> feranick@hotmail.com</a></qt>", self)
+        self.labelDetails = QLabel("If EasyLEED has been useful in your research please cite: ", self)
+        self.labelPaper = QLabel("<qt><a href = http://dx.doi.org/10.1016/j.cpc.2012.02.019>A Mayer, H Salopaasi, K Pussi, RD Diehl. Comput. Phys. Commun. 183, 1443-1447 (2012)</a>", self)
+        for label in [self.labelTitle, self.labelBy, self.labelContact, self.labelDetails, self.labelPaper]:
+            label.setWordWrap(True)
+            label.setOpenExternalLinks(True);
+            self.verticalLayout.addWidget(label)
 
 class CustomPlotToolbar(NavigationToolbar2QT):
     # only display the buttons we need
     toolitems = [t for t in NavigationToolbar2QT.toolitems if
                 t[0] in ('Home', None,'Pan','Zoom','Save')]
-        
+
     def __init__(self, *args, **kwargs):
         super(CustomPlotToolbar, self).__init__(*args, **kwargs)
         self.layout().takeAt(1)  #or more than 1 if you have more buttons
@@ -322,8 +333,8 @@ class PlotWidget(QWidget):
         super(PlotWidget, self).__init__()
         self.setWindowTitle("I(E)-curve")
         self.create_main_frame()
-    
-    def create_main_frame(self):       
+
+    def create_main_frame(self):
         """ Create the mpl Figure and FigCanvas objects. """
         # 5x4 inches, 100 dots-per-inch
         self.setGeometry(700, 420, 600, 500)
@@ -333,7 +344,7 @@ class PlotWidget(QWidget):
 
         self.canvas = FigureCanvas(self.fig)
         self.canvas.setParent(self)
-        
+
         # Create the navigation toolbar, tied to the canvas
         self.mpl_toolbar = CustomPlotToolbar(self.canvas, self)
 
@@ -348,11 +359,11 @@ class PlotWidget(QWidget):
         self.legendCheck.setChecked(False)
         # Add cButton for clearing plot
         self.clearPlotButton = QPushButton('&Clear Plot', self)
-        
+
         # Layout
         self.gridLayout = QGridLayout()
         self.setLayout(self.gridLayout)
-        
+
         self.gridLayout.addWidget(self.mpl_toolbar, 0, 0, 1, -1)
         self.gridLayout.addWidget(self.canvas, 1, 0, 1, -1)
         self.gridLayout.addWidget(self.averageCheck, 2, 0, 1, 1)
@@ -361,24 +372,17 @@ class PlotWidget(QWidget):
         self.gridLayout.addWidget(self.legendCheck, 3, 1, 1, 1)
 
         # Define events for checkbox
-        QObject.connect(self.averageCheck, SIGNAL("clicked()"), self.updatePlot)
-        QObject.connect(self.smoothCheck, SIGNAL("clicked()"), self.updatePlot)
-        QObject.connect(self.legendCheck, SIGNAL("clicked()"), self.updatePlot)
-        QObject.connect(self.clearPlotButton, SIGNAL("clicked()"), self.clearPlot)
-        
-    def setAverageChecks(self):
-        if self.averageCheck.isChecked():
-            self.smoothCheck.setEnabled(True)
-        else:
-            self.smoothCheck.setEnabled(False)
+        self.averageCheck.clicked.connect(self.onAverageCheck)
+        for button in [self.smoothCheck, self.legendCheck, self.clearPlotButton]:
+            button.clicked.connect(self.updatePlot)
 
     def initPlot(self):
         # Setup axis, labels, lines, ...
-        if config.GraphicsScene_intensTimeOn == False:
-            self.axes.set_xlabel("Energy [eV]")
-        else:
+        if config.GraphicsScene_intensTimeOn:
             self.axes.set_xlabel("Frame")
-        self.axes.set_ylabel("Intensity")
+        else:
+            self.axes.set_xlabel("Energy [eV]")
+        self.axes.set_ylabel("Intensity [a.u.]")
         # removes the ticks from y-axis
         self.axes.set_yticks([])
 
@@ -386,96 +390,100 @@ class PlotWidget(QWidget):
         self.initPlot()
         self.worker = worker
         self.lines_map = {}
-        j = 0
-        for spot in self.worker.spots_map:
-            self.lines_map[spot], = self.axes.plot([], [], label= str(j))
-            j+=1
-        
-        # set up averageLine
-        self.averageLine, = self.axes.plot([], [], 'k', lw = 2, label = 'Average')
-        # set up averageSmoothLine
-        self.averageSmoothLine, = self.axes.plot([], [], 'b', lw = 2, label = 'Smooth Average')
-        
+        for i, spot in enumerate(worker.parent().scene.spots, start=1):
+            self.lines_map[spot], = self.axes.plot([], [], label=str(i))
+
         # show dashed line at y = 0
-        self.axes.axhline(0.0, color = 'k', ls = '--')
+        self.axes.axhline(0.0, color='k', ls='--')
         # try to auto-adjust plot margins (might not be available in all matplotlib versions)
         try:
             self.fig.tight_layout()
         except:
             pass
         self.updatePlot()
-        self.axes.legend()
-        self.axes.legend().set_visible(False)
+        self.axes.legend(fontsize=10)
+        self.axes.legend().set_visible(self.legendCheck.isChecked())
         self.show()
+
+    def onAverageCheck(self):
+        if self.averageCheck.isChecked():
+            self.smoothCheck.setEnabled(True)
+        else:
+            self.smoothCheck.setEnabled(False)
+        self.updatePlot()
 
     def updatePlot(self):
         """ Basic Matplotlib plotting I(E)-curve """
-        # update data
-        self.setAverageChecks()
-        # decide whether to show legend
-        if self.axes.legend() is not None:
-            # decide whether to show legend
-            if self.legendCheck.isChecked():
-                self.axes.legend(fontsize=10).set_visible(True)
-            else:
-                self.axes.legend().set_visible(False)
-            
-        for spot, line in self.lines_map.iteritems():
+        for spot, line in six.iteritems(self.lines_map):
             line.set_data(self.worker.spots_map[spot][0].m.energy, self.worker.spots_map[spot][0].m.intensity)
         if self.averageCheck.isChecked():
             intensity = np.zeros(self.worker.numProcessed())
-            ynew = np.zeros(self.worker.numProcessed())
-            tck = np.zeros(self.worker.numProcessed())
-            
-            for model, tracker in self.worker.spots_map.itervalues():
+            for model, tracker in six.itervalues(self.worker.spots_map):
                 intensity += model.m.intensity
             intensity /= len(self.worker.spots_map)
-            self.averageLine.set_data(model.m.energy, intensity)
-            
+            if hasattr(self, "averageLine"):
+                self.averageLine.set_data(model.m.energy, intensity)
+            else:
+                # set up averageLine
+                self.averageLine, = self.axes.plot(model.m.energy, intensity, 'k', lw=2, label='Average')
+
             if self.smoothCheck.isChecked():
                 tck = interpolate.splrep(model.m.energy, intensity, s=config.GraphicsScene_smoothSpline)
                 xnew = np.arange(model.m.energy[0], model.m.energy[-1],
                                  (model.m.energy[1]-model.m.energy[0])*config.GraphicsScene_smoothPoints)
                 ynew = interpolate.splev(xnew, tck, der=0)
-                self.averageSmoothLine.set_data(xnew, ynew)
+                if hasattr(self, "averageSmoothLine"):
+                    self.averageSmoothLine.set_data(xnew, ynew)
+                else:
+                    # set up averageSmoothLine
+                    self.averageSmoothLine, = self.axes.plot(xnew, ynew, 'b', lw=2, label='Smooth Average')
             else:
-                self.averageSmoothLine.set_data([], [])
+                if hasattr(self, "averageSmoothLine"):
+                    self.averageSmoothLine.remove()
+                    del self.averageSmoothLine
         else:
-            self.averageLine.set_data([], [])
+            if hasattr(self, "averageLine"):
+                self.averageLine.remove()
+                del self.averageLine
+
+        if self.axes.legend() is not None:
+            # decide whether to show legend
+            self.axes.legend().set_visible(self.legendCheck.isChecked())
 
         # ... axes limits
         self.axes.relim()
-        self.axes.autoscale_view(True,True,True)
+        self.axes.autoscale_view(True, True, True)
         # and show the new plot
         self.canvas.draw()
 
     def clearPlot(self):
-        self.axes.cla()
+        self.axes.clear()
         self.initPlot()
         self.canvas.draw()
-        self.smoothCheck.setChecked(False)
 
     def save(self):
         """ Saving the plot """
-        # savefile prompt
-        filename = str(QFileDialog.getSaveFileName(self, "Save the plot to a file"))
+        filename = "plot.png"
+        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
+                                                    "Save the plot to a file",
+                                                    filename))
         if filename:
             self.fig.savefig(filename)
 
-class ParameterSettingWidget(QWidget): 
+class ParameterSettingWidget(QWidget):
     """PyQt widget for setting tracking parameters"""
- 
+
     def __init__(self):
         super(ParameterSettingWidget, self).__init__()
         self.initUI()
-        
+
     def initUI(self):
         # Buttons/elements
         self.inputPrecision = QSpinBox(self)
         self.inputPrecision.setWrapping(True)
         self.inputPrecision.setValue(config.Tracking_inputPrecision)
         self.ipLabel = QLabel("User input precision", self)
-        
+
         self.integrationWindowRadiusNew = QSpinBox(self)
         self.integrationWindowRadiusNew.setWrapping(True)
         self.integrationWindowRadiusNew.setValue(config.GraphicsScene_defaultRadius)
@@ -502,19 +510,19 @@ class ParameterSettingWidget(QWidget):
 
         self.backgroundSubstraction = QCheckBox("Background substraction")
         self.backgroundSubstraction.setChecked(config.Processing_backgroundSubstractionOn)
-        
+
         self.livePlotting = QCheckBox("Plot I(E) intensities during acquisition")
         self.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
-        
+
         self.intensTime = QCheckBox("Extract I(frame) - fixed energy")
         self.intensTime.setChecked(config.GraphicsScene_intensTimeOn)
-        
+
         self.smoothPoints = QSpinBox(self)
         self.smoothPoints.setWrapping(True)
         self.smoothPoints.setToolTip("Press Enter to update plot")
         self.smoothPoints.setValue(config.GraphicsScene_smoothPoints)
         self.smPoiLabel = QLabel("# points to be rescaled for smoothing", self)
-        
+
         self.smoothSpline = QSpinBox(self)
         self.smoothSpline.setWrapping(True)
         self.smoothSpline.setToolTip("Press Enter to update plot")
@@ -551,7 +559,7 @@ class ParameterSettingWidget(QWidget):
         #Layouts
         self.setGeometry(700, 30, 300, 100)
         self.setWindowTitle('Set acquisition parameters')
-     
+
         #base grid
         self.gridLayout = QGridLayout()
         self.setLayout(self.gridLayout)
@@ -625,7 +633,7 @@ class ParameterSettingWidget(QWidget):
         self.gridLayout.addLayout(self.lh6Layout, 5, 0)
         self.gridLayout.addLayout(self.lh7Layout, 6, 0)
         self.gridLayout.addLayout(self.lh8Layout, 7, 0)
-        
+
         self.gridLayout.addLayout(self.rh1Layout, 0, 2)
         self.gridLayout.addLayout(self.rh2Layout, 1, 2)
         self.gridLayout.addLayout(self.rh3Layout, 2, 2)
@@ -635,15 +643,15 @@ class ParameterSettingWidget(QWidget):
         self.gridLayout.addLayout(self.rh7Layout, 6, 2)
         self.gridLayout.addLayout(self.rh8Layout, 7, 2)
         self.gridLayout.addLayout(self.rh9Layout, 8, 2)
-        
-        self.gridLayout.addLayout(self.hLayout, 8, 0)
-        self.gridLayout.addLayout(self.vlineLayout, 0,1,9,1)
 
-        QObject.connect(self.applyButton, SIGNAL("clicked()"), self.applyParameters)
-        QObject.connect(self.defaultButton, SIGNAL("clicked()"), self.defaultValues)
-        QObject.connect(self.saveButton, SIGNAL("clicked()"), self.saveValues)
-        QObject.connect(self.loadButton, SIGNAL("clicked()"), self.loadValues)
-    
+        self.gridLayout.addLayout(self.hLayout, 8, 0)
+        self.gridLayout.addLayout(self.vlineLayout, 0, 1, 9, 1)
+
+        self.applyButton.clicked.connect(self.applyParameters)
+        self.defaultButton.clicked.connect(self.defaultValues)
+        self.saveButton.clicked.connect(self.saveValues)
+        self.loadButton.clicked.connect(self.loadValues)
+
     def applyParameters(self):
         """Parameter setting control"""
         config.Tracking_inputPrecision = self.inputPrecision.value()
@@ -664,7 +672,7 @@ class ParameterSettingWidget(QWidget):
 
     def defaultValues(self):
         """Reload config-module and get the default values"""
-        reload(config)
+        imp.reload(config)
         self.inputPrecision.setValue(config.Tracking_inputPrecision)
         self.integrationWindowRadiusNew.setValue(config.GraphicsScene_defaultRadius)
         self.integrationWindowRadius.setValue(config.Tracking_minWindowSize)
@@ -681,9 +689,9 @@ class ParameterSettingWidget(QWidget):
 
     def saveValues(self):
         """ Basic saving of the set parameter values to a file """
-        filename = str(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
+        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self, "Save the parameter configuration to a file"))
         if filename:
-            output = open(filename, 'w')
+            output = open(filename, 'wb')
             writelist = [self.inputPrecision.value(), self.integrationWindowRadiusNew.value(),
                          self.integrationWindowRadius.value(), self.validationRegionSize.value(),
                          self.determinationCoefficient.value(), self.smoothPoints.value(),
@@ -696,9 +704,9 @@ class ParameterSettingWidget(QWidget):
 
     def loadValues(self):
         """ Load a file of set parameter values that has been saved with the widget """
-        namefile = str(QFileDialog.getOpenFileName(self, 'Open spot location file'))
+        filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         try:
-            loadput = open(namefile, 'r')
+            loadput = open(filename, 'rb')
             loadlist = pickle.load(loadput)
             self.inputPrecision.setValue(loadlist[0])
             self.integrationWindowRadiusNew.setValue(loadlist[1])
@@ -720,7 +728,7 @@ class ParameterSettingWidget(QWidget):
 
 class MainWindow(QMainWindow):
     """ EasyLEED's main window. """
-    
+
     sliderCurrentPos = 1
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
@@ -736,8 +744,10 @@ class MainWindow(QMainWindow):
         self.view.setMinimumSize(660, 480)
         self.setGeometry(10, 30, 660, 480)
         self.setCentralWidget(self.view)
-        
+
         #### define actions ####
+
+        ## actions for "Process" menu
         processRunAction = self.createAction("&Run", self.run,
                 QKeySequence("Ctrl+r"), None,
                 "Run the analysis of the images.")
@@ -765,25 +775,20 @@ class MainWindow(QMainWindow):
                 "Remove Last Spot.")
 
         self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotOptions, None, self.processRemoveSpot]
-        
-        fileOpenAction = self.createAction("&Open...", self.fileOpen,
+
+        # actions for "File" menu
+        self.fileOpenAction = self.createAction("&Open...", self.fileOpen,
                 QKeySequence.Open, None,
                 "Open a directory containing the image files.")
         self.fileSaveAction = self.createAction("&Save intensities...", self.saveIntensity,
                 QKeySequence.Save, None,
                 "Save the calculated intensities to a text file.")
-                
-        # actions to "File" menu
         self.fileSavePlotAction = self.createAction("&Save plot...", self.plotwid.save,
                 QKeySequence("Ctrl+a"), None,
                 "Save the plot to a pdf file.")
-
-        # Will only enable plot saving after there is a plot to be saved
-        self.fileSavePlotAction.setEnabled(False)
         self.fileSaveScreenAction = self.createAction("&Save screenshot...", self.saveScreenShot,
                 QKeySequence("Ctrl+d"), None,
                 "Save image to a file.")
-        self.fileSaveScreenAction.setEnabled(False)
         self.fileQuitAction = self.createAction("&Quit", self.fileQuit,
                 QKeySequence("Ctrl+q"), None,
                 "Close the application.")
@@ -799,13 +804,24 @@ class MainWindow(QMainWindow):
         self.fileLoadCenterAction = self.createAction("&Load center location...", self.loadCenter,
                 QKeySequence("Ctrl+m"), None,
                 "Load center from a file.")
-                
-        # Disable when program starts.
-        self.fileSaveSpotsAction.setEnabled(False)
-        self.fileLoadSpotsAction.setEnabled(False)
-        self.fileSaveCenterAction.setEnabled(False)
-        self.fileLoadCenterAction.setEnabled(False)
-        
+
+        # Disable actions that are not immediately available
+        for action in [self.fileSaveAction,
+                       self.fileSavePlotAction,
+                       self.fileSaveScreenAction,
+                       self.fileSaveSpotsAction,
+                       self.fileLoadSpotsAction,
+                       self.fileSaveCenterAction,
+                       self.fileLoadCenterAction]:
+            action.setEnabled(False)
+
+        self.fileActions = [self.fileOpenAction, None,
+                            self.fileLoadSpotsAction, self.fileLoadCenterAction, None,
+                            self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction,
+                            self.fileSaveSpotsAction, self.fileSaveCenterAction,
+                            None, self.fileQuitAction]
+
+        # actions for "Help" menu
         self.helpAction = self.createAction("&Help", self.helpBoxShow,
                 None, None,
                 "Show help")
@@ -813,19 +829,9 @@ class MainWindow(QMainWindow):
                 None, None,
                 "About EasyLEED")
         self.helpActions = [None, self.helpAction, None, self.aboutAction]
-        
-        #self.fileActions = [fileOpenAction, self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction, None,
-        #        self.fileSaveSpotsAction, self.fileLoadSpotsAction, None, self.fileSaveCenterAction, self.fileLoadCenterAction,
-        #        None, self.fileQuitAction]
-        
-        self.fileActions = [fileOpenAction, None, self.fileLoadSpotsAction, self.fileLoadCenterAction, None,
-                            self.fileSaveAction, self.fileSavePlotAction, self.fileSaveScreenAction,
-                            self.fileSaveSpotsAction, self.fileSaveCenterAction, 
-                            None, self.fileQuitAction]
 
         #### Create menu bar ####
         fileMenu = self.menuBar().addMenu("&File")
-        self.fileSaveAction.setEnabled(False)
         self.addActions(fileMenu, self.fileActions)
         processMenu = self.menuBar().addMenu("&Process")
         self.addActions(processMenu, self.processActions)
@@ -836,9 +842,12 @@ class MainWindow(QMainWindow):
         #### Create tool bar ####
         toolBar = self.addToolBar("&Toolbar")
         # adding actions to the toolbar, addActions-function creates a separator with "None"
-        self.toolBarActions = [self.fileQuitAction, None, fileOpenAction, None, processRunAction, None, processStopAction, None, processPlotOptions, None, processSetParameters, None, self.processRemoveSpot, None, processRestartAction]
+        self.toolBarActions = [self.fileQuitAction, None, self.fileOpenAction, None,
+                               processRunAction, None, processStopAction, None,
+                               processPlotOptions, None, processSetParameters, None,
+                               self.processRemoveSpot, None, processRestartAction]
         self.addActions(toolBar, self.toolBarActions)
-        
+
         #### Create status bar ####
         self.statusBar().showMessage("Ready", 5000)
 
@@ -851,7 +860,7 @@ class MainWindow(QMainWindow):
         self.nextButton.setArrowType(Qt.RightArrow)
         self.nextButton.setEnabled(False)
         self.nextButton.setToolTip("Next image")
-        self.custEnergyButton = QPushButton("eV", self)
+        self.custEnergyButton = QPushButton("Set eV", self)
         self.custEnergyButton.setCheckable(True)
         self.custEnergyButton.setEnabled(False)
         self.custEnergyButton.setToolTip("Push to set custom energy")
@@ -861,29 +870,29 @@ class MainWindow(QMainWindow):
         ### Create slider
         self.slider = QSlider(Qt.Horizontal)
         self.slider.setEnabled(False)
-        
+
         ### Add buttons, slider and custom energy button and text in statusbar
-        self.statusBar().addWidget(self.custEnergyText)
         self.statusBar().addPermanentWidget(self.prevButton)
         self.statusBar().addPermanentWidget(self.nextButton)
         self.statusBar().addPermanentWidget(self.slider)
         self.statusBar().addPermanentWidget(self.custEnergyButton)
+        self.statusBar().addWidget(self.custEnergyText)
 
         ### Create event connector for slider and buttons in statusbar
-        QObject.connect(self.slider, SIGNAL("sliderMoved(int)"), self.slider_moved)
-        QObject.connect(self.prevButton, SIGNAL("clicked()"), self.prevBtnClicked)
-        QObject.connect(self.nextButton, SIGNAL("clicked()"), self.nextBtnClicked)
-        QObject.connect(self.custEnergyButton, SIGNAL("clicked()"), self.custEnBtnClicked)
-        QObject.connect(self.custEnergyText, SIGNAL("returnPressed()"), self.setCustEnergy)
-    
+        self.slider.sliderMoved.connect(self.slider_moved)
+        self.prevButton.clicked.connect(self.prevBtnClicked)
+        self.nextButton.clicked.connect(self.nextBtnClicked)
+        self.custEnergyButton.clicked.connect(self.custEnBtnClicked)
+        self.custEnergyText.returnPressed.connect(self.setCustEnergy)
+
         ### Create event connector for enabling fast changes to smoothing parameters
-        QObject.connect(self.parametersettingwid.smoothPoints, SIGNAL("editingFinished()"), self.liveSmoothParameters)
-        QObject.connect(self.parametersettingwid.smoothSpline, SIGNAL("editingFinished()"), self.liveSmoothParameters)
+        self.parametersettingwid.smoothPoints.editingFinished.connect(self.liveSmoothParameters)
+        self.parametersettingwid.smoothSpline.editingFinished.connect(self.liveSmoothParameters)
 
     def slider_moved(self, sliderNewPos):
         """
         This function tracks what to do with a slider movement.
-            
+
         """
         diff = self.sliderCurrentPos - sliderNewPos
         if diff > 0:
@@ -905,9 +914,9 @@ class MainWindow(QMainWindow):
         self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
         self.next_()
         self.worker.process(self.loader.goto(self.current_energy))
-    
+
     def custEnBtnClicked(self):
-        ''' Action when custom energy button is clicked'''
+        """ Action when custom energy button is clicked"""
         if self.custEnergyButton.isChecked():
             self.custEnergyText.show()
             self.custEnergyText.setText("%s" % self.current_energy)
@@ -916,13 +925,13 @@ class MainWindow(QMainWindow):
             self.custEnergyText.hide()
 
     def setCustEnergy(self):
-        ''' Take energy from custom energy text and move the corresponding frame'''
+        """ Take energy from custom energy text and move the corresponding frame"""
         self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
         self.goto(float(self.custEnergyText.text()))
         self.worker.process(self.loader.goto(self.current_energy))
-    
+
     def liveSmoothParameters(self):
-        ''' Real time setting smoothing parameters from Parameter Settings panel into actual smoothed curve '''
+        """ Real time setting smoothing parameters from Parameter Settings panel into actual smoothed curve """
         config.GraphicsScene_smoothPoints = self.parametersettingwid.smoothPoints.value()
         config.GraphicsScene_smoothSpline = self.parametersettingwid.smoothSpline.value()
         if self.plotwid.smoothCheck.isChecked():
@@ -932,14 +941,14 @@ class MainWindow(QMainWindow):
         """
         Convenience function that adds the actions to the target.
         If an action is None a separator will be added.
-        
+
         """
         for action in actions:
             if action is None:
                 target.addSeparator()
             else:
                 target.addAction(action)
-    
+
     def createAction(self, text, slot=None, shortcut=None, icon=None,
                      tip=None, checkable=False, signal="triggered()"):
         """ Convenience function that creates an action with the specified attributes. """
@@ -952,7 +961,7 @@ class MainWindow(QMainWindow):
             action.setToolTip(tip)
             action.setStatusTip(tip)
         if slot is not None:
-            self.connect(action, SIGNAL(signal), slot)
+            action.triggered.connect(slot)
         if checkable:
             action.setCheckable(True)
         return action
@@ -985,13 +994,12 @@ class MainWindow(QMainWindow):
     def goto(self, energy):
         if energy >= 0:
             try:
-                stepsGoto = self.loader.energySteps(energy)
                 image = self.loader.goto(energy)
-            except StopIteration:
+            except:
                 self.statusBar().showMessage("Outside of energy range", 5000)
             else:
                 self.setImage(image)
-                self.sliderCurrentPos += stepsGoto
+                self.sliderCurrentPos = self.loader.index
                 self.slider.setValue(self.sliderCurrentPos)
         else:
             self.statusBar().showMessage("Energy must be positive", 5000)
@@ -1005,48 +1013,49 @@ class MainWindow(QMainWindow):
         self.sliderCurrentPos = 1
         self.slider.setValue(1)
         self.fileSaveSpotsAction.setEnabled(False)
-    
+
     def setImage(self, image):
         npimage, energy = image
         qimage = npimage2qimage(npimage)
         self.view.setSceneRect(QRectF(qimage.rect()))
-        if config.GraphicsScene_intensTimeOn == False:
-            labeltext = "Energy: %s eV" % energy
-        else:
+        if config.GraphicsScene_intensTimeOn:
             labeltext = "Frame: %s" % energy
+        else:
+            labeltext = "Energy: %s eV" % energy
         self.scene.setBackground(qimage, labeltext)
         self.current_energy = energy
 
     def saveIntensity(self):
-        filename = str(QFileDialog.getSaveFileName(self, "Save intensities to a file"))
+        filename = 'intensities.csv'
+        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
+                                                    "Save intensities to a file",
+                                                    filename))
         if filename:
-            self.worker.save(filename)
+            self.worker.saveIntensity(filename)
 
     def fileOpen(self):
         """ Prompts the user to select input image files."""
         self.scene.removeAll()
-        dialog = FileDialog(parent = self,
-                caption = "Choose image files", filter= ";;".join(IMAGE_FORMATS))
-        if dialog.exec_():
-            files = dialog.selectedFiles();
-            filetype = IMAGE_FORMATS[str(dialog.selectedNameFilter())]
-            files = [str(file_) for file_ in files]
-            # Set Slider boundaries.
-            self.slider.setRange(1, len(files)+1)
-            try:
-                self.loader = filetype.loader(files, config.IO_energyRegex)
-                self.setImage(self.loader.next())
-                self.enableProcessActions(True)
-                self.prevButton.setEnabled(True)
-                self.nextButton.setEnabled(True)
-                self.slider.setEnabled(True)
-                self.custEnergyButton.setEnabled(True)
-                self.fileSaveScreenAction.setEnabled(True)
-                self.fileLoadSpotsAction.setEnabled(True)
-                self.fileLoadCenterAction.setEnabled(True)
-                selfsliderCurrentPos = self.slider.setValue(1)
-            except IOError as err:
-                self.statusBar().showMessage('IOError: ' + str(err), 5000)
+        files = qt_filedialog_convert(QFileDialog.getOpenFileNames(self,
+                                             "Open LEED images",
+                                             filter="Image files (%s)" % (" ".join(AllImageLoader.supported_extensions()))))
+        self.slider.setRange(1, len(files)+1)
+        try:
+            self.loader = AllImageLoader(files, config.IO_energyRegex)
+            self.setImage(self.loader.next())
+        except IOError as err:
+            self.statusBar().showMessage('IOError: ' + str(err), 5000)
+        else:
+            self.enableProcessActions(True)
+            self.prevButton.setEnabled(True)
+            self.nextButton.setEnabled(True)
+            self.slider.setEnabled(True)
+            self.custEnergyButton.setEnabled(True)
+            self.fileSaveScreenAction.setEnabled(True)
+            self.fileLoadSpotsAction.setEnabled(True)
+            self.fileLoadCenterAction.setEnabled(True)
+            self.sliderCurrentPos = 1
+            self.slider.setValue(self.sliderCurrentPos)
 
     def removeLastSpot(self):
         for item in self.scene.items():
@@ -1063,7 +1072,7 @@ class MainWindow(QMainWindow):
     def stopProcessing(self):
         self.stopped = True
 
-    def plot(self): 
+    def plot(self):
         if hasattr(self,'worker'):
             self.plotwid.setupPlot(self.worker)
             # can save the plot now
@@ -1075,7 +1084,6 @@ class MainWindow(QMainWindow):
         if len(self.scene.spots) == 0:
             self.statusBar().showMessage("No integration window selected.", 5000)
         else:
-            import time
             time_before = time.time()
             self.initial_energy = self.current_energy
             self.stopped = False
@@ -1087,7 +1095,7 @@ class MainWindow(QMainWindow):
             self.fileSaveAction.setEnabled(True)
             self.fileSaveSpotsAction.setEnabled(True)
             self.plotwid.clearPlotButton.setEnabled(False)
-            if config.GraphicsScene_livePlottingOn == True:
+            if config.GraphicsScene_livePlottingOn:
                 self.plot()
             self.worker.process(self.loader.goto(self.current_energy))
             for image in self.loader:
@@ -1097,7 +1105,7 @@ class MainWindow(QMainWindow):
                 self.setImage(image)
                 self.worker.process(image)
                 QApplication.processEvents()
-                if config.GraphicsScene_livePlottingOn == True:
+                if config.GraphicsScene_livePlottingOn:
                     self.plotwid.updatePlot()
                 self.sliderCurrentPos += 1
                 self.slider.setValue(self.sliderCurrentPos)
@@ -1119,10 +1127,13 @@ class MainWindow(QMainWindow):
     def saveScreenShot(self):
         """ Save Screenshot """
         # savefile prompt
-        filename = str(QFileDialog.getSaveFileName(self, "Save the image to a file"))
+        filename = "screenshot" + str(self.loader.energies[self.loader.index]) + "eV.png"
+        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
+                                                    "Save the image to a file", filename,
+                                                    filter="Image files (*.png *.bmp, *.jpg)"))
         if filename:
-            pixMap = QPixmap().grabWidget(self.view)
-            pixMap.save(filename + "_" + str(self.loader.energies[self.loader.index]) + "eV.png")
+            pixMap = QWidget.grab(self.view) if get_qt_binding_name() == 'pyqt5' else QPixmap().grabWidget(self.view)
+            pixMap.save(filename)
 
     def fileQuit(self):
         """Special quit-function as the normal window closing might leave something on the background """
@@ -1131,15 +1142,17 @@ class MainWindow(QMainWindow):
         self.plotwid.canvas.close()
 
     def saveSpots(self):
-        """Saves the spot locations to a file, uses workers saveloc-function"""
-        filename = str(QFileDialog.getSaveFileName(self, "Save the spot locations to a file"))
+        """Saves the spot locations to a file, uses workers saveLoc-function"""
+        filename = "loc_" + str(self.initial_energy) + "eV.csv"
+        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
+                                                    "Save the spot locations to a file", filename))
         if filename:
-            self.worker.saveloc(filename + "_" + str(self.initial_energy) + "eV_pos.txt")
+            self.worker.saveLoc(filename)
 
     def loadSpots(self):
         """Load saved spot positions"""
         # This can probably be done in a better way
-        filename = QFileDialog.getOpenFileName(self, 'Open spot location file')
+        filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         if filename:
             # pickle doesn't recognise the file opened by PyQt's openfile dialog as a file so 'normal' file processing
             pkl_file = open(filename, 'rb')
@@ -1150,31 +1163,32 @@ class MainWindow(QMainWindow):
             energy, locationx, locationy, radius = zip(*location)
             # NEED TO FIGURE OUT HOW TO GET ALL THE SPOTS TO RESPECTIVE ENERGIES, now only loads the first energy's spots
             # improving might involve modifying the algorithm for calculating intensity
+            self.scene.removeAll()
             for i in range(len(energy)):
                 #for j in range(len(energy[i])):
                 # only taking the first energy location, [0] -> [j] for all, but now puts every spot to the first energy
                 point = QPointF(locationx[i][0], locationy[i][0])
                 item = QGraphicsSpotItem(point, radius[i][0])
                 # adding the item to the gui
-                self.scene.clearSelection()
-                self.scene.addItem(item)
-                item.setSelected(True)
-                self.scene.setFocusItem(item)
-                self.scene.spots.append(item)
+                self.scene.addSpot(item)
 
     def saveCenter(self):
         """Saves the center locations to a file"""
-        filename = str(QFileDialog.getSaveFileName(self, "Save the center location to a file"))
+        filename = 'loc_center.pkl'
+        filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
+                                                    "Save the center location to a file",
+                                                    filename))
         if filename:
-            zipped = zip([self.scene.center.x()], [self.scene.center.y()])
-            output = open(filename + "_center.txt", 'wb')
+            zipped = list(zip([self.scene.center.x()], [self.scene.center.y()]))
+            output = open(filename, 'wb')
             pickle.dump(zipped, output)
             output.close()
 
     def loadCenter(self):
         """Load saved center position from file"""
         # This can probably be done in a better way
-        filename = QFileDialog.getOpenFileName(self, 'Open center location file')
+        filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self,
+                                                    "Open center location file"))
         if filename:
             if hasattr (self.scene, "center"):
                 self.scene.removeCenter()
@@ -1184,8 +1198,6 @@ class MainWindow(QMainWindow):
             location = pickle.load(pkl_file)
             pkl_file.close()
             # unzipping the "location"
-            cLocx = 0
-            cLocy = 0
             cLocx, cLocy = zip(*location)
             point = QPointF(cLocx[0], cLocy[0])
             item = QGraphicsCenterItem(point, config.QGraphicsCenterItem_size)
@@ -1198,105 +1210,87 @@ class MainWindow(QMainWindow):
             self.fileSaveCenterAction.setEnabled(True)
 
 class Worker(QObject):
-    """ Worker that manages the spots."""
+    """ Worker that manages the spots.
+
+        spots_map:
+        - key: spot
+        - value: SpotModel, Tracker
+    """
 
     def __init__(self, spots, center, energy, parent=None):
         super(Worker, self).__init__(parent)
-        #### setup widgets ####
-        self.plotwid = PlotWidget()
-        
-        # spots_map:
-        # - key: spot
-        # - value: SpotModel, Tracker
+
         self.spots_map = {}
         for spot in spots:
             pos = spot.scenePos()
             if center:
                 tracker = Tracker(pos.x(), pos.y(), spot.radius(), energy, center.x(), center.y(),
-                            input_precision = config.Tracking_inputPrecision,
-                            window_scaling = config.Tracking_windowScalingOn)
+                            input_precision=config.Tracking_inputPrecision,
+                            window_scaling=config.Tracking_windowScalingOn)
             else:
                 tracker = Tracker(pos.x(), pos.y(), spot.radius(), energy,
-                            input_precision = config.Tracking_inputPrecision,
-                            window_scaling = config.Tracking_windowScalingOn)
+                            input_precision=config.Tracking_inputPrecision,
+                            window_scaling=config.Tracking_windowScalingOn)
             self.spots_map[spot] = (QSpotModel(self), tracker)
 
-        for view, tup in self.spots_map.iteritems():
+        for view, tup in six.iteritems(self.spots_map):
             # view = QGraphicsSpotItem, tup = (QSpotModel, tracker) -> tup[0] = QSpotModel
-            self.connect(tup[0], SIGNAL("positionChanged"), view.onPositionChange)
-            self.connect(tup[0], SIGNAL("radiusChanged"), view.onRadiusChange)
+            tup[0].positionChanged.connect(view.onPositionChange)
+            tup[0].radiusChanged.connect(view.onRadiusChange)
 
     def process(self, image):
-        if config.GraphicsScene_intensTimeOn == False:
-            print("Current image energy: " + str(self.parent().current_energy) + "eV")
-        else:
+        if config.GraphicsScene_intensTimeOn:
             print("Current frame: " + str(self.parent().current_energy))
-        for model, tracker in self.spots_map.itervalues():
+        else:
+            print("Current image energy: " + str(self.parent().current_energy) + "eV")
+        for model, tracker in six.itervalues(self.spots_map):
             tracker_result = tracker.feed_image(image)
             # feed_image returns x, y, intensity, energy and radius
             model.update(*tracker_result)
 
     def numProcessed(self):
         """ Return the number of processed images. """
-        return len(self.spots_map.itervalues().next()[0].m.energy)
+        return len(next(six.itervalues(self.spots_map))[0].m.energy)
 
-    def save(self, filename):
-        intensities = [model.m.intensity for model, tracker \
-                                in self.spots_map.itervalues()]
-        energy = [model.m.energy for model, tracker in self.spots_map.itervalues()]
-        zipped = zip(energy[0], *intensities)
-        
-        if config.Processing_backgroundSubstractionOn == True:
-            np.savetxt(filename + "_bs.int.txt", zipped)
-        else:
-            np.savetxt(filename + "_no-bs.int.txt", zipped)
-        
-        x = [model.m.x for model, tracker \
-                in self.spots_map.itervalues()]
-        y = [model.m.y for model, tracker \
-                in self.spots_map.itervalues()]
+    def saveIntensity(self, filename):
+        """save intensities"""
+        spots = self.parent().scene.spots
+        intensities = [self.spots_map[spot][0].m.intensity for spot in spots]
+        energy = self.spots_map[spots[0]][0].m.energy
+        zipped = np.asarray(list(zip(energy, *intensities)))
+        bs = config.Processing_backgroundSubstractionOn
+        np.savetxt(filename, zipped,
+                   header='energy, intensity 1, intensity 2, ..., [background substraction = %s]' % bs)
 
-        x.extend(y)
-        zipped = zip(energy[0], *x)
-        if config.Processing_backgroundSubstractionOn == True:
-            np.savetxt(filename + "_bs.spot-coord.txt", zipped)
-        else:
-            np.savetxt(filename + "_no-bs.spot-coord.txt", zipped)
-        
         # Save Average intensity (if checkbox selected)
-        if self.parent().plotwid.averageCheck.isChecked() == True:
+        if self.parent().plotwid.averageCheck.isChecked():
             intensity = np.zeros(self.numProcessed())
-            for model, tracker in self.spots_map.itervalues():
+            for model, tracker in six.itervalues(self.spots_map):
                 intensity += model.m.intensity
             intensity = [i/len(self.spots_map) for i in intensity]
-            zipped = zip(energy[0], intensity)
-            if config.Processing_backgroundSubstractionOn == True:
-                np.savetxt(filename + "_bs.average.txt", zipped)
-            else:
-                np.savetxt(filename + "_no-bs.average.txt", zipped)
+            zipped = list(zip(energy, intensity))
+            np.savetxt(filename+'_avg', zipped,
+                   header='energy, avg. intensity [background substraction = %s]' % bs)
 
-            if self.parent().plotwid.smoothCheck.isChecked():
-                ynew = np.zeros(self.numProcessed())
-                tck = np.zeros(self.numProcessed())
-                tck = interpolate.splrep(model.m.energy, intensity, s=config.GraphicsScene_smoothSpline)
-                xnew = np.arange(model.m.energy[0], model.m.energy[-1],
-                                 (model.m.energy[1]-model.m.energy[0])*config.GraphicsScene_smoothPoints)
-                ynew = interpolate.splev(xnew, tck, der=0)
-                zipped = zip(xnew, ynew)
-                if config.Processing_backgroundSubstractionOn == True:
-                    np.savetxt(filename + "_bs.sm-average.txt", zipped)
-                else:
-                    np.savetxt(filename + "_no-bs.sm-average.txt", zipped)
-    
-    def saveloc(self, filename):
-        # model = QSpotModel object tracker = tracker
-        # dict function .itervalues() = return an iterator over the mapping's values
-        energy = [model.m.energy for model, tracker in self.spots_map.itervalues()]
-        locationx = [model.m.x for model, tracker in self.spots_map.itervalues()]
-        locationy = [model.m.y for model, tracker in self.spots_map.itervalues()]
-        radius = [model.m.radius for model, tracker in self.spots_map.itervalues()]
+#        # save positions
+#        x = [model.m.x for model, tracker \
+#                in six.itervalues(self.spots_map)]
+#        y = [model.m.y for model, tracker \
+#                in six.itervalues(self.spots_map)]
+#        x.extend(y)
+#        zipped = np.asarray(list(zip(energy[0], *x))
+#        np.savetxt(filename, zipped,
+#                   header='energy, x, y')
+
+    def saveLoc(self, filename):
+        """save spot locations"""
+        spots = self.parent().scene.spots
+        energy = [self.spots_map[spot][0].m.energy for spot in spots]
+        locationx = [self.spots_map[spot][0].m.x for spot in spots]
+        locationy = [self.spots_map[spot][0].m.y for spot in spots]
+        radius = [self.spots_map[spot][0].m.radius for spot in spots]
         locations = [locationx, locationy, radius]
-        zipped = zip(energy, *locations)
+        zipped = list(zip(energy, *locations))
         output = open(filename, 'wb')
         pickle.dump(zipped, output)
         output.close()
