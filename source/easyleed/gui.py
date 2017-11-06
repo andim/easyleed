@@ -503,6 +503,13 @@ class ParameterSettingWidget(QWidget):
         self.validationRegionSize.setValue(config.Tracking_gamma)
         self.vrsLabel = QLabel("Size of the validation region", self)
         self.validationRegionSize.editingFinished.connect(self.collectParameters)
+        
+        self.fitRegionFactor = QDoubleSpinBox(self)
+        self.fitRegionFactor.setWrapping(True)
+        self.fitRegionFactor.setSingleStep(0.01)
+        self.fitRegionFactor.setValue(config.Tracking_fitRegionFactor)
+        self.frfLabel = QLabel("Searching area for peaks", self)
+        self.fitRegionFactor.editingFinished.connect(self.collectParameters)
 
         self.determinationCoefficient = QDoubleSpinBox(self)
         self.determinationCoefficient.setWrapping(True)
@@ -598,16 +605,17 @@ class ParameterSettingWidget(QWidget):
         self.lh4Layout.addWidget(self.vrsLabel)
         self.lh4Layout.addWidget(self.validationRegionSize)
         self.lh5Layout = QHBoxLayout()
-        self.lh5Layout.addWidget(self.dcLabel)
-        self.lh5Layout.addWidget(self.determinationCoefficient)
+        self.lh5Layout.addWidget(self.frfLabel)
+        self.lh5Layout.addWidget(self.fitRegionFactor)
         self.lh6Layout = QHBoxLayout()
-        self.lh6Layout.addWidget(self.smPoiLabel)
-        self.lh6Layout.addWidget(self.smoothPoints)
+        self.lh6Layout.addWidget(self.dcLabel)
+        self.lh6Layout.addWidget(self.determinationCoefficient)
         self.lh7Layout = QHBoxLayout()
-        self.lh7Layout.addWidget(self.smSplLabel)
-        self.lh7Layout.addWidget(self.smoothSpline)
+        self.lh7Layout.addWidget(self.smPoiLabel)
+        self.lh7Layout.addWidget(self.smoothPoints)
         self.lh8Layout = QHBoxLayout()
-        self.lh8Layout.addWidget(self.horLine)
+        self.lh8Layout.addWidget(self.smSplLabel)
+        self.lh8Layout.addWidget(self.smoothSpline)
 
         #2nd (right) vertical layout
         self.rh1Layout = QHBoxLayout()
@@ -681,6 +689,7 @@ class ParameterSettingWidget(QWidget):
         config.Tracking_processNoiseVelocity = self.processNoiseVelocity.value()
         config.Tracking_gamma = self.validationRegionSize.value()
         config.Tracking_minRsq = self.determinationCoefficient.value()
+        config.Tracking_fitRegionFactor = self.fitRegionFactor.value()
 
     def applyParameters(self):
         """Parameter setting control"""
@@ -705,6 +714,7 @@ class ParameterSettingWidget(QWidget):
         config.conf['Tracking']['Tracking_processNoiseVelocity'] = str(config.Tracking_processNoiseVelocity)
         config.conf['Tracking']['Tracking_gamma'] = str(config.Tracking_gamma)
         config.conf['Tracking']['Tracking_minRsq'] = str(config.Tracking_minRsq)
+        config.conf['Tracking']['Tracking_fitRegionFactor'] = str(config.Tracking_fitRegionFactor)
     
         config.conf['Processing']['Processing_backgroundSubstractionOn'] = str(config.Processing_backgroundSubstractionOn)
         
@@ -720,6 +730,7 @@ class ParameterSettingWidget(QWidget):
         self.integrationWindowRadiusNew.setValue(config.GraphicsScene_defaultRadius)
         self.integrationWindowRadius.setValue(config.Tracking_minWindowSize)
         self.validationRegionSize.setValue(config.Tracking_gamma)
+        self.fitRegionFactor.setValue(config.Tracking_fitRegionFactor)
         self.determinationCoefficient.setValue(config.Tracking_minRsq)
         self.smoothPoints.setValue(config.GraphicsScene_smoothPoints)
         self.smoothSpline.setValue(config.GraphicsScene_smoothSpline)
