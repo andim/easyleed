@@ -482,71 +482,86 @@ class ParameterSettingWidget(QWidget):
         self.inputPrecision.setWrapping(True)
         self.inputPrecision.setValue(config.Tracking_inputPrecision)
         self.ipLabel = QLabel("User input precision", self)
+        self.inputPrecision.editingFinished.connect(self.collectParameters)
 
         self.integrationWindowRadiusNew = QSpinBox(self)
         self.integrationWindowRadiusNew.setWrapping(True)
         self.integrationWindowRadiusNew.setValue(config.GraphicsScene_defaultRadius)
         self.iwrnLabel = QLabel("Default radius of a new spot", self)
+        self.integrationWindowRadiusNew.editingFinished.connect(self.collectParameters)
 
         self.integrationWindowRadius = QSpinBox(self)
         self.integrationWindowRadius.setWrapping(True)
         self.integrationWindowRadius.setValue(config.Tracking_minWindowSize)
         self.iwrLabel = QLabel("Minimal radius of the integration window", self)
+        self.integrationWindowRadius.editingFinished.connect(self.collectParameters)
 
         self.validationRegionSize = QSpinBox(self)
         self.validationRegionSize.setWrapping(True)
         self.validationRegionSize.setValue(config.Tracking_gamma)
         self.vrsLabel = QLabel("Size of the validation region", self)
+        self.validationRegionSize.editingFinished.connect(self.collectParameters)
 
         self.determinationCoefficient = QDoubleSpinBox(self)
         self.determinationCoefficient.setWrapping(True)
         self.determinationCoefficient.setSingleStep(0.01)
         self.determinationCoefficient.setValue(config.Tracking_minRsq)
         self.dcLabel = QLabel("Minimal R" + chr(0x00B2) + " to accept fit", self)
+        self.determinationCoefficient.editingFinished.connect(self.collectParameters)
 
         self.integrationWindowScale = QCheckBox("Scale integration window with changing energy")
         self.integrationWindowScale.setChecked(config.Tracking_windowScalingOn)
+        self.integrationWindowScale.stateChanged.connect(self.collectParameters)
 
         self.backgroundSubstraction = QCheckBox("Background substraction")
         self.backgroundSubstraction.setChecked(config.Processing_backgroundSubstractionOn)
+        self.backgroundSubstraction.stateChanged.connect(self.collectParameters)
 
         self.livePlotting = QCheckBox("Plot I(E) intensities during acquisition")
         self.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
+        self.livePlotting.stateChanged.connect(self.collectParameters)
 
         self.intensTime = QCheckBox("Extract I(frame) - fixed energy")
         self.intensTime.setChecked(config.GraphicsScene_intensTimeOn)
+        self.intensTime.stateChanged.connect(self.collectParameters)
 
         self.smoothPoints = QSpinBox(self)
         self.smoothPoints.setWrapping(True)
         self.smoothPoints.setToolTip("Press Enter to update plot")
         self.smoothPoints.setValue(config.GraphicsScene_smoothPoints)
         self.smPoiLabel = QLabel("# points to be rescaled for smoothing", self)
+        self.smoothPoints.editingFinished.connect(self.collectParameters)
 
         self.smoothSpline = QSpinBox(self)
         self.smoothSpline.setWrapping(True)
         self.smoothSpline.setToolTip("Press Enter to update plot")
         self.smoothSpline.setValue(config.GraphicsScene_smoothSpline)
         self.smSplLabel = QLabel("Amount of smoothing to perform", self)
+        self.smoothSpline.editingFinished.connect(self.collectParameters)
 
         self.spotIdentification = QComboBox(self)
         self.spotIdentification.addItem("guess_from_Gaussian")
         self.siLabel = QLabel("Spot ident. algorithm", self)
+        self.spotIdentification.currentIndexChanged.connect(self.collectParameters)
 
         self.fnLabel = QLabel("Kalman tracker process noise Q", self)
         self.processNoisePosition = QDoubleSpinBox(self)
         self.processNoisePosition.setSingleStep(0.1)
         self.processNoisePosition.setValue(config.Tracking_processNoisePosition)
         self.processNoisePositionLabel = QLabel("Position", self)
+        self.processNoisePosition.editingFinished.connect(self.collectParameters)
+        
         self.processNoiseVelocity = QDoubleSpinBox(self)
         self.processNoiseVelocity.setSingleStep(0.1)
         self.processNoiseVelocity.setValue(config.Tracking_processNoiseVelocity)
         self.processNoiseVelocityLabel = QLabel("Velocity", self)
+        self.processNoiseVelocity.editingFinished.connect(self.collectParameters)
 
         self.saveButton = QPushButton('&Save', self)
         self.loadButton = QPushButton('&Load', self)
-        self.defaultButton = QPushButton('&Default', self)
+        self.defaultButton = QPushButton('&Restore Default', self)
         self.wrongLabel = QLabel(" ", self)
-        self.applyButton = QPushButton('&Apply', self)
+        self.applyButton = QPushButton('&Save as Default', self)
 
         self.vertLine = QFrame()
         self.vertLine.setFrameStyle(QFrame.VLine)
@@ -654,13 +669,10 @@ class ParameterSettingWidget(QWidget):
     def collectParameters(self):
         """Parameter setting control"""
         config.GraphicsScene_defaultRadius = self.integrationWindowRadiusNew.value()
-        config.GraphicsScene_livePlottingOn = self.livePlotting.isChecked()
-        config.GraphicsScene_intensTimeOn = self.intensTime.isChecked()
         config.GraphicsScene_smoothPoints = self.smoothPoints.value()
         config.GraphicsScene_smoothSpline = self.smoothSpline.value()
         
         config.Tracking_inputPrecision = self.inputPrecision.value()
-        config.Tracking_windowScalingOn = self.integrationWindowScale.isChecked()
         config.Tracking_minWindowSize = self.integrationWindowRadius.value()
         config.Tracking_guessFunc = self.spotIdentification.currentText()
         config.Tracking_processNoisePosition = self.processNoisePosition.value()
@@ -668,6 +680,13 @@ class ParameterSettingWidget(QWidget):
         config.Tracking_gamma = self.validationRegionSize.value()
         config.Tracking_minRsq = self.determinationCoefficient.value()
 
+    def applyParameters(self):
+        """Parameter setting control"""
+        self.collectParameters()
+        
+        config.GraphicsScene_livePlottingOn = self.livePlotting.isChecked()
+        config.GraphicsScene_intensTimeOn = self.intensTime.isChecked()
+        config.Tracking_windowScalingOn = self.integrationWindowScale.isChecked()
         config.Processing_backgroundSubstractionOn = self.backgroundSubstraction.isChecked()
 
         config.conf['GUI']['GraphicsScene_defaultRadius'] = str(config.GraphicsScene_defaultRadius)
@@ -686,11 +705,9 @@ class ParameterSettingWidget(QWidget):
         config.conf['Tracking']['Tracking_minRsq'] = str(config.Tracking_minRsq)
     
         config.conf['Processing']['Processing_backgroundSubstractionOn'] = str(config.Processing_backgroundSubstractionOn)
-
-    def applyParameters(self):
-        """Parameter setting control"""
-        self.collectParameters()
+        
         config.saveConfig(config.configFile)
+        logger.info("Current acquisition parameters set as default")
 
     def defaultValues(self):
         # Set default acquisition parameters from configuration ini
@@ -704,12 +721,12 @@ class ParameterSettingWidget(QWidget):
         self.determinationCoefficient.setValue(config.Tracking_minRsq)
         self.smoothPoints.setValue(config.GraphicsScene_smoothPoints)
         self.smoothSpline.setValue(config.GraphicsScene_smoothSpline)
+        self.processNoisePosition.setValue(config.Tracking_processNoisePosition)
+        self.processNoiseVelocity.setValue(config.Tracking_processNoiseVelocity)
         self.intensTime.setChecked(config.GraphicsScene_intensTimeOn)
         self.integrationWindowScale.setChecked(config.Tracking_windowScalingOn)
         self.backgroundSubstraction.setChecked(config.Processing_backgroundSubstractionOn)
         self.livePlotting.setChecked(config.GraphicsScene_livePlottingOn)
-        self.processNoisePosition.setValue(config.Tracking_processNoisePosition)
-        self.processNoiseVelocity.setValue(config.Tracking_processNoiseVelocity)
         logger.info("Default acquisition parameters restored")
 
     def saveValues(self):
