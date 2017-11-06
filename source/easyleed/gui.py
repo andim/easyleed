@@ -669,13 +669,10 @@ class ParameterSettingWidget(QWidget):
     def collectParameters(self):
         """Parameter setting control"""
         config.GraphicsScene_defaultRadius = self.integrationWindowRadiusNew.value()
-        config.GraphicsScene_livePlottingOn = self.livePlotting.isChecked()
-        config.GraphicsScene_intensTimeOn = self.intensTime.isChecked()
         config.GraphicsScene_smoothPoints = self.smoothPoints.value()
         config.GraphicsScene_smoothSpline = self.smoothSpline.value()
         
         config.Tracking_inputPrecision = self.inputPrecision.value()
-        config.Tracking_windowScalingOn = self.integrationWindowScale.isChecked()
         config.Tracking_minWindowSize = self.integrationWindowRadius.value()
         config.Tracking_guessFunc = self.spotIdentification.currentText()
         config.Tracking_processNoisePosition = self.processNoisePosition.value()
@@ -687,6 +684,9 @@ class ParameterSettingWidget(QWidget):
         """Parameter setting control"""
         self.collectParameters()
         
+        config.GraphicsScene_livePlottingOn = self.livePlotting.isChecked()
+        config.GraphicsScene_intensTimeOn = self.intensTime.isChecked()
+        config.Tracking_windowScalingOn = self.integrationWindowScale.isChecked()
         config.Processing_backgroundSubstractionOn = self.backgroundSubstraction.isChecked()
 
         config.conf['GUI']['GraphicsScene_defaultRadius'] = str(config.GraphicsScene_defaultRadius)
@@ -707,8 +707,7 @@ class ParameterSettingWidget(QWidget):
         config.conf['Processing']['Processing_backgroundSubstractionOn'] = str(config.Processing_backgroundSubstractionOn)
         
         config.saveConfig(config.configFile)
-        logger.info("Current aquisition parameters set as default")
-
+        logger.info("Current acquisition parameters set as default")
 
     def defaultValues(self):
         # Set default acquisition parameters from configuration ini
