@@ -1144,7 +1144,7 @@ class MainWindow(QMainWindow):
 
     def saveSpots(self):
         """Saves the spot locations to a file, uses workers saveLoc-function"""
-        filename = "loc_" + str(self.initial_energy) + "eV.csv"
+        filename = "loc_" + str(self.initial_energy) + "eV.pkl"
         filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save the spot locations to a file", filename))
         if filename:
