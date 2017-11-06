@@ -1044,8 +1044,8 @@ class MainWindow(QMainWindow):
         try:
             self.loader = AllImageLoader(files, config.IO_energyRegex)
             self.setImage(self.loader.next())
-        except IOError as err:
-            self.statusBar().showMessage('IOError: ' + str(err), 5000)
+        except StopIteration:
+            self.statusBar().showMessage('Error opening image files', 5000)
         else:
             self.enableProcessActions(True)
             self.prevButton.setEnabled(True)
