@@ -1011,7 +1011,6 @@ class MainWindow(QMainWindow):
         self.scene.removeAll()
         self.loader.restart()
         self.setImage(self.loader.next())
-        #self.plotwid.clearPlot()
         self.sliderCurrentPos = 1
         self.slider.setValue(1)
         self.fileSaveSpotsAction.setEnabled(False)
