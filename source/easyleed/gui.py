@@ -373,8 +373,9 @@ class PlotWidget(QWidget):
 
         # Define events for checkbox
         self.averageCheck.clicked.connect(self.onAverageCheck)
-        for button in [self.smoothCheck, self.legendCheck, self.clearPlotButton]:
+        for button in [self.smoothCheck, self.legendCheck]:
             button.clicked.connect(self.updatePlot)
+        self.clearPlotButton.clicked.connect(self.clearPlot)
 
     def initPlot(self):
         # Setup axis, labels, lines, ...
@@ -457,7 +458,8 @@ class PlotWidget(QWidget):
         self.canvas.draw()
 
     def clearPlot(self):
-        self.axes.clear()
+        self.fig.clf()
+        self.axes = self.fig.add_subplot(111)
         self.initPlot()
         self.canvas.draw()
 
@@ -1009,7 +1011,6 @@ class MainWindow(QMainWindow):
         self.scene.removeAll()
         self.loader.restart()
         self.setImage(self.loader.next())
-        self.plotwid.clearPlot()
         self.sliderCurrentPos = 1
         self.slider.setValue(1)
         self.fileSaveSpotsAction.setEnabled(False)
