@@ -1080,6 +1080,8 @@ class MainWindow(QMainWindow):
         try:
             self.loader = AllImageLoader(files, config.IO_energyRegex)
             self.setImage(self.loader.next())
+        except IOError as err:
+            print(err)
         except StopIteration:
             self.statusBar().showMessage('Error opening image files', 5000)
         else:
