@@ -74,7 +74,7 @@ class Tracker:
             x_th, y_th, guess_cov = guess
             # spot in validation region?  (based on residual covariance)
             if self.kalman.measurement_distance((x_th, y_th), guess_cov) > config.Tracking_gamma:
-                print(" no spot in validation gate")
+                print(" No spot in validation gate")
             else:
                 self.kalman.update([x_th, y_th], guess_cov)
         x, y = self.kalman.get_position()
@@ -103,7 +103,7 @@ def guess_from_Gaussian(image, *args, **kwargs):
     p_cov = output[1]
     infodict = output[2]
     if infodict["nfev"] >= maxfev or p_cov is None:
-        print(" fit failed")
+        print(" Fit failed")
         return None
     # residual sum of squares sum (x_i - f_i)^2
     sum_of_squares_regression = (errfunc(p_opt)**2).sum()
@@ -112,7 +112,7 @@ def guess_from_Gaussian(image, *args, **kwargs):
     # calculate R^2
     Rsq = 1 - sum_of_squares_regression / sum_of_squares_total
     if Rsq < config.Tracking_minRsq:
-        print(" Rsq to low")
+        print(" R^2 too low")
         return None
     # estimate sigma^2 from a chi^2 equivalent
     s_sq = sum_of_squares_regression/(len(image[circle].flatten())-len(params))
@@ -133,20 +133,19 @@ try:
     def guess_from_blob_dog(image, *args, **kwargs):
         A = skimage.feature.blob_dog(image)
         if not A.shape[0]:
-            print("No blob found")
+            print(" No blob found")
             return None
-        print('blobs found', A)
+        print(' Blobs found', A)
         return (A[0, 1], A[0, 0]), np.diag([2, 2])
 
     def guess_from_blob_log(image, *args, **kwargs):
         A = skimage.feature.blob_log(image, threshold=0.1)
         if not A.shape[0]:
-            print("No blob found")
+            print(" No blob found")
             return None
-        print('blobs found', A)
+        print(' Blobs found', A)
         return (A[0, 1], A[0, 0]), np.diag([2, 2])
         
-
     guesser_routines['Blob dog'] = guess_from_blob_dog
     guesser_routines['Blob log'] = guess_from_blob_log
 
@@ -154,27 +153,28 @@ except ImportError:
     pass
 
 
-def guesser(npimage, x_in, y_in, radius, func=guesser_routines[config.Tracking_guessFunc],
-            fit_region_factor=config.Tracking_fitRegionFactor):
+def guesser(npimage, x_in, y_in, radius):
     def failure(reason):
-        logger.info(" no guess, because " + reason)
+        logger.info(" No guess, because " + reason)
         print(reason)
         return None
 
     # try to get patch from image around estimated position
     try:
+        func=guesser_routines[config.Tracking_guessFunc]
+        fit_region_factor=config.Tracking_fitRegionFactor
         x_min, x_max, y_min, y_max = adjust_slice(npimage,
                                                   x_in-fit_region_factor*radius,
                                                   x_in+fit_region_factor*radius+1,
                                                   y_in-fit_region_factor*radius,
                                                   y_in+fit_region_factor*radius+1)
     except IndexError:
-        return failure(" position outside image")
+        return failure(" Position outside image")
     image = npimage[y_min:y_max, x_min:x_max]
 
     result = func(image, x_mid=x_in-x_min, y_mid=y_in-y_min, size=radius)
     if result is None:
-        return failure(" fit failed")
+        return failure(" Fit failed")
     pos, cov = result
     y_res, x_res = pos
     x_res += x_min
