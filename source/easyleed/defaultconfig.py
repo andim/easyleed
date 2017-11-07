@@ -1,8 +1,9 @@
 '''
 configuration
 ------------------
-Class for handling configuration
+Class for handling configuration settings
 '''
+
 import configparser, logging, os
 import numpy as np
 from pathlib import Path
@@ -11,13 +12,13 @@ from . import __version__
 class Configuration():
     def __init__(self):
         self.home = str(Path.home())+"/"
-        self.configFile = str(self.home+"easyleed.ini")
-        self.loggingFilename = str("easyleed.log")
+        self.configFile = self.home+"easyleed.ini"
+        self.loggingFilename = "easyleed.log"
         self.conf = configparser.ConfigParser()
         self.conf.optionxform = str
     
-    # Create configuration file
     def createConfig(self):
+        """Create configuration file"""
         try:
             self.defineIOConfig()
             self.defineGUIConfig()
@@ -29,7 +30,7 @@ class Configuration():
         except:
             print("Error in creating configuration file")
 
-    # Hadrcoded default definitions for the confoguration file
+    # Hardcoded default definitions for the configuration file
     def defineIOConfig(self):
         self.conf['IO'] = {
             'IO_energyRegex' : "[0-9]+(\.[0-9]*)?([Ee](|\+|-)[0-9]+)?(?=[^.0-9]*\.[A-Za-z0-9]+$)",
@@ -103,70 +104,68 @@ class Configuration():
         #####################
         ## GraphicsScene ##
         # default radius of a new spot
-        self.GraphicsScene_defaultRadius = eval(self.GUIConfig['GraphicsScene_defaultRadius'])
+        self.GraphicsScene_defaultRadius = self.conf.getfloat('GUI', 'GraphicsScene_defaultRadius')
         # Live IV plotting during acquisition
-        self.GraphicsScene_livePlottingOn = eval(self.GUIConfig['GraphicsScene_livePlottingOn'])
+        self.GraphicsScene_livePlottingOn = self.conf.getboolean('GUI', 'GraphicsScene_livePlottingOn')
         # Acquire I(time) at fixed energy
-        self.GraphicsScene_intensTimeOn = eval(self.GUIConfig['GraphicsScene_intensTimeOn'])
+        self.GraphicsScene_intensTimeOn = self.conf.getboolean('GUI', 'GraphicsScene_intensTimeOn')
         # Plot averages
-        self.GraphicsScene_plotAverage = eval(self.GUIConfig['GraphicsScene_plotAverage'])
+        self.GraphicsScene_plotAverage = self.conf.getboolean('GUI', 'GraphicsScene_plotAverage')
         # Plot smoothAverages
-        self.GraphicsScene_plotSmoothAverage = eval(self.GUIConfig['GraphicsScene_plotSmoothAverage'])
+        self.GraphicsScene_plotSmoothAverage = self.conf.getboolean('GUI', 'GraphicsScene_plotSmoothAverage')
         # Interval of points to be rescaled for smoothing average
-        self.GraphicsScene_smoothPoints = eval(self.GUIConfig['GraphicsScene_smoothPoints'])
+        self.GraphicsScene_smoothPoints = self.conf.getint('GUI', 'GraphicsScene_smoothPoints')
         # Amount of smoothing to perform during the spline fit.
         # The default value of s is s=m-\sqrt{2m} where m is the number of data-points being fit.
-        self.GraphicsScene_smoothSpline = eval(self.GUIConfig['GraphicsScene_smoothSpline'])
+        self.GraphicsScene_smoothSpline = self.conf.getint('GUI', 'GraphicsScene_smoothSpline')
 
         ## QGraphicsMovableItem ##
         # change in position per key press (Arrow keys)
-        self.QGraphicsMovableItem_bigMove = eval(self.GUIConfig['QGraphicsMovableItem_bigMove'])
+        self.QGraphicsMovableItem_bigMove = self.conf.getfloat('GUI', 'QGraphicsMovableItem_bigMove')
         # change in position per key press if Ctrl pressed
-        self.QGraphicsMovableItem_smallMove = eval(self.GUIConfig['QGraphicsMovableItem_smallMove'])
+        self.QGraphicsMovableItem_smallMove = self.conf.getfloat('GUI', 'QGraphicsMovableItem_smallMove')
 
         ## QGraphicsSpotItem ##
         # change in radius of the spot per key press (+/-) in pixel
-        self.QGraphicsSpotItem_spotSizeChange = eval(self.GUIConfig['QGraphicsSpotItem_spotSizeChange'])
+        self.QGraphicsSpotItem_spotSizeChange = self.conf.getfloat('GUI', 'QGraphicsSpotItem_spotSizeChange')
 
         ## QGraphicsCenterItem ##
-        self.QGraphicsCenterItem_size = eval(self.GUIConfig['QGraphicsCenterItem_size'])
+        self.QGraphicsCenterItem_size = self.conf.getfloat('GUI', 'QGraphicsCenterItem_size')
 
         ##########################
         #### Tracking related ####
         ##########################
 
         # precision of the user input (standard deviation in pixel)
-        self.Tracking_inputPrecision = eval(self.trackingConfig['Tracking_inputPrecision'])
+        self.Tracking_inputPrecision = self.conf.getfloat('Tracking', 'Tracking_inputPrecision')
         # scale the integration window with changing energy
-        self.Tracking_windowScalingOn = eval(self.trackingConfig['Tracking_windowScalingOn'])
+        self.Tracking_windowScalingOn = self.conf.getboolean('Tracking', 'Tracking_windowScalingOn')
         # minimal radius of the integration window (in pixel)
-        self.Tracking_minWindowSize = eval(self.trackingConfig['Tracking_minWindowSize'])
+        self.Tracking_minWindowSize = self.conf.getfloat('Tracking', 'Tracking_minWindowSize')
         # function for spot identification
         self.Tracking_guessFunc = self.trackingConfig['Tracking_guessFunc']
         # Kalman tracker process noise
-        self.Tracking_processNoisePosition = eval(self.trackingConfig['Tracking_processNoisePosition'])
-        self.Tracking_processNoiseVelocity = eval(self.trackingConfig['Tracking_processNoiseVelocity'])
+        self.Tracking_processNoisePosition = self.conf.getfloat('Tracking', 'Tracking_processNoisePosition')
+        self.Tracking_processNoiseVelocity = self.conf.getfloat('Tracking', 'Tracking_processNoiseVelocity')
         # size of validation region
         # Ideal assumptions D_M^2 ~ Chi^2 with two degrees of freedom
         # cdf Chi^2 with two degrees of freedom is 1 - exp(-x/2)
-        self.Tracking_gamma = eval(self.trackingConfig['Tracking_gamma'])
+        self.Tracking_gamma = self.conf.getfloat('Tracking', 'Tracking_gamma')
         # Minimal coefficient of determination R^2 for fit
-        self.Tracking_minRsq = eval(self.trackingConfig['Tracking_minRsq'])
+        self.Tracking_minRsq = self.conf.getfloat('Tracking', 'Tracking_minRsq')
         # factor by which the fitted region is bigger than the radius
-        self.Tracking_fitRegionFactor = eval(self.trackingConfig['Tracking_fitRegionFactor'])
+        self.Tracking_fitRegionFactor = self.conf.getfloat('Tracking', 'Tracking_fitRegionFactor')
 
         ############################
         #### Processing related ####
         ############################
         # substract the background from the intensity measurements
-        self.Processing_backgroundSubstractionOn = eval(self.processingConfig['Processing_backgroundSubstractionOn'])
+        self.Processing_backgroundSubstractionOn = self.conf.getboolean('Processing', 'Processing_backgroundSubstractionOn')
         
         ############################
         #### System related ####
         ############################
-        # substract the background from the intensity measurements
-        self.loggingLevel = eval(self.sysConfig['loggingLevel'])
-        self.loggingLevel = eval(self.sysConfig['loggingLevel'])
+        self.loggingLevel = self.conf.getint('System', 'loggingLevel')
 
     # Save current parameters in configuration file
     def saveConfig(self, configFile):
