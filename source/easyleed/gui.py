@@ -736,8 +736,8 @@ class ParameterSettingWidget(QWidget):
                         "Save INI config file", "","*.ini")
         self.collectParameters()
         config.saveConfig(filename[0])
-        print("Confguration parameters saved to:",filename[0])
-        logger.info("Confguration parameters saved to:"+filename[0])
+        print("Configuration parameters saved to:",filename[0])
+        logger.info("Configuration parameters saved to:"+filename[0])
 
     def loadValues(self):
         """ Load a file of set parameter values that has been saved with the widget """
@@ -746,8 +746,8 @@ class ParameterSettingWidget(QWidget):
                         "Open INI config file", "","*.ini")
         try:
             config.readConfig(filename)
-            print("Confguration parameters loaded from:",filename[0])
-            logger.info("Confguration parameters loaded from:"+filename[0])
+            print("Configuration parameters loaded from:",filename[0])
+            logger.info("Configuration parameters loaded from:"+filename[0])
         except:
             print("Invalid file")
 
