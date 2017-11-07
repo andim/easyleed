@@ -12,6 +12,7 @@ Version 2.4
 (AM):
 - added (optional) peak detection algorithms from scikit-image to be used in
 the tracking
+- optional dependencies (skimage, fits) can now be installed via pip
 
 Version 2.3.4
 -------------
