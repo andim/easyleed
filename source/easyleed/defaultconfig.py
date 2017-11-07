@@ -54,7 +54,7 @@ class Configuration():
             'Tracking_inputPrecision' : 2,
             'Tracking_windowScalingOn' : True,
             'Tracking_minWindowSize' : 0,
-            'Tracking_guessFunc' : "guess_from_Gaussian",
+            'Tracking_guessFunc' : "Gaussian fit",
             'Tracking_processNoisePosition' : 0.1,
             'Tracking_processNoiseVelocity' : 0.0,
             'Tracking_gamma' : 8,

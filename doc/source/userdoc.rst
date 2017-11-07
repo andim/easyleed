@@ -24,8 +24,8 @@ Here is a short step-by-step guide:
 - Plot the generated intensities using "Process --> Plot" or the "Plot" option in the toolbar.
 - Save the generated plot image using "File --> Save Plot"
 
-- Parameter settings can also be saved/loaded
-- The selected spot and center positions can also be saved and reloaded for further intensity acquisitions.
+- Parameter settings can also be saved/loaded using an ini-format through the "Set Parameters" dialog
+- The extraced spot and center positions can also be saved and reloaded
 
 Parameter settings
 ------------------
@@ -54,9 +54,9 @@ You can change the regular expression that is used for parsing energies from fil
 Custom configuration
 --------------------
 
-Most of the default parameters of the algorithm as well as many UI tweaks are controlled via a config file. Copy `easyleed/default-config.py` to a file named `easyleedconfig.py` on your PYTHONPATH and edit this file for customization. 
+Most of the default parameters of the algorithm as well as many UI tweaks are controlled via a config file. This config file is saved in your home folder as "easyleed.ini". You can edit this file to make persistent changes to the parameters used at startup.
 
 Qt Wrapper
 ----------
 
-There exist two different python wrappers for the `Qt` library (`PyQt4` and `PySide`). Both can be used with EasyLEED. To select which one to use set the `QT_API` environment variable to either `pyqt` or `pyside`.
+There exist different python wrappers for the `Qt` library (`PyQt5`, `PyQt4` and `PySide`). All can be used with EasyLEED. To select which one to use set the `QT_API` environment variable to either `pyqt` or `pyside`.

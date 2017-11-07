@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='EasyLEED',
     packages=['easyleed'],
-    requires=['numpy', 'matplotlib', 'scipy', 'pillow', 'pyqt4'],
+    install_requires=['numpy', 'matplotlib', 'scipy', 'pillow', 'pathlib'],
 #    scripts=['easyleed.pyw'],
     entry_points={'gui_scripts' : ['easyleed = easyleed.__main__:main']},
     version='2.3.4',
