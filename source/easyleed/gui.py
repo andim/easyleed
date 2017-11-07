@@ -1046,6 +1046,8 @@ class MainWindow(QMainWindow):
             self.setImage(self.loader.next())
         except IOError as err:
             self.statusBar().showMessage('IOError: ' + str(err), 5000)
+        except StopIteration:
+            self.statusBar().showMessage('No image file selected', 5000)
         else:
             self.enableProcessActions(True)
             self.prevButton.setEnabled(True)
