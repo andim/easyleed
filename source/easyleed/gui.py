@@ -549,7 +549,10 @@ class ParameterSettingWidget(QWidget):
         self.smoothSpline.editingFinished.connect(self.collectParameters)
 
         self.spotIdentification = QComboBox(self)
-        self.spotIdentification.addItem("guess_from_Gaussian")
+        guesser_routines_l = list(guesser_routines)
+        for guesser in guesser_routines_l:
+            self.spotIdentification.addItem(guesser)
+        self.spotIdentification.setCurrentIndex(guesser_routines_l.index(config.Tracking_guessFunc))
         self.siLabel = QLabel("Spot ident. algorithm", self)
         self.spotIdentification.currentIndexChanged.connect(self.collectParameters)
 

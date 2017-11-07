@@ -81,7 +81,6 @@ class Tracker:
         intensity = calc_intensity(npimage, x, y, self.radius, background_substraction=config.Processing_backgroundSubstractionOn)
         return x, y, intensity, energy, self.radius
 
-
 def guess_from_Gaussian(image, *args, **kwargs):
     """ Guess position of spot from a Gaussian fit. """
     # construct circle where data is fit
@@ -95,35 +94,67 @@ def guess_from_Gaussian(image, *args, **kwargs):
     params.append(background)
     errfunc = lambda p: np.ravel(gaussian2d(*p)(*np.indices(image.shape))[circle] - image[circle])
     # fit Gaussian
+    maxfev = 200
     try:
-        output = optimize.leastsq(errfunc, params, full_output=True, maxfev=200)
+        output = optimize.leastsq(errfunc, params, full_output=True, maxfev=maxfev)
     except:
         return None
     p_opt = output[0]
     p_cov = output[1]
     infodict = output[2]
-    if infodict["nfev"] >= 150 or p_cov is None:
+    if infodict["nfev"] >= maxfev or p_cov is None:
         print(" fit failed")
         return None
     # residual sum of squares sum (x_i - f_i)^2
     sum_of_squares_regression = (errfunc(p_opt)**2).sum()
     # variance of the data sum (x_i - <x>)^2
-    sum_of_squares_total = ((image-np.mean(image))**2).sum()
+    sum_of_squares_total = ((image[circle]-np.mean(image[circle]))**2).sum()
     # calculate R^2
     Rsq = 1 - sum_of_squares_regression / sum_of_squares_total
     if Rsq < config.Tracking_minRsq:
         print(" Rsq to low")
         return None
     # estimate sigma^2 from a chi^2 equivalent
-    s_sq = sum_of_squares_regression/(len(image.flatten())-len(params))
+    s_sq = sum_of_squares_regression/(len(image[circle].flatten())-len(params))
     p_cov *= s_sq
     p_cov = p_cov[1:3, 1:3]
     x_res = p_opt[1]
     y_res = p_opt[2]
     return (x_res, y_res), p_cov
 
+guesser_routines = {'Gaussian fit' : guess_from_Gaussian}
 
-def guesser(npimage, x_in, y_in, radius, func=eval(config.Tracking_guessFunc),
+
+try:
+    import skimage.feature
+
+    logger.info('imported scikit image package')
+
+    def guess_from_blob_dog(image, *args, **kwargs):
+        A = skimage.feature.blob_dog(image)
+        if not A.shape[0]:
+            print("No blob found")
+            return None
+        print('blobs found', A)
+        return (A[0, 1], A[0, 0]), np.diag([2, 2])
+
+    def guess_from_blob_log(image, *args, **kwargs):
+        A = skimage.feature.blob_log(image, threshold=0.1)
+        if not A.shape[0]:
+            print("No blob found")
+            return None
+        print('blobs found', A)
+        return (A[0, 1], A[0, 0]), np.diag([2, 2])
+        
+
+    guesser_routines['Blob dog'] = guess_from_blob_dog
+    guesser_routines['Blob log'] = guess_from_blob_log
+
+except ImportError:
+    pass
+
+
+def guesser(npimage, x_in, y_in, radius, func=guesser_routines[config.Tracking_guessFunc],
             fit_region_factor=config.Tracking_fitRegionFactor):
     def failure(reason):
         logger.info(" no guess, because " + reason)
