@@ -154,8 +154,7 @@ except ImportError:
     pass
 
 
-def guesser(npimage, x_in, y_in, radius, func=guesser_routines[config.Tracking_guessFunc],
-            fit_region_factor=config.Tracking_fitRegionFactor):
+def guesser(npimage, x_in, y_in, radius):
     def failure(reason):
         logger.info(" no guess, because " + reason)
         print(reason)
@@ -163,6 +162,8 @@ def guesser(npimage, x_in, y_in, radius, func=guesser_routines[config.Tracking_g
 
     # try to get patch from image around estimated position
     try:
+        func=guesser_routines[config.Tracking_guessFunc]
+        fit_region_factor=config.Tracking_fitRegionFactor
         x_min, x_max, y_min, y_max = adjust_slice(npimage,
                                                   x_in-fit_region_factor*radius,
                                                   x_in+fit_region_factor*radius+1,
