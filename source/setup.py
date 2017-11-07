@@ -4,6 +4,7 @@ setup(
     name='EasyLEED',
     packages=['easyleed'],
     install_requires=['numpy', 'matplotlib', 'scipy', 'pillow', 'pathlib'],
+    extras_require={'skimage': ["scikit-image"], 'fits' : ["pyfits"]},
 #    scripts=['easyleed.pyw'],
     entry_points={'gui_scripts' : ['easyleed = easyleed.__main__:main']},
     version='2.3.4',

@@ -15,11 +15,13 @@ EasyLEED is written in `Python <http://www.python.org/>`_ and relies on the foll
 - Qt4 or Qt5 `<http://qt.nokia.com/>`_, along with either the respective PyQt version `<http://www.riverbankcomputing.co.uk/>`_ or PySide `<https://wiki.qt.io/Category:LanguageBindings::PySide>`_
 - Numpy >1.5 and Scipy >0.9 `<http://www.scipy.org/>`_
 - Matplotlib >0.9 `<http://matplotlib.org/>`_ 
-
-Dependent on the file format of your input LEED images, you should also install the following packages:
-
 - Pillow (for .tif, .png, .jpg) `<https://python-pillow.github.io/>`_
-- PyFITS (for .fits) `<http://www.stsci.edu/resources/software_hardware/pyfits/>`_
+
+There are also two optional dependencies:
+- PyFITS `<http://www.stsci.edu/resources/software_hardware/pyfits/>`_ for loading .fits file
+- Scikit-image `<http://scikit-image.org/>`_ for more functions for extracting spot positions.
+
+You can install these two dependencies using pip by indicating the extra dependencies in bracket `pip install easyleed[fits,skimage]`.
 
 Installing dependencies on Windows
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
