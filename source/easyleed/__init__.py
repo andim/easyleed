@@ -23,15 +23,21 @@ The EasyLEED package is divided into several subpackages:
 __version__ = "2.3.4"
 __author__ = "Andreas Mayer, Hanna Salopaasi, Nicola Ferralis"
 
-# import packages
-try:
-    import easyleedconfig as config
-except:
-    from . import defaultconfig as config
+from .defaultconfig import *
+import os.path
+
+config = Configuration()
+if os.path.isfile(config.configFile) is False:
+    print("Configuration file does not exist: Creating one.")
+    config.createConfig()
+config.readConfig(config.configFile)
 
 import logging
-logging.basicConfig(filename=config.loggingFilename, level=config.loggingLevel)
+logging.basicConfig(filename=config.loggingFilename, level=int(config.loggingLevel))
 logger = logging.getLogger()
+
+from . import defaultconfig
+from . import gui
 
 from . import kalman
 from . import io
