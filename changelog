@@ -9,6 +9,10 @@ Version 2.4
 - fixed crash if no image selected in file open widget
 - changed filetype ending for spot position export to *.pkl
 
+(AM):
+- added (optional) peak detection algorithms from scikit-image to be used in
+the tracking
+
 Version 2.3.4
 -------------
 
