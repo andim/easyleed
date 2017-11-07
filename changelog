@@ -1,6 +1,14 @@
 Changelog
 ==========
 
+Version 2.4
+-----------
+
+(NF):
+- revamp of configuration handling (now uses *.ini format)
+- fixed crash if no image selected in file open widget
+- changed filetype ending for spot position export to *.pkl
+
 Version 2.3.4
 -------------
 
