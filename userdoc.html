@@ -1,25 +1,23 @@
 
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
   "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
 
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    
-    <title>EasyLEED: LEED I(E)-spectra analysis &mdash; EasyLEED 2.3.4 documentation</title>
-    
+    <title>EasyLEED: LEED I(E)-spectra analysis &#8212; EasyLEED 2.4 documentation</title>
     <link rel="stylesheet" href="_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/print.css" type="text/css" />
-    
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.3.4',
+        VERSION:     '2.4',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true
+        HAS_SOURCE:  true,
+        SOURCELINK_SUFFIX: '.txt'
       };
     </script>
     <script type="text/javascript" src="_static/jquery.js"></script>
@@ -27,11 +25,12 @@
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="_static/theme_extras.js"></script>
     <link rel="shortcut icon" href="_static/icon.ico"/>
-    <link rel="top" title="EasyLEED 2.3.4 documentation" href="index.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="The EasyLEED API" href="api.html" />
     <link rel="prev" title="Manual Installation" href="maninstall.html" /> 
   </head>
-  <body role="document">
+  <body>
       <div class="header">
         <a href="index.html">
           <img class="logo" src="_static/logo.png" alt="Logo"/>
@@ -47,7 +46,7 @@
             <div class="body">
                 
   <div class="section" id="user-s-guide">
-<h1>User&#8217;s Guide<a class="headerlink" href="#user-s-guide" title="Permalink to this headline">¶</a></h1>
+<h1>User’s Guide<a class="headerlink" href="#user-s-guide" title="Permalink to this headline">¶</a></h1>
 <div class="admonition warning">
 <p class="first admonition-title">Warning</p>
 <p>This guide is incomplete and not always up-to-date with the newest version of the software.
@@ -56,49 +55,49 @@ If you are running into trouble using the software we are happy to provide furth
 </div>
 <p>Here is a short step-by-step guide:</p>
 <ul class="simple">
-<li>Open the images you want to work with using &#8220;File &#8211;&gt; Open...&#8221; or use &#8220;Open&#8221; in the toolbar. Only the images selected in the file dialog will be processed later on.</li>
-<li>Navigate through the images using &#8220;Process &#8211;&gt; Previous Image&#8221; and &#8220;Process &#8211;&gt; Next Image”, or buttons in the status bar, or with the slider until you have found the image at which you want to start the analysis. If you know the energy corresponding to the image of interest, you can enter it to select the corresponding image by pressing the button labeled “eV” and by entering the relative energy.</li>
+<li>Open the images you want to work with using “File –&gt; Open…” or use “Open” in the toolbar. Only the images selected in the file dialog will be processed later on.</li>
+<li>Navigate through the images using “Process –&gt; Previous Image” and “Process –&gt; Next Image”, or buttons in the status bar, or with the slider until you have found the image at which you want to start the analysis. If you know the energy corresponding to the image of interest, you can enter it to select the corresponding image by pressing the button labeled “eV” and by entering the relative energy.</li>
 <li>Select the position of the spots by a left click.</li>
 <li>The center of the pattern can be set for an optimized spot tracking with a right click.</li>
 <li>You can change the position of the selected spot with the arrow keys. The size of the integration window can be changed using + or -. (optional)</li>
-<li>Change the tracking parameters using &#8220;Process &#8211; Set Parameters&#8221; or pressing &#8220;Set Parameters&#8221; in the toolbar. (Optional)</li>
-<li>Start the tracking of the spots using &#8220;Process &#8211;&gt; Run&#8221; or pressing &#8220;Run&#8221; in the toolbar. The I(E) plot starts automatically.</li>
+<li>Change the tracking parameters using “Process – Set Parameters” or pressing “Set Parameters” in the toolbar. (Optional)</li>
+<li>Start the tracking of the spots using “Process –&gt; Run” or pressing “Run” in the toolbar. The I(E) plot starts automatically.</li>
 <li>I(E) averages can be plotted directly from the check box in the Plot window.</li>
 <li>Smoothed I(E) averages can be plotted directly from the check box in the Plot window (uses cubic spline).
 * Any change in smoothing parameters in settings is immediately applied in the plot.</li>
 <li>Tooltips in the image in correspondence to the spots show the spot number. The same number is displayed in the legend in the plot.</li>
 <li>Click the stop button in the status bar to stop processing. (optional)</li>
-<li>Save the generated intensities using &#8220;File &#8211;&gt; Save Intensities...&#8221; OR</li>
-<li>Plot the generated intensities using &#8220;Process &#8211;&gt; Plot&#8221; or the &#8220;Plot&#8221; option in the toolbar.</li>
-<li>Save the generated plot image using &#8220;File &#8211;&gt; Save Plot&#8221;</li>
-<li>Parameter settings can also be saved/loaded</li>
-<li>The selected spot and center positions can also be saved and reloaded for further intensity acquisitions.</li>
+<li>Save the generated intensities using “File –&gt; Save Intensities…” OR</li>
+<li>Plot the generated intensities using “Process –&gt; Plot” or the “Plot” option in the toolbar.</li>
+<li>Save the generated plot image using “File –&gt; Save Plot”</li>
+<li>Parameter settings can also be saved/loaded using an ini-format through the “Set Parameters” dialog</li>
+<li>The extraced spot and center positions can also be saved and reloaded</li>
 </ul>
 <div class="section" id="parameter-settings">
 <h2>Parameter settings<a class="headerlink" href="#parameter-settings" title="Permalink to this headline">¶</a></h2>
 <p>It might be useful to get a rough understanding of the underlying algorithm for intuition into how to set parameters. We recommend you read our paper for an introduction to the ideas behind EasyLEED.</p>
-<p>Broadly in the algorithm there is a trade-off between how much to rely on the fitted vs predicted positions. Fitted positions are roughly the maxima of intensity of the spots. The prediction comes from a simple dynamical model of the spots moving towards the center as beam energy is increased. How much the algorithm relies on one over the other depends on an assumed variance of both predictions. The variance of predictions increases if there is more &#8220;process noise&#8221;, i.e. the larger you set those parameters the more the algorithm is going to rely on its fitted position.</p>
-<p>The algorithm also uses the user input of initial spot positions (and if set center position). The weight put on this information is controlled by the parameter &#8220;User input precision&#8221;. Larger values of this parameter lead to less weight being put on this prior information.</p>
-<p>Sometimes spots vanish so they cannot be fit accurately. The algorithm should then purely rely on the prediction. The &#8220;Minimal R^2 to accept fit&#8221; specifies the quality of fit below which to reject the position from the fit. Similarly the fit might go awry and converge to a different spot. The parameter &#8220;Size of the validation region&#8221; sets a cutoff on how much the fitted position can differ from the predicted position, before it is discarded.</p>
+<p>Broadly in the algorithm there is a trade-off between how much to rely on the fitted vs predicted positions. Fitted positions are roughly the maxima of intensity of the spots. The prediction comes from a simple dynamical model of the spots moving towards the center as beam energy is increased. How much the algorithm relies on one over the other depends on an assumed variance of both predictions. The variance of predictions increases if there is more “process noise”, i.e. the larger you set those parameters the more the algorithm is going to rely on its fitted position.</p>
+<p>The algorithm also uses the user input of initial spot positions (and if set center position). The weight put on this information is controlled by the parameter “User input precision”. Larger values of this parameter lead to less weight being put on this prior information.</p>
+<p>Sometimes spots vanish so they cannot be fit accurately. The algorithm should then purely rely on the prediction. The “Minimal R^2 to accept fit” specifies the quality of fit below which to reject the position from the fit. Similarly the fit might go awry and converge to a different spot. The parameter “Size of the validation region” sets a cutoff on how much the fitted position can differ from the predicted position, before it is discarded.</p>
 </div>
 <div class="section" id="file-naming-policy">
 <h2>File naming policy<a class="headerlink" href="#file-naming-policy" title="Permalink to this headline">¶</a></h2>
 <p>EasyLEED tries to infer the beam energy from the filename.</p>
 <p>Examples of valid file names in the default configuration:</p>
 <ul class="simple">
-<li>file30.jpg &#8211;&gt;  at 30eV beam energy</li>
-<li>file30.5.jpg &#8211;&gt;  at 30.5eV beam energy</li>
+<li>file30.jpg –&gt;  at 30eV beam energy</li>
+<li>file30.5.jpg –&gt;  at 30.5eV beam energy</li>
 </ul>
 <p>For advanced users:
 You can change the regular expression that is used for parsing energies from filenames in the config file.</p>
 </div>
 <div class="section" id="custom-configuration">
 <h2>Custom configuration<a class="headerlink" href="#custom-configuration" title="Permalink to this headline">¶</a></h2>
-<p>Most of the default parameters of the algorithm as well as many UI tweaks are controlled via a config file. Copy <cite>easyleed/default-config.py</cite> to a file named <cite>easyleedconfig.py</cite> on your PYTHONPATH and edit this file for customization.</p>
+<p>Most of the default parameters of the algorithm as well as many UI tweaks are controlled via a config file. This config file is saved in your home folder as “easyleed.ini”. You can edit this file to make persistent changes to the parameters used at startup.</p>
 </div>
 <div class="section" id="qt-wrapper">
 <h2>Qt Wrapper<a class="headerlink" href="#qt-wrapper" title="Permalink to this headline">¶</a></h2>
-<p>There exist two different python wrappers for the <cite>Qt</cite> library (<cite>PyQt4</cite> and <cite>PySide</cite>). Both can be used with EasyLEED. To select which one to use set the <cite>QT_API</cite> environment variable to either <cite>pyqt</cite> or <cite>pyside</cite>.</p>
+<p>There exist different python wrappers for the <cite>Qt</cite> library (<cite>PyQt5</cite>, <cite>PyQt4</cite> and <cite>PySide</cite>). All can be used with EasyLEED. To select which one to use set the <cite>QT_API</cite> environment variable to either <cite>pyqt</cite> or <cite>pyside</cite>.</p>
 </div>
 </div>
 
@@ -115,9 +114,9 @@ You can change the regular expression that is used for parsing energies from fil
     src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" /></a>
 
     <div class="footer" role="contentinfo">
-        &copy; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2017-09-15.
-      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+        &#169; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
+      Last updated on 2017-11-07.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
 </html>
