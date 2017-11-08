@@ -420,7 +420,8 @@ class PlotWidget(QWidget):
         """ Basic Matplotlib plotting I(E)-curve """
         for spot, line in six.iteritems(self.lines_map):
             line.set_data(self.worker.spots_map[spot][0].m.energy, self.worker.spots_map[spot][0].m.intensity)
-        if self.averageCheck.isChecked():
+        
+        if self.averageCheck.isChecked() and len(self.axes.lines) > 1:
             intensity = np.zeros(self.worker.numProcessed())
             for model, tracker in six.itervalues(self.worker.spots_map):
                 intensity += model.m.intensity
@@ -447,8 +448,11 @@ class PlotWidget(QWidget):
                     del self.averageSmoothLine
         else:
             if hasattr(self, "averageLine"):
-                self.averageLine.remove()
-                del self.averageLine
+                try:
+                    self.averageLine.remove()
+                    del self.averageLine
+                except:
+                    pass
 
         if self.axes.legend() is not None:
             # decide whether to show legend
@@ -461,6 +465,8 @@ class PlotWidget(QWidget):
         self.canvas.draw()
 
     def clearPlot(self):
+        self.averageCheck.setChecked(False)
+        self.updatePlot()
         self.fig.clf()
         self.axes = self.fig.add_subplot(111)
         self.initPlot()
