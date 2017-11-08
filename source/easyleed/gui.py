@@ -1301,46 +1301,45 @@ class Worker(QObject):
         return len(next(six.itervalues(self.spots_map))[0].m.energy)
 
     def saveIntensity(self, filename):
+    
+        import pandas as pd
         """save intensities"""
         spots = self.parent().scene.spots
         bs = config.Processing_backgroundSubstractionOn
         
-        header = 'energy,'
-        for s in range(len(spots)):
-            header = header+'intensity '+ str(s+1) +','
-        
         intensities = [self.spots_map[spot][0].m.intensity for spot in spots]
         energy = self.spots_map[spots[0]][0].m.energy
-        zipped = np.asarray(list(zip(energy, *intensities)))
         
         # Save Average intensity (if checkbox selected)
-        if self.parent().plotwid.averageCheck.isChecked():
-            intensity = np.zeros(self.numProcessed())
-            for model, tracker in six.itervalues(self.spots_map):
-                intensity += model.m.intensity
-            intensity = np.asarray([[i/len(self.spots_map)] for i in intensity])
-            header = header + 'average ,'
-            zipped = np.hstack((zipped, intensity))
-    
-        header = header + '[background substraction = %s],' % bs
-        np.savetxt(filename, zipped, header=header, delimiter=",")
+        intensity = np.zeros(self.numProcessed())
+        for model, tracker in six.itervalues(self.spots_map):
+            intensity += model.m.intensity
+        intensity = np.asarray([i/len(self.spots_map) for i in intensity])
+
+        pdframe = pd.DataFrame({'Energy': energy})
+        for s in range(len(spots)):
+            pdframe = pd.concat([pdframe,pd.DataFrame({'Intensity #'+str(s+1) : self.spots_map[spots[s]][0].m.intensity})], axis=1)
+        pdframe = pd.concat([pdframe,pd.DataFrame({'Average' : intensity})], axis=1)
+
+        for s in range(len(spots)):
+            loc = []
+            #loc = [[self.spots_map[spots[s]][0].m.x[i],self.spots_map[spots[s]][0].m.y[i],self.spots_map[spots[s]][0].m.radius[i]] \
+            #    for i in range(len(self.spots_map[spots[0]][0].m.x))]
+            
+            locx = [self.spots_map[spots[s]][0].m.x[i] for i in range(len(self.spots_map[spots[0]][0].m.x))]
+            locy = [self.spots_map[spots[s]][0].m.y[i] for i in range(len(self.spots_map[spots[0]][0].m.x))]
+            locr = [self.spots_map[spots[s]][0].m.radius[i] for i in range(len(self.spots_map[spots[0]][0].m.x))]
+
+            pdframe = pd.concat([pdframe,pd.DataFrame({'x #'+str(s+1) : locx})], axis=1)
+            pdframe = pd.concat([pdframe,pd.DataFrame({'y #'+str(s+1) : locy})], axis=1)
+            pdframe = pd.concat([pdframe,pd.DataFrame({'r #'+str(s+1) : locr})], axis=1)
+            
+        pdframe = pd.concat([pdframe,pd.DataFrame({'Background substraction' : [bs]})], axis=1)
+
+        print(pdframe)
         
-        #locationx = [self.spots_map[spot][0].m.x for spot in spots]
-        #locationy = [self.spots_map[spot][0].m.y for spot in spots]
-        #radius = [self.spots_map[spot][0].m.radius for spot in spots]
-        #locations = [locationx, locationy, radius]
+        pdframe.to_csv(filename, sep=',', index=False)
         
-        locations = np.zeros((0,0))
-        numPoints = len(self.spots_map[spots[0]][0].m.x)
-        for i in range(numPoints):
-            print(self.spots_map[spots[0]][0].m.x)
-            print(self.spots_map[spots[0]][0].m.y)
-            print(self.spots_map[spots[0]][0].m.radius)
-            locations = [[self.spots_map[spot][0].m.x[i],self.spots_map[spot][0].m.y[i],self.spots_map[spot][0].m.radius[i]] for spot in spots]
-            #locations = np.hstack((locations, [self.spots_map[spot][0].m.x,self.spots_map[spot][0].m.y,self.spots_map[spot][0].m.radius]))
-            #[[self.spots_map[spot][0].m.x,self.spots_map[spot][0].m.y,self.spots_map[spot][0].m.radius] for spot in spots]
-        
-        print(locations)
 
 #        # save positions
 #        x = [model.m.x for model, tracker \
