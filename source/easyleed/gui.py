@@ -1299,24 +1299,37 @@ class Worker(QObject):
     def saveIntensity(self, filename):
         """save intensities"""
         spots = self.parent().scene.spots
+        bs = config.Processing_backgroundSubstractionOn
+        
+        header = 'energy,'
+        for s in range(len(spots)):
+            header = header+'intensity '+ str(s+1) +','
+        if self.parent().plotwid.averageCheck.isChecked():
+            header = header + 'average ,'
+        header = header + '[background substraction = %s],' % bs
+        
         intensities = [self.spots_map[spot][0].m.intensity for spot in spots]
         energy = self.spots_map[spots[0]][0].m.energy
         zipped = np.asarray(list(zip(energy, *intensities)))
-        bs = config.Processing_backgroundSubstractionOn
-        np.savetxt(filename, zipped,
-                   header='energy, intensity 1, intensity 2, ..., [background substraction = %s]' % bs,
-                   delimiter=",")
-
+        
         # Save Average intensity (if checkbox selected)
         if self.parent().plotwid.averageCheck.isChecked():
             intensity = np.zeros(self.numProcessed())
             for model, tracker in six.itervalues(self.spots_map):
                 intensity += model.m.intensity
-            intensity = [i/len(self.spots_map) for i in intensity]
-            zipped = list(zip(energy, intensity))
-            np.savetxt(filename+'_avg', zipped,
-                   header='energy, avg. intensity [background substraction = %s]' % bs,
-                   delimiter=",")
+            intensity = np.asarray([[i/len(self.spots_map)] for i in intensity])
+            #zipped = list(zip(energy, intensity))
+            #np.savetxt(filename+'_avg', zipped,
+            #       header='energy, avg. intensity [background substraction = %s]' % bs,
+            #       delimiter=",")
+            
+            print(zipped.shape)
+            print(intensity.shape)
+            print(zipped)
+            print(intensity)
+            zipped = np.hstack((zipped, intensity))
+                
+        np.savetxt(filename, zipped, header=header, delimiter=",")
 
 #        # save positions
 #        x = [model.m.x for model, tracker \
