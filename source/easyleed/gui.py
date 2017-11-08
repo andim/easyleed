@@ -1324,6 +1324,23 @@ class Worker(QObject):
     
         header = header + '[background substraction = %s],' % bs
         np.savetxt(filename, zipped, header=header, delimiter=",")
+        
+        #locationx = [self.spots_map[spot][0].m.x for spot in spots]
+        #locationy = [self.spots_map[spot][0].m.y for spot in spots]
+        #radius = [self.spots_map[spot][0].m.radius for spot in spots]
+        #locations = [locationx, locationy, radius]
+        
+        locations = np.zeros((0,0))
+        numPoints = len(self.spots_map[spots[0]][0].m.x)
+        for i in range(numPoints):
+            print(self.spots_map[spots[0]][0].m.x)
+            print(self.spots_map[spots[0]][0].m.y)
+            print(self.spots_map[spots[0]][0].m.radius)
+            locations = [[self.spots_map[spot][0].m.x[i],self.spots_map[spot][0].m.y[i],self.spots_map[spot][0].m.radius[i]] for spot in spots]
+            #locations = np.hstack((locations, [self.spots_map[spot][0].m.x,self.spots_map[spot][0].m.y,self.spots_map[spot][0].m.radius]))
+            #[[self.spots_map[spot][0].m.x,self.spots_map[spot][0].m.y,self.spots_map[spot][0].m.radius] for spot in spots]
+        
+        print(locations)
 
 #        # save positions
 #        x = [model.m.x for model, tracker \
