@@ -3,7 +3,7 @@ from setuptools import setup
 setup(
     name='EasyLEED',
     packages=['easyleed'],
-    install_requires=['numpy', 'matplotlib', 'scipy', 'pillow', 'pathlib'],
+    install_requires=['numpy', 'matplotlib', 'scipy', 'pillow', 'pathlib', 'pandas'],
     extras_require={'skimage': ["scikit-image"], 'fits' : ["pyfits"]},
 #    scripts=['easyleed.pyw'],
     entry_points={'gui_scripts' : ['easyleed = easyleed.__main__:main']},
