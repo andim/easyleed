@@ -1304,7 +1304,8 @@ class Worker(QObject):
         zipped = np.asarray(list(zip(energy, *intensities)))
         bs = config.Processing_backgroundSubstractionOn
         np.savetxt(filename, zipped,
-                   header='energy, intensity 1, intensity 2, ..., [background substraction = %s]' % bs)
+                   header='energy, intensity 1, intensity 2, ..., [background substraction = %s]' % bs,
+                   delimiter=",")
 
         # Save Average intensity (if checkbox selected)
         if self.parent().plotwid.averageCheck.isChecked():
@@ -1314,7 +1315,8 @@ class Worker(QObject):
             intensity = [i/len(self.spots_map) for i in intensity]
             zipped = list(zip(energy, intensity))
             np.savetxt(filename+'_avg', zipped,
-                   header='energy, avg. intensity [background substraction = %s]' % bs)
+                   header='energy, avg. intensity [background substraction = %s]' % bs,
+                   delimiter=",")
 
 #        # save positions
 #        x = [model.m.x for model, tracker \
