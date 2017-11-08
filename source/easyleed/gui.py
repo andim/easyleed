@@ -9,6 +9,7 @@ import webbrowser
 import pickle
 import six
 import time
+import os.path
 
 from .qt import get_qt_binding_name, qt_filedialog_convert
 from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, QTimer, QObject)
@@ -1069,6 +1070,9 @@ class MainWindow(QMainWindow):
 
     def saveIntensity(self):
         filename = 'intensities.csv'
+        if self.plotwid.averageCheck.isChecked():
+            filename = os.path.splitext(filename)[0]+"_with-average.csv"
+        
         filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save intensities to a file",
                                                     filename))
@@ -1304,9 +1308,6 @@ class Worker(QObject):
         header = 'energy,'
         for s in range(len(spots)):
             header = header+'intensity '+ str(s+1) +','
-        if self.parent().plotwid.averageCheck.isChecked():
-            header = header + 'average ,'
-        header = header + '[background substraction = %s],' % bs
         
         intensities = [self.spots_map[spot][0].m.intensity for spot in spots]
         energy = self.spots_map[spots[0]][0].m.energy
@@ -1318,17 +1319,10 @@ class Worker(QObject):
             for model, tracker in six.itervalues(self.spots_map):
                 intensity += model.m.intensity
             intensity = np.asarray([[i/len(self.spots_map)] for i in intensity])
-            #zipped = list(zip(energy, intensity))
-            #np.savetxt(filename+'_avg', zipped,
-            #       header='energy, avg. intensity [background substraction = %s]' % bs,
-            #       delimiter=",")
-            
-            print(zipped.shape)
-            print(intensity.shape)
-            print(zipped)
-            print(intensity)
+            header = header + 'average ,'
             zipped = np.hstack((zipped, intensity))
-                
+    
+        header = header + '[background substraction = %s],' % bs
         np.savetxt(filename, zipped, header=header, delimiter=",")
 
 #        # save positions
