@@ -386,6 +386,7 @@ class PlotWidget(QWidget):
         self.axes.set_ylabel("Intensity [a.u.]")
         # removes the ticks from y-axis
         self.axes.set_yticks([])
+        self.fig.tight_layout()
 
     def setupPlot(self, worker):
         self.initPlot()
