@@ -9,6 +9,7 @@ import webbrowser
 import pickle
 import six
 import time
+import os.path
 
 from .qt import get_qt_binding_name, qt_filedialog_convert
 from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, QTimer, QObject)
@@ -1069,6 +1070,9 @@ class MainWindow(QMainWindow):
 
     def saveIntensity(self):
         filename = 'intensities.csv'
+        if self.plotwid.averageCheck.isChecked():
+            filename = os.path.splitext(filename)[0]+"_with-average.csv"
+        
         filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save intensities to a file",
                                                     filename))
@@ -1299,22 +1303,27 @@ class Worker(QObject):
     def saveIntensity(self, filename):
         """save intensities"""
         spots = self.parent().scene.spots
+        bs = config.Processing_backgroundSubstractionOn
+        
+        header = 'energy,'
+        for s in range(len(spots)):
+            header = header+'intensity '+ str(s+1) +','
+        
         intensities = [self.spots_map[spot][0].m.intensity for spot in spots]
         energy = self.spots_map[spots[0]][0].m.energy
         zipped = np.asarray(list(zip(energy, *intensities)))
-        bs = config.Processing_backgroundSubstractionOn
-        np.savetxt(filename, zipped,
-                   header='energy, intensity 1, intensity 2, ..., [background substraction = %s]' % bs)
-
+        
         # Save Average intensity (if checkbox selected)
         if self.parent().plotwid.averageCheck.isChecked():
             intensity = np.zeros(self.numProcessed())
             for model, tracker in six.itervalues(self.spots_map):
                 intensity += model.m.intensity
-            intensity = [i/len(self.spots_map) for i in intensity]
-            zipped = list(zip(energy, intensity))
-            np.savetxt(filename+'_avg', zipped,
-                   header='energy, avg. intensity [background substraction = %s]' % bs)
+            intensity = np.asarray([[i/len(self.spots_map)] for i in intensity])
+            header = header + 'average ,'
+            zipped = np.hstack((zipped, intensity))
+    
+        header = header + '[background substraction = %s],' % bs
+        np.savetxt(filename, zipped, header=header, delimiter=",")
 
 #        # save positions
 #        x = [model.m.x for model, tracker \
