@@ -1313,30 +1313,30 @@ class Worker(QObject):
         intensities = [self.spots_map[spot][0].m.intensity for spot in spots]
         energy = self.spots_map[spots[0]][0].m.energy
         
-        # Save Average intensity
+        # Extract average spot intensity
         intensity = np.zeros(self.numProcessed())
         for model, tracker in six.itervalues(self.spots_map):
             intensity += model.m.intensity
         intensity = np.asarray([i/len(self.spots_map) for i in intensity])
-
+        
+        # Save spot intensities in dataframe
         self.pdframe = pd.DataFrame({'Energy': energy})
         for s in range(len(spots)):
-            self.pdframe = pd.concat([self.pdframe,pd.DataFrame({'Intensity #'+str(s+1) : self.spots_map[spots[s]][0].m.intensity})], axis=1)
-        self.pdframe = pd.concat([self.pdframe,pd.DataFrame({'Average' : intensity})], axis=1)
+            self.pdframe['Intensity #'+str(s+1)] = self.spots_map[spots[s]][0].m.intensity
+        self.pdframe['Average'] = intensity
 
-        # Save spots coordinates and radius
+        numEnergies = len(self.spots_map[spots[0]][0].m.x)
+        # Save spots coordinates and radius in dataframe
         for s in range(len(spots)):
-            locx = [self.spots_map[spots[s]][0].m.x[i] for i in range(len(self.spots_map[spots[0]][0].m.x))]
-            locy = [self.spots_map[spots[s]][0].m.y[i] for i in range(len(self.spots_map[spots[0]][0].m.x))]
-            locr = [self.spots_map[spots[s]][0].m.radius[i] for i in range(len(self.spots_map[spots[0]][0].m.x))]
+            self.pdframe = self.pdframe.join(pd.DataFrame({\
+                'x #'+str(s+1) : [self.spots_map[spots[s]][0].m.x[i] for i in range(numEnergies)],
+                'y #'+str(s+1) : [self.spots_map[spots[s]][0].m.y[i] for i in range(numEnergies)],
+                'r #'+str(s+1) : [self.spots_map[spots[s]][0].m.radius[i] for i in range(numEnergies)]}))
 
-            self.pdframe = pd.concat([self.pdframe,pd.DataFrame({'x #'+str(s+1) : locx,
-                    'y #'+str(s+1) : locy, 'r #'+str(s+1) : locr})], axis=1)
-
-        # Save Center coordinates
-        self.pdframe = pd.concat([self.pdframe,pd.DataFrame({'Center x' : [self.parent().scene.center.x()],
-                    'Center y' : [self.parent().scene.center.y()]})], axis = 1)
-        self.pdframe = pd.concat([self.pdframe,pd.DataFrame({'Background substraction' : [bs]})], axis=1)
+        # Save Center coordinates in dataframe
+        self.pdframe['Center x'] = self.parent().scene.center.x()
+        self.pdframe['Center y'] = self.parent().scene.center.y()
+        self.pdframe['Background substraction'] = bs
 
     def saveIntensity(self, filename):
         """save intensities"""
