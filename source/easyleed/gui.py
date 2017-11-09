@@ -1196,28 +1196,26 @@ class MainWindow(QMainWindow):
 
     def saveSpots(self):
         """Saves the spot locations to a file, uses workers saveLoc-function"""
-        filename = "loc_" + str(self.initial_energy) + "eV.pkl"
+        filename = "loc-spots_" + str(self.initial_energy) + "eV.csv"
         filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save the spot locations to a file", filename))
         if filename:
             self.worker.saveLoc(filename)
 
     def loadSpots(self):
-        """Load saved spot positions"""
-        # This can probably be done in a better way
         filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         if filename:
-            # pickle doesn't recognise the file opened by PyQt's openfile dialog as a file so 'normal' file processing
-            pkl_file = open(filename, 'rb')
-            # loading the zipped info to "location"
-            location = pickle.load(pkl_file)
-            pkl_file.close()
-            # unzipping the "location"
-            energy, locationx, locationy, radius = zip(*location)
+            df = pd.read_csv(filename, skipinitialspace=True)
+            energy = df['Energy'].tolist()
+            numSpots = int((len(df.columns)-1)/3)
+            print(energy)
+            locationx = [df['x #'+str(s+1)].tolist() for s in range(numSpots)]
+            locationy = [df['y #'+str(s+1)].tolist() for s in range(numSpots)]
+            radius = [df['r #'+str(s+1)].tolist() for s in range(numSpots)]
             # NEED TO FIGURE OUT HOW TO GET ALL THE SPOTS TO RESPECTIVE ENERGIES, now only loads the first energy's spots
             # improving might involve modifying the algorithm for calculating intensity
             self.scene.removeAll()
-            for i in range(len(energy)):
+            for i in range(numSpots):
                 #for j in range(len(energy[i])):
                 # only taking the first energy location, [0] -> [j] for all, but now puts every spot to the first energy
                 point = QPointF(locationx[i][0], locationy[i][0])
@@ -1227,32 +1225,23 @@ class MainWindow(QMainWindow):
 
     def saveCenter(self):
         """Saves the center locations to a file"""
-        filename = 'loc_center.pkl'
+        filename = 'loc-center.csv'
         filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save the center location to a file",
                                                     filename))
+                                                    
         if filename:
-            zipped = list(zip([self.scene.center.x()], [self.scene.center.y()]))
-            output = open(filename, 'wb')
-            pickle.dump(zipped, output)
-            output.close()
+            self.worker.saveCenter(filename)
 
     def loadCenter(self):
-        """Load saved center position from file"""
-        # This can probably be done in a better way
-        filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self,
-                                                    "Open center location file"))
+        """Load Center location from csv file"""
+        filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         if filename:
-            if hasattr (self.scene, "center"):
-                self.scene.removeCenter()
-            # pickle doesn't recognise the file opened by PyQt's openfile dialog as a file so 'normal' file processing
-            pkl_file = open(filename, 'rb')
-            # loading the zipped info to "location"
-            location = pickle.load(pkl_file)
-            pkl_file.close()
-            # unzipping the "location"
-            cLocx, cLocy = zip(*location)
-            point = QPointF(cLocx[0], cLocy[0])
+            df = pd.read_csv(filename, skipinitialspace=True)
+            cLocx = [df['Center x'].tolist()]
+            cLocy = [df['Center y'].tolist()]
+            
+            point = QPointF(cLocx[0][0], cLocy[0][0])
             item = QGraphicsCenterItem(point, config.QGraphicsCenterItem_size)
             # adding the item to the gui
             self.scene.clearSelection()
@@ -1343,14 +1332,18 @@ class Worker(QObject):
         self.pdframe.to_csv(filename, sep=',', index=False)
 
     def saveLoc(self, filename):
-        """save spot locations"""
+        """save spots location"""
         spots = self.parent().scene.spots
-        energy = [self.spots_map[spot][0].m.energy for spot in spots]
-        locationx = [self.spots_map[spot][0].m.x for spot in spots]
-        locationy = [self.spots_map[spot][0].m.y for spot in spots]
-        radius = [self.spots_map[spot][0].m.radius for spot in spots]
-        locations = [locationx, locationy, radius]
-        zipped = list(zip(energy, *locations))
-        output = open(filename, 'wb')
-        pickle.dump(zipped, output)
-        output.close()
+        locationCols = ['Energy']
+        for s in range(len(spots)):
+            locationCols.extend(['x #'+str(s+1), 'y #'+str(s+1),'r #'+str(s+1)])
+        self.pdframe[locationCols].to_csv(filename, sep=',', index=False)
+
+    def saveCenter(self, filename):
+        """save center location"""
+        spots = self.parent().scene.spots
+        centerCols = ['Energy']
+        for s in range(len(spots)):
+            centerCols.extend(['Center x', 'Center y'])
+        self.pdframe[centerCols].to_csv(filename, sep=',', index=False)
+
