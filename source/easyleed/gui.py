@@ -795,6 +795,7 @@ class MainWindow(QMainWindow):
         self.view.setMinimumSize(660, 480)
         self.setGeometry(10, 30, 660, 480)
         self.setCentralWidget(self.view)
+        self.scene.selectionChanged.connect(self.highlightSelSpot)
 
         #### define actions ####
 
@@ -1109,6 +1110,18 @@ class MainWindow(QMainWindow):
             self.sliderCurrentPos = 1
             self.slider.setValue(self.sliderCurrentPos)
 
+    def highlightSelSpot(self):
+        ### Highlight the plot corresponding to a selected spot ###
+        if hasattr(self.plotwid,"lines_map"):
+            for _,lines in six.iteritems(self.plotwid.lines_map):
+                lines.set_linewidth(1)
+            try:
+                line = self.plotwid.lines_map[self.scene.selectedItems()[0]]
+                line.set_linewidth(3)
+                self.plotwid.updatePlot()
+            except:
+                pass
+    
     def removeLastSpot(self):
         for item in self.scene.items():
             if type(item) == QGraphicsSpotItem:
@@ -1237,7 +1250,6 @@ class MainWindow(QMainWindow):
         filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save the center location to a file",
                                                     filename))
-                                                    
         if filename:
             self.worker.saveCenter(filename)
 
@@ -1339,8 +1351,11 @@ class Worker(QObject):
                 'r #'+str(s+1) : [self.spots_map[spots[s]][0].m.radius[i] for i in range(numEnergies)]}))
 
         # Save Center coordinates in dataframe
-        self.pdframe['Center x'] = self.parent().scene.center.x()
-        self.pdframe['Center y'] = self.parent().scene.center.y()
+        if hasattr(self.parent().scene.center, "x"):
+            self.pdframe['Center x'] = self.parent().scene.center.x()
+            self.pdframe['Center y'] = self.parent().scene.center.y()
+        else:
+            pass
         self.pdframe['Background substraction'] = bs
 
     def saveIntensity(self, filename):
