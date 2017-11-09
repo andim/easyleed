@@ -420,7 +420,8 @@ class PlotWidget(QWidget):
         """ Basic Matplotlib plotting I(E)-curve """
         for spot, line in six.iteritems(self.lines_map):
             line.set_data(self.worker.spots_map[spot][0].m.energy, self.worker.spots_map[spot][0].m.intensity)
-        if self.averageCheck.isChecked():
+        
+        if self.averageCheck.isChecked() and len(self.axes.lines) > 1:
             intensity = np.zeros(self.worker.numProcessed())
             for model, tracker in six.itervalues(self.worker.spots_map):
                 intensity += model.m.intensity
@@ -447,8 +448,11 @@ class PlotWidget(QWidget):
                     del self.averageSmoothLine
         else:
             if hasattr(self, "averageLine"):
-                self.averageLine.remove()
-                del self.averageLine
+                try:
+                    self.averageLine.remove()
+                    del self.averageLine
+                except:
+                    pass
 
         if self.axes.legend() is not None:
             # decide whether to show legend
@@ -461,6 +465,8 @@ class PlotWidget(QWidget):
         self.canvas.draw()
 
     def clearPlot(self):
+        self.averageCheck.setChecked(False)
+        self.updatePlot()
         self.fig.clf()
         self.axes = self.fig.add_subplot(111)
         self.initPlot()
@@ -1159,6 +1165,7 @@ class MainWindow(QMainWindow):
             self.plotwid.clearPlotButton.setEnabled(True)
             self.slider.setEnabled(True)
             self.processRemoveSpot.setEnabled(True)
+            self.worker.createDataframe()
             print("Total time acquisition:", time.time() - time_before, "s")
 
     def disableInput(self):
@@ -1298,8 +1305,8 @@ class Worker(QObject):
         """ Return the number of processed images. """
         return len(next(six.itervalues(self.spots_map))[0].m.energy)
 
-    def saveIntensity(self, filename):
-        """save intensities"""
+    def createDataframe(self):
+        """ Create internal dataframe with intensities, spot locations, and center """
         spots = self.parent().scene.spots
         bs = config.Processing_backgroundSubstractionOn
         
@@ -1312,10 +1319,10 @@ class Worker(QObject):
             intensity += model.m.intensity
         intensity = np.asarray([i/len(self.spots_map) for i in intensity])
 
-        pdframe = pd.DataFrame({'Energy': energy})
+        self.pdframe = pd.DataFrame({'Energy': energy})
         for s in range(len(spots)):
-            pdframe = pd.concat([pdframe,pd.DataFrame({'Intensity #'+str(s+1) : self.spots_map[spots[s]][0].m.intensity})], axis=1)
-        pdframe = pd.concat([pdframe,pd.DataFrame({'Average' : intensity})], axis=1)
+            self.pdframe = pd.concat([self.pdframe,pd.DataFrame({'Intensity #'+str(s+1) : self.spots_map[spots[s]][0].m.intensity})], axis=1)
+        self.pdframe = pd.concat([self.pdframe,pd.DataFrame({'Average' : intensity})], axis=1)
 
         # Save spots coordinates and radius
         for s in range(len(spots)):
@@ -1323,15 +1330,17 @@ class Worker(QObject):
             locy = [self.spots_map[spots[s]][0].m.y[i] for i in range(len(self.spots_map[spots[0]][0].m.x))]
             locr = [self.spots_map[spots[s]][0].m.radius[i] for i in range(len(self.spots_map[spots[0]][0].m.x))]
 
-            pdframe = pd.concat([pdframe,pd.DataFrame({'x #'+str(s+1) : locx,
+            self.pdframe = pd.concat([self.pdframe,pd.DataFrame({'x #'+str(s+1) : locx,
                     'y #'+str(s+1) : locy, 'r #'+str(s+1) : locr})], axis=1)
 
         # Save Center coordinates
-        pdframe = pd.concat([pdframe,pd.DataFrame({'Center x' : [self.parent().scene.center.x()],
+        self.pdframe = pd.concat([self.pdframe,pd.DataFrame({'Center x' : [self.parent().scene.center.x()],
                     'Center y' : [self.parent().scene.center.y()]})], axis = 1)
-        pdframe = pd.concat([pdframe,pd.DataFrame({'Background substraction' : [bs]})], axis=1)
-        
-        pdframe.to_csv(filename, sep=',', index=False)
+        self.pdframe = pd.concat([self.pdframe,pd.DataFrame({'Background substraction' : [bs]})], axis=1)
+
+    def saveIntensity(self, filename):
+        """save intensities"""
+        self.pdframe.to_csv(filename, sep=',', index=False)
 
     def saveLoc(self, filename):
         """save spot locations"""
