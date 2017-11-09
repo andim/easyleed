@@ -30,6 +30,7 @@ from .base import *
 from .io import *
 
 import numpy as np
+import pandas as pd
 from scipy import interpolate
 
 from matplotlib.figure import Figure
@@ -830,7 +831,7 @@ class MainWindow(QMainWindow):
         self.fileOpenAction = self.createAction("&Open...", self.fileOpen,
                 QKeySequence.Open, None,
                 "Open a directory containing the image files.")
-        self.fileSaveAction = self.createAction("&Save intensities...", self.saveIntensity,
+        self.fileSaveAction = self.createAction("&Save intensities and spots...", self.saveIntensity,
                 QKeySequence.Save, None,
                 "Save the calculated intensities to a text file.")
         self.fileSavePlotAction = self.createAction("&Save plot...", self.plotwid.save,
@@ -1075,10 +1076,7 @@ class MainWindow(QMainWindow):
         self.current_energy = energy
 
     def saveIntensity(self):
-        filename = 'intensities.csv'
-        if self.plotwid.averageCheck.isChecked():
-            filename = os.path.splitext(filename)[0]+"_with-average.csv"
-        
+        filename = 'intensities_spots.csv'
         filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save intensities to a file",
                                                     filename))
@@ -1167,6 +1165,7 @@ class MainWindow(QMainWindow):
             self.plotwid.clearPlotButton.setEnabled(True)
             self.slider.setEnabled(True)
             self.processRemoveSpot.setEnabled(True)
+            self.worker.createDataframe()
             print("Total time acquisition:", time.time() - time_before, "s")
 
     def disableInput(self):
@@ -1306,40 +1305,42 @@ class Worker(QObject):
         """ Return the number of processed images. """
         return len(next(six.itervalues(self.spots_map))[0].m.energy)
 
-    def saveIntensity(self, filename):
-        """save intensities"""
+    def createDataframe(self):
+        """ Create internal dataframe with intensities, spot locations, and center """
         spots = self.parent().scene.spots
         bs = config.Processing_backgroundSubstractionOn
         
-        header = 'energy,'
-        for s in range(len(spots)):
-            header = header+'intensity '+ str(s+1) +','
-        
         intensities = [self.spots_map[spot][0].m.intensity for spot in spots]
         energy = self.spots_map[spots[0]][0].m.energy
-        zipped = np.asarray(list(zip(energy, *intensities)))
         
-        # Save Average intensity (if checkbox selected)
-        if self.parent().plotwid.averageCheck.isChecked():
-            intensity = np.zeros(self.numProcessed())
-            for model, tracker in six.itervalues(self.spots_map):
-                intensity += model.m.intensity
-            intensity = np.asarray([[i/len(self.spots_map)] for i in intensity])
-            header = header + 'average ,'
-            zipped = np.hstack((zipped, intensity))
-    
-        header = header + '[background substraction = %s],' % bs
-        np.savetxt(filename, zipped, header=header, delimiter=",")
+        # Extract average spot intensity
+        intensity = np.zeros(self.numProcessed())
+        for model, tracker in six.itervalues(self.spots_map):
+            intensity += model.m.intensity
+        intensity = np.asarray([i/len(self.spots_map) for i in intensity])
+        
+        # Save spot intensities in dataframe
+        self.pdframe = pd.DataFrame({'Energy': energy})
+        for s in range(len(spots)):
+            self.pdframe['Intensity #'+str(s+1)] = self.spots_map[spots[s]][0].m.intensity
+        self.pdframe['Average'] = intensity
 
-#        # save positions
-#        x = [model.m.x for model, tracker \
-#                in six.itervalues(self.spots_map)]
-#        y = [model.m.y for model, tracker \
-#                in six.itervalues(self.spots_map)]
-#        x.extend(y)
-#        zipped = np.asarray(list(zip(energy[0], *x))
-#        np.savetxt(filename, zipped,
-#                   header='energy, x, y')
+        numEnergies = len(self.spots_map[spots[0]][0].m.x)
+        # Save spots coordinates and radius in dataframe
+        for s in range(len(spots)):
+            self.pdframe = self.pdframe.join(pd.DataFrame({\
+                'x #'+str(s+1) : [self.spots_map[spots[s]][0].m.x[i] for i in range(numEnergies)],
+                'y #'+str(s+1) : [self.spots_map[spots[s]][0].m.y[i] for i in range(numEnergies)],
+                'r #'+str(s+1) : [self.spots_map[spots[s]][0].m.radius[i] for i in range(numEnergies)]}))
+
+        # Save Center coordinates in dataframe
+        self.pdframe['Center x'] = self.parent().scene.center.x()
+        self.pdframe['Center y'] = self.parent().scene.center.y()
+        self.pdframe['Background substraction'] = bs
+
+    def saveIntensity(self, filename):
+        """save intensities"""
+        self.pdframe.to_csv(filename, sep=',', index=False)
 
     def saveLoc(self, filename):
         """save spot locations"""
