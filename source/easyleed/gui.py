@@ -241,6 +241,12 @@ class GraphicsScene(QGraphicsScene):
                 if type(item) is QGraphicsSpotItem:
                     self.spots.remove(item)
                     self.removeItem(item)
+                    try:
+                        line = self.parent().plotwid.lines_map[item]
+                        line.remove()
+                        self.parent().plotwid.updatePlot()
+                    except:
+                        pass
                 elif type(item) is QGraphicsCenterItem:
                     self.removeCenter()
                 del item
