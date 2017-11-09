@@ -1339,8 +1339,11 @@ class Worker(QObject):
                 'r #'+str(s+1) : [self.spots_map[spots[s]][0].m.radius[i] for i in range(numEnergies)]}))
 
         # Save Center coordinates in dataframe
-        self.pdframe['Center x'] = self.parent().scene.center.x()
-        self.pdframe['Center y'] = self.parent().scene.center.y()
+        if hasattr(self.parent().scene.center, "x"):
+            self.pdframe['Center x'] = self.parent().scene.center.x()
+            self.pdframe['Center y'] = self.parent().scene.center.y()
+        else:
+            pass
         self.pdframe['Background substraction'] = bs
 
     def saveIntensity(self, filename):
