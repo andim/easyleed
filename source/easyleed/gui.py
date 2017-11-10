@@ -1132,6 +1132,12 @@ class MainWindow(QMainWindow):
         for item in self.scene.items():
             if type(item) == QGraphicsSpotItem:
                 self.scene.removeItem(item)
+                try:
+                    line = self.plotwid.lines_map[item]
+                    line.remove()
+                    self.plotwid.updatePlot()
+                except:
+                    pass
                 break
         try:
             self.scene.spots.remove(self.scene.spots[-1])
