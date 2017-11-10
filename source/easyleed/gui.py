@@ -1231,30 +1231,31 @@ class MainWindow(QMainWindow):
         """Load Spots location from csv file"""
         filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         if filename:
-            if os.path.splitext(filename)[1] == ".csv":
-                df = pd.read_csv(filename, skipinitialspace=True)
-                energy = df['Energy'].tolist()
-                numSpots = int((len(df.columns)-1)/3)
-                locationx = [df['x #'+str(s+1)].tolist() for s in range(numSpots)]
-                locationy = [df['y #'+str(s+1)].tolist() for s in range(numSpots)]
-                radius = [df['r #'+str(s+1)].tolist() for s in range(numSpots)]
-                # NEED TO FIGURE OUT HOW TO GET ALL THE SPOTS TO RESPECTIVE ENERGIES, now only loads the first energy's spots
-                # improving might involve modifying the algorithm for calculating intensity
-            else:
-                print("Old format for spot locations file detected...")
-                with open(filename, 'rb') as pkl_file:
-                    location = pickle.load(pkl_file)
-                energy, locationx, locationy, radius = zip(*location)
-                numSpots = len(energy)
+            try:
+                if os.path.splitext(filename)[1] == ".csv":
+                    df = pd.read_csv(filename, skipinitialspace=True)
+                    energy = df['Energy'].tolist()
+                    numSpots = int((len(df.columns)-1)/3)
+                    locationx = [df['x #'+str(s+1)].tolist() for s in range(numSpots)]
+                    locationy = [df['y #'+str(s+1)].tolist() for s in range(numSpots)]
+                    radius = [df['r #'+str(s+1)].tolist() for s in range(numSpots)]
+                    # NEED TO FIGURE OUT HOW TO GET ALL THE SPOTS TO RESPECTIVE ENERGIES, now only loads the first energy's spots
+                    # improving might involve modifying the algorithm for calculating intensity
+                else:
+                    with open(filename, 'rb') as pkl_file:
+                        location = pickle.load(pkl_file)
+                    energy, locationx, locationy, radius = zip(*location)
+                    numSpots = len(energy)
             
-            self.scene.removeAll()
-            for i in range(numSpots):
-                #for j in range(len(energy[i])):
-                # only taking the first energy location, [0] -> [j] for all, but now puts every spot to the first energy
-                point = QPointF(locationx[i][0], locationy[i][0])
-                item = QGraphicsSpotItem(point, radius[i][0])
-                # adding the item to the gui
-                self.scene.addSpot(item)
+                self.scene.removeAll()
+                for i in range(numSpots):
+                    # only taking the first energy location, [0] -> [j] for all, but now puts every spot to the first energy
+                    point = QPointF(locationx[i][0], locationy[i][0])
+                    item = QGraphicsSpotItem(point, radius[i][0])
+                    # adding the item to the gui
+                    self.scene.addSpot(item)
+            except:
+                print("Invalid file for spot locations...")
 
     def saveCenter(self):
         """Saves the center locations to a file, uses workers saveCenter-method"""
@@ -1269,27 +1270,29 @@ class MainWindow(QMainWindow):
         """Load Center location from csv file"""
         filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         if filename:
-            if os.path.splitext(filename)[1] == ".csv":
-                df = pd.read_csv(filename, skipinitialspace=True)
-                cLocx = [df['Center x'].tolist()]
-                cLocy = [df['Center y'].tolist()]
-            else:
-                print("Old format for center locations file detected...")
-                # pickle doesn't recognise the file opened by PyQt's openfile dialog as a file so 'normal' file processing
-                with open(filename, 'rb') as pkl_file:
-                    location = pickle.load(pkl_file)
-                cLocx, cLocy = zip(*location)
-            
-            self.scene.removeCenter()
-            point = QPointF(cLocx[0][0], cLocy[0][0])
-            item = QGraphicsCenterItem(point, config.QGraphicsCenterItem_size)
-            # adding the item to the gui
-            self.scene.clearSelection()
-            self.scene.addItem(item)
-            item.setSelected(True)
-            self.scene.center = item
-            self.scene.setFocusItem(item)
-            self.fileSaveCenterAction.setEnabled(True)
+            try:
+                if os.path.splitext(filename)[1] == ".csv":
+                    df = pd.read_csv(filename, skipinitialspace=True)
+                    cLocx = df['Center x'].tolist()
+                    cLocy = df['Center y'].tolist()
+                else:
+                    # pickle doesn't recognise the file opened by PyQt's openfile dialog as a file so 'normal' file processing
+                    with open(filename, 'rb') as pkl_file:
+                        location = pickle.load(pkl_file)
+                    cLocx, cLocy = zip(*location)
+                
+                self.scene.removeCenter()
+                point = QPointF(cLocx[0], cLocy[0])
+                item = QGraphicsCenterItem(point, config.QGraphicsCenterItem_size)
+                # adding the item to the gui
+                self.scene.clearSelection()
+                self.scene.addItem(item)
+                item.setSelected(True)
+                self.scene.center = item
+                self.scene.setFocusItem(item)
+                self.fileSaveCenterAction.setEnabled(True)
+            except:
+                print("Invalid file for center location...")
 
 class Worker(QObject):
     """ Worker that manages the spots.
