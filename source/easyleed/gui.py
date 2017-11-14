@@ -241,6 +241,12 @@ class GraphicsScene(QGraphicsScene):
                 if type(item) is QGraphicsSpotItem:
                     self.spots.remove(item)
                     self.removeItem(item)
+                    try:
+                        line = self.parent().plotwid.lines_map[item]
+                        line.remove()
+                        self.parent().plotwid.updatePlot()
+                    except:
+                        pass
                 elif type(item) is QGraphicsCenterItem:
                     self.removeCenter()
                 del item
@@ -795,6 +801,7 @@ class MainWindow(QMainWindow):
         self.view.setMinimumSize(660, 480)
         self.setGeometry(10, 30, 660, 480)
         self.setCentralWidget(self.view)
+        self.scene.selectionChanged.connect(self.highlightSelSpot)
 
         #### define actions ####
 
@@ -1109,10 +1116,28 @@ class MainWindow(QMainWindow):
             self.sliderCurrentPos = 1
             self.slider.setValue(self.sliderCurrentPos)
 
+    def highlightSelSpot(self):
+        ### Highlight the plot corresponding to a selected spot ###
+        if hasattr(self.plotwid,"lines_map"):
+            for _,lines in six.iteritems(self.plotwid.lines_map):
+                lines.set_linewidth(1)
+            try:
+                line = self.plotwid.lines_map[self.scene.selectedItems()[0]]
+                line.set_linewidth(3)
+                self.plotwid.updatePlot()
+            except:
+                pass
+
     def removeLastSpot(self):
         for item in self.scene.items():
             if type(item) == QGraphicsSpotItem:
                 self.scene.removeItem(item)
+                try:
+                    line = self.plotwid.lines_map[item]
+                    line.remove()
+                    self.plotwid.updatePlot()
+                except:
+                    pass
                 break
         try:
             self.scene.spots.remove(self.scene.spots[-1])
