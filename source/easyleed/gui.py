@@ -9,6 +9,7 @@ import webbrowser
 import pickle
 import six
 import time
+import os.path
 
 from .qt import get_qt_binding_name, qt_filedialog_convert
 from .qt.QtCore import (QPoint, QRectF, QPointF, Qt, QTimer, QObject)
@@ -29,6 +30,7 @@ from .base import *
 from .io import *
 
 import numpy as np
+import pandas as pd
 from scipy import interpolate
 
 from matplotlib.figure import Figure
@@ -239,6 +241,12 @@ class GraphicsScene(QGraphicsScene):
                 if type(item) is QGraphicsSpotItem:
                     self.spots.remove(item)
                     self.removeItem(item)
+                    try:
+                        line = self.parent().plotwid.lines_map[item]
+                        line.remove()
+                        self.parent().plotwid.updatePlot()
+                    except:
+                        pass
                 elif type(item) is QGraphicsCenterItem:
                     self.removeCenter()
                 del item
@@ -418,7 +426,8 @@ class PlotWidget(QWidget):
         """ Basic Matplotlib plotting I(E)-curve """
         for spot, line in six.iteritems(self.lines_map):
             line.set_data(self.worker.spots_map[spot][0].m.energy, self.worker.spots_map[spot][0].m.intensity)
-        if self.averageCheck.isChecked():
+        
+        if self.averageCheck.isChecked() and len(self.axes.lines) > 1:
             intensity = np.zeros(self.worker.numProcessed())
             for model, tracker in six.itervalues(self.worker.spots_map):
                 intensity += model.m.intensity
@@ -445,8 +454,11 @@ class PlotWidget(QWidget):
                     del self.averageSmoothLine
         else:
             if hasattr(self, "averageLine"):
-                self.averageLine.remove()
-                del self.averageLine
+                try:
+                    self.averageLine.remove()
+                    del self.averageLine
+                except:
+                    pass
 
         if self.axes.legend() is not None:
             # decide whether to show legend
@@ -459,6 +471,8 @@ class PlotWidget(QWidget):
         self.canvas.draw()
 
     def clearPlot(self):
+        self.averageCheck.setChecked(False)
+        self.updatePlot()
         self.fig.clf()
         self.axes = self.fig.add_subplot(111)
         self.initPlot()
@@ -787,6 +801,7 @@ class MainWindow(QMainWindow):
         self.view.setMinimumSize(660, 480)
         self.setGeometry(10, 30, 660, 480)
         self.setCentralWidget(self.view)
+        self.scene.selectionChanged.connect(self.highlightSelSpot)
 
         #### define actions ####
 
@@ -823,7 +838,7 @@ class MainWindow(QMainWindow):
         self.fileOpenAction = self.createAction("&Open...", self.fileOpen,
                 QKeySequence.Open, None,
                 "Open a directory containing the image files.")
-        self.fileSaveAction = self.createAction("&Save intensities...", self.saveIntensity,
+        self.fileSaveAction = self.createAction("&Save intensities and spots...", self.saveIntensity,
                 QKeySequence.Save, None,
                 "Save the calculated intensities to a text file.")
         self.fileSavePlotAction = self.createAction("&Save plot...", self.plotwid.save,
@@ -1068,7 +1083,7 @@ class MainWindow(QMainWindow):
         self.current_energy = energy
 
     def saveIntensity(self):
-        filename = 'intensities.csv'
+        filename = 'intensities_spots.csv'
         filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save intensities to a file",
                                                     filename))
@@ -1101,10 +1116,28 @@ class MainWindow(QMainWindow):
             self.sliderCurrentPos = 1
             self.slider.setValue(self.sliderCurrentPos)
 
+    def highlightSelSpot(self):
+        ### Highlight the plot corresponding to a selected spot ###
+        if hasattr(self.plotwid,"lines_map"):
+            for _,lines in six.iteritems(self.plotwid.lines_map):
+                lines.set_linewidth(1)
+            try:
+                line = self.plotwid.lines_map[self.scene.selectedItems()[0]]
+                line.set_linewidth(3)
+                self.plotwid.updatePlot()
+            except:
+                pass
+
     def removeLastSpot(self):
         for item in self.scene.items():
             if type(item) == QGraphicsSpotItem:
                 self.scene.removeItem(item)
+                try:
+                    line = self.plotwid.lines_map[item]
+                    line.remove()
+                    self.plotwid.updatePlot()
+                except:
+                    pass
                 break
         try:
             self.scene.spots.remove(self.scene.spots[-1])
@@ -1157,6 +1190,7 @@ class MainWindow(QMainWindow):
             self.plotwid.clearPlotButton.setEnabled(True)
             self.slider.setEnabled(True)
             self.processRemoveSpot.setEnabled(True)
+            self.worker.createDataframe()
             print("Total time acquisition:", time.time() - time_before, "s")
 
     def disableInput(self):
@@ -1186,73 +1220,81 @@ class MainWindow(QMainWindow):
         self.plotwid.canvas.close()
 
     def saveSpots(self):
-        """Saves the spot locations to a file, uses workers saveLoc-function"""
-        filename = "loc_" + str(self.initial_energy) + "eV.pkl"
+        """Saves the spot locations to a file, uses workers saveLoc-method"""
+        filename = "loc-spots_" + str(self.initial_energy) + "eV.csv"
         filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save the spot locations to a file", filename))
         if filename:
             self.worker.saveLoc(filename)
 
     def loadSpots(self):
-        """Load saved spot positions"""
-        # This can probably be done in a better way
+        """Load Spots location from csv file"""
         filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         if filename:
-            # pickle doesn't recognise the file opened by PyQt's openfile dialog as a file so 'normal' file processing
-            pkl_file = open(filename, 'rb')
-            # loading the zipped info to "location"
-            location = pickle.load(pkl_file)
-            pkl_file.close()
-            # unzipping the "location"
-            energy, locationx, locationy, radius = zip(*location)
-            # NEED TO FIGURE OUT HOW TO GET ALL THE SPOTS TO RESPECTIVE ENERGIES, now only loads the first energy's spots
-            # improving might involve modifying the algorithm for calculating intensity
-            self.scene.removeAll()
-            for i in range(len(energy)):
-                #for j in range(len(energy[i])):
-                # only taking the first energy location, [0] -> [j] for all, but now puts every spot to the first energy
-                point = QPointF(locationx[i][0], locationy[i][0])
-                item = QGraphicsSpotItem(point, radius[i][0])
-                # adding the item to the gui
-                self.scene.addSpot(item)
+            try:
+                if os.path.splitext(filename)[1] == ".csv":
+                    df = pd.read_csv(filename, skipinitialspace=True)
+                    energy = df['Energy'].tolist()
+                    numSpots = int((len(df.columns)-1)/3)
+                    locationx = [df['x #'+str(s+1)].tolist() for s in range(numSpots)]
+                    locationy = [df['y #'+str(s+1)].tolist() for s in range(numSpots)]
+                    radius = [df['r #'+str(s+1)].tolist() for s in range(numSpots)]
+                    # NEED TO FIGURE OUT HOW TO GET ALL THE SPOTS TO RESPECTIVE ENERGIES, now only loads the first energy's spots
+                    # improving might involve modifying the algorithm for calculating intensity
+                else:
+                    with open(filename, 'rb') as pkl_file:
+                        location = pickle.load(pkl_file)
+                    energy, locationx, locationy, radius = zip(*location)
+                    numSpots = len(energy)
+            
+                self.scene.removeAll()
+                for i in range(numSpots):
+                    # only taking the first energy location, [0] -> [j] for all, but now puts every spot to the first energy
+                    point = QPointF(locationx[i][0], locationy[i][0])
+                    item = QGraphicsSpotItem(point, radius[i][0])
+                    # adding the item to the gui
+                    self.scene.addSpot(item)
+            except:
+                print("Invalid file for spot locations...")
 
     def saveCenter(self):
-        """Saves the center locations to a file"""
-        filename = 'loc_center.pkl'
+        """Saves the center locations to a file, uses workers saveCenter-method"""
+        filename = 'loc-center.csv'
         filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save the center location to a file",
                                                     filename))
+                                                    
         if filename:
-            zipped = list(zip([self.scene.center.x()], [self.scene.center.y()]))
-            output = open(filename, 'wb')
-            pickle.dump(zipped, output)
-            output.close()
+            self.worker.saveCenter(filename)
 
     def loadCenter(self):
-        """Load saved center position from file"""
-        # This can probably be done in a better way
-        filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self,
-                                                    "Open center location file"))
+        """Load Center location from csv file"""
+        filename = qt_filedialog_convert(QFileDialog.getOpenFileName(self, 'Open spot location file'))
         if filename:
-            if hasattr (self.scene, "center"):
+            try:
+                if os.path.splitext(filename)[1] == ".csv":
+                    df = pd.read_csv(filename, skipinitialspace=True)
+                    cLocx = df['Center x'].tolist()
+                    cLocy = df['Center y'].tolist()
+                else:
+                    # pickle doesn't recognise the file opened by PyQt's openfile dialog as a file so 'normal' file processing
+                    with open(filename, 'rb') as pkl_file:
+                        location = pickle.load(pkl_file)
+                    cLocx, cLocy = zip(*location)
+                
                 self.scene.removeCenter()
-            # pickle doesn't recognise the file opened by PyQt's openfile dialog as a file so 'normal' file processing
-            pkl_file = open(filename, 'rb')
-            # loading the zipped info to "location"
-            location = pickle.load(pkl_file)
-            pkl_file.close()
-            # unzipping the "location"
-            cLocx, cLocy = zip(*location)
-            point = QPointF(cLocx[0], cLocy[0])
-            item = QGraphicsCenterItem(point, config.QGraphicsCenterItem_size)
-            # adding the item to the gui
-            self.scene.clearSelection()
-            self.scene.addItem(item)
-            item.setSelected(True)
-            self.scene.center = item
-            self.scene.setFocusItem(item)
-            self.fileSaveCenterAction.setEnabled(True)
-
+                point = QPointF(cLocx[0], cLocy[0])
+                item = QGraphicsCenterItem(point, config.QGraphicsCenterItem_size)
+                # adding the item to the gui
+                self.scene.clearSelection()
+                self.scene.addItem(item)
+                item.setSelected(True)
+                self.scene.center = item
+                self.scene.setFocusItem(item)
+                self.fileSaveCenterAction.setEnabled(True)
+            except:
+                print("Invalid file for center location...")
+                
 class Worker(QObject):
     """ Worker that manages the spots.
 
@@ -1296,45 +1338,59 @@ class Worker(QObject):
         """ Return the number of processed images. """
         return len(next(six.itervalues(self.spots_map))[0].m.energy)
 
-    def saveIntensity(self, filename):
-        """save intensities"""
+    def createDataframe(self):
+        """ Create internal dataframe with intensities, spot locations, and center """
         spots = self.parent().scene.spots
+        bs = config.Processing_backgroundSubstractionOn
+        
         intensities = [self.spots_map[spot][0].m.intensity for spot in spots]
         energy = self.spots_map[spots[0]][0].m.energy
-        zipped = np.asarray(list(zip(energy, *intensities)))
-        bs = config.Processing_backgroundSubstractionOn
-        np.savetxt(filename, zipped,
-                   header='energy, intensity 1, intensity 2, ..., [background substraction = %s]' % bs)
+        
+        # Extract average spot intensity
+        intensity = np.zeros(self.numProcessed())
+        for model, tracker in six.itervalues(self.spots_map):
+            intensity += model.m.intensity
+        intensity = np.asarray([i/len(self.spots_map) for i in intensity])
+        
+        # Save spot intensities in dataframe
+        self.pdframe = pd.DataFrame({'Energy': energy})
+        for s in range(len(spots)):
+            self.pdframe['Intensity #'+str(s+1)] = self.spots_map[spots[s]][0].m.intensity
+        self.pdframe['Average'] = intensity
 
-        # Save Average intensity (if checkbox selected)
-        if self.parent().plotwid.averageCheck.isChecked():
-            intensity = np.zeros(self.numProcessed())
-            for model, tracker in six.itervalues(self.spots_map):
-                intensity += model.m.intensity
-            intensity = [i/len(self.spots_map) for i in intensity]
-            zipped = list(zip(energy, intensity))
-            np.savetxt(filename+'_avg', zipped,
-                   header='energy, avg. intensity [background substraction = %s]' % bs)
+        numEnergies = len(self.spots_map[spots[0]][0].m.x)
+        # Save spots coordinates and radius in dataframe
+        for s in range(len(spots)):
+            self.pdframe = self.pdframe.join(pd.DataFrame({\
+                'x #'+str(s+1) : [self.spots_map[spots[s]][0].m.x[i] for i in range(numEnergies)],
+                'y #'+str(s+1) : [self.spots_map[spots[s]][0].m.y[i] for i in range(numEnergies)],
+                'r #'+str(s+1) : [self.spots_map[spots[s]][0].m.radius[i] for i in range(numEnergies)]}))
 
-#        # save positions
-#        x = [model.m.x for model, tracker \
-#                in six.itervalues(self.spots_map)]
-#        y = [model.m.y for model, tracker \
-#                in six.itervalues(self.spots_map)]
-#        x.extend(y)
-#        zipped = np.asarray(list(zip(energy[0], *x))
-#        np.savetxt(filename, zipped,
-#                   header='energy, x, y')
+        # Save Center coordinates in dataframe
+        if hasattr(self.parent().scene.center, "x"):
+            self.pdframe['Center x'] = self.parent().scene.center.x()
+            self.pdframe['Center y'] = self.parent().scene.center.y()
+        else:
+            pass
+        self.pdframe['Background substraction'] = bs
+
+    def saveIntensity(self, filename):
+        """save intensities"""
+        self.pdframe.to_csv(filename, sep=',', index=False)
 
     def saveLoc(self, filename):
-        """save spot locations"""
+        """save spots location"""
         spots = self.parent().scene.spots
-        energy = [self.spots_map[spot][0].m.energy for spot in spots]
-        locationx = [self.spots_map[spot][0].m.x for spot in spots]
-        locationy = [self.spots_map[spot][0].m.y for spot in spots]
-        radius = [self.spots_map[spot][0].m.radius for spot in spots]
-        locations = [locationx, locationy, radius]
-        zipped = list(zip(energy, *locations))
-        output = open(filename, 'wb')
-        pickle.dump(zipped, output)
-        output.close()
+        locationCols = ['Energy']
+        for s in range(len(spots)):
+            locationCols.extend(['x #'+str(s+1), 'y #'+str(s+1),'r #'+str(s+1)])
+        self.pdframe[locationCols].to_csv(filename, sep=',', index=False)
+
+    def saveCenter(self, filename):
+        """save center location"""
+        spots = self.parent().scene.spots
+        centerCols = ['Energy']
+        for s in range(len(spots)):
+            centerCols.extend(['Center x', 'Center y'])
+        self.pdframe[centerCols].to_csv(filename, sep=',', index=False)
+
