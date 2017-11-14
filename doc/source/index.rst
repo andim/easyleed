@@ -55,4 +55,4 @@ The paper is available `at the publisher's website <http://dx.doi.org/10.1016/j.
 
 Contributors
 ============
-Development of EasyLEED was started by Andreas Mayer while working in Renee Diehl's lab (Penn State). Hanna Salopaasi has contributed to the user interface while working in Katariina Pussi's lab (Lappeenranta University of Technology). Further UI and core improvements were contributed by Nicola Ferralis (Massachusetts Institute of Technology).
+Development of EasyLEED was started by Andreas Mayer while working in Renee Diehl's lab (Penn State). Hanna Salopaasi has contributed to the user interface while working in Katariina Pussi's lab (Lappeenranta University of Technology). UI, core and usability improvements were contributed by Nicola Ferralis (Massachusetts Institute of Technology).
