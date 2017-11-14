@@ -1197,6 +1197,8 @@ class MainWindow(QMainWindow):
                     self.view.setInteractive(True)
                     QApplication.processEvents()
                     self.worker.update_positions(self.scene.spots,self.scene.center, self.current_energy)
+                    if self.stopped:
+                        break
 
                 self.processPauseAction.setText("Pause")
                 #self.view.setInteractive(False)
