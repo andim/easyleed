@@ -2,12 +2,10 @@
 [![License](https://img.shields.io/pypi/l/easyleed.svg)](https://github.com/andim/easyleed/blob/master/LICENSE)
 [![Latest release](https://img.shields.io/pypi/v/easyleed.svg)](https://pypi.python.org/pypi/easyleed)
 [![Py2.7/3.x](https://img.shields.io/pypi/pyversions/easyleed.svg)](https://pypi.python.org/pypi/easyleed)
-
 ![Status](https://img.shields.io/pypi/status/easyleed.svg)
-[![Impact](http://depsy.org/api/package/pypi/EasyLEED/badge.svg)](http://depsy.org/package/python/EasyLEED)
 
 
-# EasyLEED : Automated extraction of I(E) spectra from LEED patterns.
+# EasyLEED : Automated extraction of intensity-energy spectra from LEED patterns.
 
 EasyLEED facilitates data analysis of images obtained by low-energy electron diffraction, a common technique in surface science. It aims to automate the process of extracting intensity-energy spectra from a series of diffraction patterns acquired at different beam energies. At its core a tracking algorithm exploiting the specifics of the underlying physics (see [paper](http://dx.doi.org/10.1016/j.cpc.2012.02.019)) allows to link the position of the diffraction maxima between subsequent images.
 
