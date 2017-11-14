@@ -806,12 +806,15 @@ class MainWindow(QMainWindow):
         #### define actions ####
 
         ## actions for "Process" menu
-        processRunAction = self.createAction("&Run", self.run,
+        self.processRunAction = self.createAction("&Run", self.run,
                 QKeySequence("Ctrl+r"), None,
                 "Run the analysis of the images.")
         processStopAction = self.createAction("&Stop", self.stopProcessing,
                 QKeySequence("Ctrl+w"), None,
                 "Stop the analysis of the images.")
+        self.processPauseAction = self.createAction("&Pause", self.pauseProcessing,
+                QKeySequence("Ctrl+p"), None,
+                "Pause the analysis of the images.")
         processRestartAction = self.createAction("&Restart", self.restart,
                 QKeySequence("Ctrl+z"), None,
                 "Reset chosen points and jump to first image.")
@@ -832,7 +835,7 @@ class MainWindow(QMainWindow):
                 None, None,
                 "Remove Last Spot.")
 
-        self.processActions = [processNextAction, processPreviousAction, None, processRunAction, processStopAction, processRestartAction, None, processPlotOptions, None, self.processRemoveSpot]
+        self.processActions = [processNextAction, processPreviousAction, None, self.processRunAction, self.processPauseAction, processStopAction, processRestartAction, None, processPlotOptions, None, self.processRemoveSpot]
 
         # actions for "File" menu
         self.fileOpenAction = self.createAction("&Open...", self.fileOpen,
@@ -901,7 +904,7 @@ class MainWindow(QMainWindow):
         toolBar = self.addToolBar("&Toolbar")
         # adding actions to the toolbar, addActions-function creates a separator with "None"
         self.toolBarActions = [self.fileQuitAction, None, self.fileOpenAction, None,
-                               processRunAction, None, processStopAction, None,
+                               self.processRunAction, None, self.processPauseAction, None, processStopAction, None,
                                processPlotOptions, None, processSetParameters, None,
                                self.processRemoveSpot, None, processRestartAction]
         self.addActions(toolBar, self.toolBarActions)
@@ -1127,7 +1130,7 @@ class MainWindow(QMainWindow):
                 self.plotwid.updatePlot()
             except:
                 pass
-
+    
     def removeLastSpot(self):
         for item in self.scene.items():
             if type(item) == QGraphicsSpotItem:
@@ -1148,6 +1151,13 @@ class MainWindow(QMainWindow):
 
     def stopProcessing(self):
         self.stopped = True
+    
+    def pauseProcessing(self):
+        if hasattr(self, "paused"):
+            if self.paused:
+                self.paused = False
+            else:
+                self.paused = True
 
     def plot(self):
         if hasattr(self,'worker'):
@@ -1164,6 +1174,9 @@ class MainWindow(QMainWindow):
             time_before = time.time()
             self.initial_energy = self.current_energy
             self.stopped = False
+            self.paused = False
+            self.processRunAction.setEnabled(False)
+            self.processPauseAction.setEnabled(True)
             self.view.setInteractive(False)
             self.slider.setEnabled(False)
             self.processRemoveSpot.setEnabled(False)
@@ -1178,6 +1191,15 @@ class MainWindow(QMainWindow):
             for image in self.loader:
                 if self.stopped:
                     break
+                while self.paused:
+                    self.processPauseAction.setText("Resume")
+                    time.sleep(0.1)
+                    self.view.setInteractive(True)
+                    QApplication.processEvents()
+                    self.worker.update_positions(self.scene.spots,self.scene.center, self.current_energy)
+
+                self.processPauseAction.setText("Pause")
+                #self.view.setInteractive(False)
                 QApplication.processEvents()
                 self.setImage(image)
                 self.worker.process(image)
@@ -1191,6 +1213,8 @@ class MainWindow(QMainWindow):
             self.slider.setEnabled(True)
             self.processRemoveSpot.setEnabled(True)
             self.worker.createDataframe()
+            self.processRunAction.setEnabled(True)
+            self.processPauseAction.setEnabled(False)
             print("Total time acquisition:", time.time() - time_before, "s")
 
     def disableInput(self):
@@ -1215,6 +1239,7 @@ class MainWindow(QMainWindow):
 
     def fileQuit(self):
         """Special quit-function as the normal window closing might leave something on the background """
+        self.pauseProcessing()
         self.stopProcessing()
         QApplication.closeAllWindows()
         self.plotwid.canvas.close()
@@ -1263,7 +1288,6 @@ class MainWindow(QMainWindow):
         filename = qt_filedialog_convert(QFileDialog.getSaveFileName(self,
                                                     "Save the center location to a file",
                                                     filename))
-                                                    
         if filename:
             self.worker.saveCenter(filename)
 
@@ -1294,7 +1318,7 @@ class MainWindow(QMainWindow):
                 self.fileSaveCenterAction.setEnabled(True)
             except:
                 print("Invalid file for center location...")
-                
+
 class Worker(QObject):
     """ Worker that manages the spots.
 
@@ -1302,27 +1326,38 @@ class Worker(QObject):
         - key: spot
         - value: SpotModel, Tracker
     """
-
     def __init__(self, spots, center, energy, parent=None):
         super(Worker, self).__init__(parent)
-
         self.spots_map = {}
-        for spot in spots:
-            pos = spot.scenePos()
+        self.tracker = {}
+        self.spots = spots
+        for i in range(len(self.spots)):
+            pos = self.spots[i].scenePos()
             if center:
-                tracker = Tracker(pos.x(), pos.y(), spot.radius(), energy, center.x(), center.y(),
+                self.tracker[i] = Tracker(pos.x(), pos.y(), self.spots[i].radius(), energy, center.x(), center.y(),
                             input_precision=config.Tracking_inputPrecision,
                             window_scaling=config.Tracking_windowScalingOn)
             else:
-                tracker = Tracker(pos.x(), pos.y(), spot.radius(), energy,
+                self.tracker[i] = Tracker(pos.x(), pos.y(), self.spots[i].radius(), energy,
                             input_precision=config.Tracking_inputPrecision,
                             window_scaling=config.Tracking_windowScalingOn)
-            self.spots_map[spot] = (QSpotModel(self), tracker)
+            self.spots_map[self.spots[i]] = (QSpotModel(self), self.tracker[i])
 
         for view, tup in six.iteritems(self.spots_map):
             # view = QGraphicsSpotItem, tup = (QSpotModel, tracker) -> tup[0] = QSpotModel
             tup[0].positionChanged.connect(view.onPositionChange)
             tup[0].radiusChanged.connect(view.onRadiusChange)
+
+    def update_positions(self, spots, center, energy):
+        for i in range(len(spots)):
+            #for spot in self.scene.spots:
+            pos = spots[i].scenePos()
+            self.tracker[i].init_tracker(pos.x(), pos.y(), spots[i].radius(), energy, center.x(), center.y(),
+                    input_precision=config.Tracking_inputPrecision,
+                    window_scaling=config.Tracking_windowScalingOn)
+
+    def isPausedSetFlag(self, flag):
+        self.isPausedFlag = flag
 
     def process(self, image):
         if config.GraphicsScene_intensTimeOn:

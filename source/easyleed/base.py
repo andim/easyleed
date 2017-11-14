@@ -40,16 +40,21 @@ class Tracker:
             input_precision=1, window_scaling=False):
         """ x_in, y_in: start position of spot """
         self.radius = radius
+        self.init_tracker(x_in, y_in, radius, energy, x_c, y_c,
+            input_precision, window_scaling)
+        
+    def init_tracker(self, x_in, y_in, radius, energy, x_c, y_c,
+            input_precision, window_scaling):
         if x_c and y_c:
-            x, y = x_in - x_c, y_in - y_c
-            r = (x**2 + y**2)**.5
-            v = - 0.5 * r / energy
+            self.x, self.y = x_in - x_c, y_in - y_c
+            self.r = (self.x**2 + self.y**2)**.5
+            self.v = - 0.5 * self.r / energy
             # calculate std. dev. of velocity guess
             # by propagation of uncertainty from the input precision
             v_precision = 2**.5 * 0.5 * input_precision / energy
-            phi = np.arctan2(y, x)
+            self.phi = np.arctan2(self.y, self.x)
             cov_input = np.diag([input_precision, input_precision, v_precision, v_precision])**2
-            self.kalman = kalman.PVKalmanFilter2(x_in, y_in, cov_input, energy, vx_in=v * np.cos(phi), vy_in=v * np.sin(phi))
+            self.kalman = kalman.PVKalmanFilter2(x_in, y_in, cov_input, energy, vx_in=self.v * np.cos(self.phi), vy_in=self.v * np.sin(self.phi))
         else:
             cov_input = np.diag([input_precision, input_precision, 1000, 1000])
             self.kalman = kalman.PVKalmanFilter2(x_in, y_in, cov_input, energy)
@@ -57,6 +62,7 @@ class Tracker:
         self.window_scaling = window_scaling
         if self.window_scaling:
             self.c_size = energy**0.5 * self.radius
+
 
     def feed_image(self, image):
         npimage, energy = image
