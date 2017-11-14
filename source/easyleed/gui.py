@@ -819,20 +819,20 @@ class MainWindow(QMainWindow):
                 QKeySequence("Ctrl+z"), None,
                 "Reset chosen points and jump to first image.")
         processNextAction = self.createAction("&Next Image", self.next_,
-                QKeySequence("Ctrl+right"), None,
+                QKeySequence("Ctrl+n"), None,
                 "Open next image.")
         processPreviousAction = self.createAction("&Previous Image", self.previous,
-                QKeySequence("Ctrl+left"), None,
+                QKeySequence("Ctrl+p"), None,
                 "Open previous image.")
 
         processPlotOptions = self.createAction("&Plot...", self.plot,
-                QKeySequence("Ctrl+Shift+p"), None,
+                QKeySequence("Ctrl+p"), None,
                 "Plot Intensities.")
         processSetParameters = self.createAction("&Set Parameters", self.parametersettingwid.show,
                 None, None,
                 "Set tracking parameters.")
         self.processRemoveSpot = self.createAction("&Remove Spot", self.removeLastSpot,
-                QKeySequence("Ctrl+Shift+r"), None,
+                None, None,
                 "Remove Last Spot.")
 
         self.processActions = [processNextAction, processPreviousAction, None, self.processRunAction, self.processPauseAction, processStopAction, processRestartAction, None, processPlotOptions, None, self.processRemoveSpot]
@@ -854,16 +854,16 @@ class MainWindow(QMainWindow):
                 QKeySequence("Ctrl+q"), None,
                 "Close the application.")
         self.fileSaveSpotsAction = self.createAction("&Save spot locations...", self.saveSpots,
-                QKeySequence("Ctrl+Shift+s"), None,
+                QKeySequence("Ctrl+c"), None,
                 "Save the spots to a file.")
         self.fileLoadSpotsAction = self.createAction("&Load spot locations...", self.loadSpots,
-                QKeySequence("Ctrl+l"), None,
+                QKeySequence("Ctrl+v"), None,
                 "Load spots from a file.")
         self.fileSaveCenterAction = self.createAction("&Save center location...", self.saveCenter,
-                QKeySequence("Ctrl+Shift+c"), None,
+                QKeySequence("Ctrl+n"), None,
                 "Save the center to a file.")
         self.fileLoadCenterAction = self.createAction("&Load center location...", self.loadCenter,
-                QKeySequence("Ctrl+Shift+l"), None,
+                QKeySequence("Ctrl+m"), None,
                 "Load center from a file.")
 
         # Disable actions that are not immediately available
@@ -1197,6 +1197,8 @@ class MainWindow(QMainWindow):
                     self.view.setInteractive(True)
                     QApplication.processEvents()
                     self.worker.update_positions(self.scene.spots,self.scene.center, self.current_energy)
+                    if self.stopped:
+                        break
 
                 self.processPauseAction.setText("Pause")
                 #self.view.setInteractive(False)
