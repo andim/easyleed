@@ -6,14 +6,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>EasyLEED: LEED I(E)-spectra analysis &#8212; EasyLEED 2.4 documentation</title>
+    <title>EasyLEED: LEED I(E)-spectra analysis &#8212; EasyLEED 2.5 documentation</title>
     <link rel="stylesheet" href="_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/print.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.4',
+        VERSION:     '2.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -392,13 +392,13 @@ If an action is None a separator will be added.</p>
 <dl class="method">
 <dt id="easyleed.gui.MainWindow.loadCenter">
 <code class="descname">loadCenter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.loadCenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.loadCenter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load saved center position from file</p>
+<dd><p>Load Center location from csv file</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="easyleed.gui.MainWindow.loadSpots">
 <code class="descname">loadSpots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.loadSpots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.loadSpots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load saved spot positions</p>
+<dd><p>Load Spots location from csv file</p>
 </dd></dl>
 
 <dl class="method">
@@ -410,7 +410,7 @@ If an action is None a separator will be added.</p>
 <dl class="method">
 <dt id="easyleed.gui.MainWindow.saveCenter">
 <code class="descname">saveCenter</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.saveCenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.saveCenter" title="Permalink to this definition">¶</a></dt>
-<dd><p>Saves the center locations to a file</p>
+<dd><p>Saves the center locations to a file, uses workers saveCenter-method</p>
 </dd></dl>
 
 <dl class="method">
@@ -422,7 +422,7 @@ If an action is None a separator will be added.</p>
 <dl class="method">
 <dt id="easyleed.gui.MainWindow.saveSpots">
 <code class="descname">saveSpots</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#MainWindow.saveSpots"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.MainWindow.saveSpots" title="Permalink to this definition">¶</a></dt>
-<dd><p>Saves the spot locations to a file, uses workers saveLoc-function</p>
+<dd><p>Saves the spot locations to a file, uses workers saveLoc-method</p>
 </dd></dl>
 
 <dl class="method">
@@ -589,9 +589,21 @@ inc &lt; 0: decrease</p>
 - key: spot
 - value: SpotModel, Tracker</p>
 <dl class="method">
+<dt id="easyleed.gui.Worker.createDataframe">
+<code class="descname">createDataframe</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#Worker.createDataframe"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Worker.createDataframe" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create internal dataframe with intensities, spot locations, and center</p>
+</dd></dl>
+
+<dl class="method">
 <dt id="easyleed.gui.Worker.numProcessed">
 <code class="descname">numProcessed</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#Worker.numProcessed"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Worker.numProcessed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the number of processed images.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="easyleed.gui.Worker.saveCenter">
+<code class="descname">saveCenter</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#Worker.saveCenter"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Worker.saveCenter" title="Permalink to this definition">¶</a></dt>
+<dd><p>save center location</p>
 </dd></dl>
 
 <dl class="method">
@@ -603,7 +615,7 @@ inc &lt; 0: decrease</p>
 <dl class="method">
 <dt id="easyleed.gui.Worker.saveLoc">
 <code class="descname">saveLoc</code><span class="sig-paren">(</span><em>filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/easyleed/gui.html#Worker.saveLoc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#easyleed.gui.Worker.saveLoc" title="Permalink to this definition">¶</a></dt>
-<dd><p>save spot locations</p>
+<dd><p>save spots location</p>
 </dd></dl>
 
 </dd></dl>
@@ -625,7 +637,7 @@ inc &lt; 0: decrease</p>
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2017-11-07.
+      Last updated on 2017-11-19.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>

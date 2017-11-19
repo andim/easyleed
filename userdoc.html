@@ -6,14 +6,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>EasyLEED: LEED I(E)-spectra analysis &#8212; EasyLEED 2.4 documentation</title>
+    <title>EasyLEED: LEED I(E)-spectra analysis &#8212; EasyLEED 2.5 documentation</title>
     <link rel="stylesheet" href="_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/print.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.4',
+        VERSION:     '2.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -57,27 +57,29 @@ If you are running into trouble using the software we are happy to provide furth
 <ul class="simple">
 <li>Open the images you want to work with using “File –&gt; Open…” or use “Open” in the toolbar. Only the images selected in the file dialog will be processed later on.</li>
 <li>Navigate through the images using “Process –&gt; Previous Image” and “Process –&gt; Next Image”, or buttons in the status bar, or with the slider until you have found the image at which you want to start the analysis. If you know the energy corresponding to the image of interest, you can enter it to select the corresponding image by pressing the button labeled “eV” and by entering the relative energy.</li>
-<li>Select the position of the spots by a left click.</li>
+<li>Select the position of the spots by a left click. You can remove a spot by selecting it, and pressing the “Delete” key (fn+Delete on Macs).</li>
 <li>The center of the pattern can be set for an optimized spot tracking with a right click.</li>
 <li>You can change the position of the selected spot with the arrow keys. The size of the integration window can be changed using + or -. (optional)</li>
 <li>Change the tracking parameters using “Process – Set Parameters” or pressing “Set Parameters” in the toolbar. (Optional)</li>
 <li>Start the tracking of the spots using “Process –&gt; Run” or pressing “Run” in the toolbar. The I(E) plot starts automatically.</li>
+<li>When pressing “Pause” during a run, spots can be moved. When the run is resumed, the spots will move from the new location.</li>
 <li>I(E) averages can be plotted directly from the check box in the Plot window.</li>
 <li>Smoothed I(E) averages can be plotted directly from the check box in the Plot window (uses cubic spline).
 * Any change in smoothing parameters in settings is immediately applied in the plot.</li>
 <li>Tooltips in the image in correspondence to the spots show the spot number. The same number is displayed in the legend in the plot.</li>
 <li>Click the stop button in the status bar to stop processing. (optional)</li>
-<li>Save the generated intensities using “File –&gt; Save Intensities…” OR</li>
+<li>Save the generated intensities using “File –&gt; Save Intensities…”. This will also save both spot and center location.</li>
 <li>Plot the generated intensities using “Process –&gt; Plot” or the “Plot” option in the toolbar.</li>
 <li>Save the generated plot image using “File –&gt; Save Plot”</li>
+<li>Selecting a spot after a run will highlight the corresponding curve in the plot.</li>
 <li>Parameter settings can also be saved/loaded using an ini-format through the “Set Parameters” dialog</li>
-<li>The extraced spot and center positions can also be saved and reloaded</li>
+<li>The extracted spot and center positions can also be saved and reloaded as csv files.</li>
 </ul>
 <div class="section" id="parameter-settings">
 <h2>Parameter settings<a class="headerlink" href="#parameter-settings" title="Permalink to this headline">¶</a></h2>
-<p>It might be useful to get a rough understanding of the underlying algorithm for intuition into how to set parameters. We recommend you read our paper for an introduction to the ideas behind EasyLEED.</p>
-<p>Broadly in the algorithm there is a trade-off between how much to rely on the fitted vs predicted positions. Fitted positions are roughly the maxima of intensity of the spots. The prediction comes from a simple dynamical model of the spots moving towards the center as beam energy is increased. How much the algorithm relies on one over the other depends on an assumed variance of both predictions. The variance of predictions increases if there is more “process noise”, i.e. the larger you set those parameters the more the algorithm is going to rely on its fitted position.</p>
-<p>The algorithm also uses the user input of initial spot positions (and if set center position). The weight put on this information is controlled by the parameter “User input precision”. Larger values of this parameter lead to less weight being put on this prior information.</p>
+<p>It might be useful to get a rough understanding of the underlying algorithm for intuition into how to set parameters. We recommend reading [our paper](&lt;<a class="reference external" href="http://dx.doi.org/10.1016/j.cpc.2012.02.019">http://dx.doi.org/10.1016/j.cpc.2012.02.019</a>&gt;) for an introduction to the ideas behind EasyLEED.</p>
+<p>Briefly, in the algorithm a trade-off is made between the reliance on the fitted vs predicted spot positions. Fitted positions are roughly the maxima of intensity of the spots. The prediction is made based on a simple dynamical model of the spots moving towards the center as beam energy is increased. How much the algorithm relies on one over the other depends on an assumed variance of both predictions. The variance of predictions increases if there is more “process noise”, i.e. the larger you set those parameters the more the algorithm is going to rely on its fitted position.</p>
+<p>The algorithm also uses the user input of initial spot positions (and if set center position). The weight put on this information is controlled by the parameter “User input precision”. Larger values of this parameter lead to less weight being placed on this prior information.</p>
 <p>Sometimes spots vanish so they cannot be fit accurately. The algorithm should then purely rely on the prediction. The “Minimal R^2 to accept fit” specifies the quality of fit below which to reject the position from the fit. Similarly the fit might go awry and converge to a different spot. The parameter “Size of the validation region” sets a cutoff on how much the fitted position can differ from the predicted position, before it is discarded.</p>
 </div>
 <div class="section" id="file-naming-policy">
@@ -97,7 +99,7 @@ You can change the regular expression that is used for parsing energies from fil
 </div>
 <div class="section" id="qt-wrapper">
 <h2>Qt Wrapper<a class="headerlink" href="#qt-wrapper" title="Permalink to this headline">¶</a></h2>
-<p>There exist different python wrappers for the <cite>Qt</cite> library (<cite>PyQt5</cite>, <cite>PyQt4</cite> and <cite>PySide</cite>). All can be used with EasyLEED. To select which one to use set the <cite>QT_API</cite> environment variable to either <cite>pyqt</cite> or <cite>pyside</cite>.</p>
+<p>Different python wrappers for the <cite>Qt</cite> library exist (<cite>PyQt5</cite>, <cite>PyQt4</cite> and <cite>PySide</cite>). All can be used with EasyLEED. To select which one to use set the <cite>QT_API</cite> environment variable to either <cite>pyqt</cite> or <cite>pyside</cite>.</p>
 </div>
 </div>
 
@@ -115,7 +117,7 @@ You can change the regular expression that is used for parsing energies from fil
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2017-11-07.
+      Last updated on 2017-11-19.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>

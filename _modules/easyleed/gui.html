@@ -6,14 +6,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>EasyLEED: LEED I(E)-spectra analysis &#8212; EasyLEED 2.4 documentation</title>
+    <title>EasyLEED: LEED I(E)-spectra analysis &#8212; EasyLEED 2.5 documentation</title>
     <link rel="stylesheet" href="../../_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/print.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.4',
+        VERSION:     '2.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -55,6 +55,7 @@
 <span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">six</span>
 <span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">os.path</span>
 
 <span class="kn">from</span> <span class="nn">.qt</span> <span class="k">import</span> <span class="n">get_qt_binding_name</span><span class="p">,</span> <span class="n">qt_filedialog_convert</span>
 <span class="kn">from</span> <span class="nn">.qt.QtCore</span> <span class="k">import</span> <span class="p">(</span><span class="n">QPoint</span><span class="p">,</span> <span class="n">QRectF</span><span class="p">,</span> <span class="n">QPointF</span><span class="p">,</span> <span class="n">Qt</span><span class="p">,</span> <span class="n">QTimer</span><span class="p">,</span> <span class="n">QObject</span><span class="p">)</span>
@@ -75,6 +76,7 @@
 <span class="kn">from</span> <span class="nn">.io</span> <span class="k">import</span> <span class="o">*</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
 <span class="kn">from</span> <span class="nn">scipy</span> <span class="k">import</span> <span class="n">interpolate</span>
 
 <span class="kn">from</span> <span class="nn">matplotlib.figure</span> <span class="k">import</span> <span class="n">Figure</span>
@@ -285,6 +287,12 @@
                 <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">is</span> <span class="n">QGraphicsSpotItem</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">spots</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">lines_map</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+                        <span class="n">line</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">updatePlot</span><span class="p">()</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">pass</span>
                 <span class="k">elif</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="ow">is</span> <span class="n">QGraphicsCenterItem</span><span class="p">:</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">removeCenter</span><span class="p">()</span>
                 <span class="k">del</span> <span class="n">item</span>
@@ -464,7 +472,8 @@
         <span class="sd">&quot;&quot;&quot; Basic Matplotlib plotting I(E)-curve &quot;&quot;&quot;</span>
         <span class="k">for</span> <span class="n">spot</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lines_map</span><span class="p">):</span>
             <span class="n">line</span><span class="o">.</span><span class="n">set_data</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spot</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spot</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">intensity</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">averageCheck</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
+        
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">averageCheck</span><span class="o">.</span><span class="n">isChecked</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">lines</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">numProcessed</span><span class="p">())</span>
             <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">tracker</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">spots_map</span><span class="p">):</span>
                 <span class="n">intensity</span> <span class="o">+=</span> <span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">intensity</span>
@@ -491,8 +500,11 @@
                     <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">averageSmoothLine</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;averageLine&quot;</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">averageLine</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
-                <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">averageLine</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">averageLine</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">averageLine</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">axes</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="c1"># decide whether to show legend</span>
@@ -505,6 +517,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span></div>
 
     <span class="k">def</span> <span class="nf">clearPlot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">averageCheck</span><span class="o">.</span><span class="n">setChecked</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">updatePlot</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">clf</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">initPlot</span><span class="p">()</span>
@@ -833,43 +847,47 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">setMinimumSize</span><span class="p">(</span><span class="mi">660</span><span class="p">,</span> <span class="mi">480</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setGeometry</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">30</span><span class="p">,</span> <span class="mi">660</span><span class="p">,</span> <span class="mi">480</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setCentralWidget</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selectionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">highlightSelSpot</span><span class="p">)</span>
 
         <span class="c1">#### define actions ####</span>
 
         <span class="c1">## actions for &quot;Process&quot; menu</span>
-        <span class="n">processRunAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Run&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processRunAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Run&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">,</span>
                 <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+r&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Run the analysis of the images.&quot;</span><span class="p">)</span>
         <span class="n">processStopAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Stop&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopProcessing</span><span class="p">,</span>
                 <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+w&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Stop the analysis of the images.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processPauseAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Pause&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">pauseProcessing</span><span class="p">,</span>
+                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+p&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="s2">&quot;Pause the analysis of the images.&quot;</span><span class="p">)</span>
         <span class="n">processRestartAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Restart&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">restart</span><span class="p">,</span>
                 <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+z&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Reset chosen points and jump to first image.&quot;</span><span class="p">)</span>
         <span class="n">processNextAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Next Image&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_</span><span class="p">,</span>
-                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+n&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+right&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Open next image.&quot;</span><span class="p">)</span>
         <span class="n">processPreviousAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Previous Image&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous</span><span class="p">,</span>
-                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+p&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+left&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Open previous image.&quot;</span><span class="p">)</span>
 
         <span class="n">processPlotOptions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Plot...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">plot</span><span class="p">,</span>
-                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+p&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+Shift+p&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Plot Intensities.&quot;</span><span class="p">)</span>
         <span class="n">processSetParameters</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Set Parameters&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">parametersettingwid</span><span class="o">.</span><span class="n">show</span><span class="p">,</span>
                 <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Set tracking parameters.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">processRemoveSpot</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Remove Spot&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">removeLastSpot</span><span class="p">,</span>
-                <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+Shift+r&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Remove Last Spot.&quot;</span><span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">processActions</span> <span class="o">=</span> <span class="p">[</span><span class="n">processNextAction</span><span class="p">,</span> <span class="n">processPreviousAction</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">processRunAction</span><span class="p">,</span> <span class="n">processStopAction</span><span class="p">,</span> <span class="n">processRestartAction</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">processPlotOptions</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">processRemoveSpot</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">processActions</span> <span class="o">=</span> <span class="p">[</span><span class="n">processNextAction</span><span class="p">,</span> <span class="n">processPreviousAction</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">processRunAction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">processPauseAction</span><span class="p">,</span> <span class="n">processStopAction</span><span class="p">,</span> <span class="n">processRestartAction</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">processPlotOptions</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">processRemoveSpot</span><span class="p">]</span>
 
         <span class="c1"># actions for &quot;File&quot; menu</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileOpenAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Open...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileOpen</span><span class="p">,</span>
                 <span class="n">QKeySequence</span><span class="o">.</span><span class="n">Open</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Open a directory containing the image files.&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Save intensities...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveIntensity</span><span class="p">,</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Save intensities and spots...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveIntensity</span><span class="p">,</span>
                 <span class="n">QKeySequence</span><span class="o">.</span><span class="n">Save</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Save the calculated intensities to a text file.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileSavePlotAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Save plot...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">save</span><span class="p">,</span>
@@ -882,16 +900,16 @@
                 <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+q&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Close the application.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveSpotsAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Save spot locations...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveSpots</span><span class="p">,</span>
-                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+c&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+Shift+s&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Save the spots to a file.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadSpotsAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Load spot locations...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadSpots</span><span class="p">,</span>
-                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+v&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+l&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Load spots from a file.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveCenterAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Save center location...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">saveCenter</span><span class="p">,</span>
-                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+n&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+Shift+c&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Save the center to a file.&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fileLoadCenterAction</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">createAction</span><span class="p">(</span><span class="s2">&quot;&amp;Load center location...&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">loadCenter</span><span class="p">,</span>
-                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+m&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
+                <span class="n">QKeySequence</span><span class="p">(</span><span class="s2">&quot;Ctrl+Shift+l&quot;</span><span class="p">),</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="s2">&quot;Load center from a file.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Disable actions that are not immediately available</span>
@@ -932,7 +950,7 @@
         <span class="n">toolBar</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">addToolBar</span><span class="p">(</span><span class="s2">&quot;&amp;Toolbar&quot;</span><span class="p">)</span>
         <span class="c1"># adding actions to the toolbar, addActions-function creates a separator with &quot;None&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">toolBarActions</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">fileQuitAction</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">fileOpenAction</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
-                               <span class="n">processRunAction</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">processStopAction</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="bp">self</span><span class="o">.</span><span class="n">processRunAction</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">processPauseAction</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">processStopAction</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
                                <span class="n">processPlotOptions</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">processSetParameters</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">processRemoveSpot</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">processRestartAction</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">addActions</span><span class="p">(</span><span class="n">toolBar</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">toolBarActions</span><span class="p">)</span>
@@ -1114,7 +1132,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">current_energy</span> <span class="o">=</span> <span class="n">energy</span>
 
     <span class="k">def</span> <span class="nf">saveIntensity</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;intensities.csv&#39;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;intensities_spots.csv&#39;</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                     <span class="s2">&quot;Save intensities to a file&quot;</span><span class="p">,</span>
                                                     <span class="n">filename</span><span class="p">))</span>
@@ -1147,10 +1165,28 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">sliderCurrentPos</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setValue</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sliderCurrentPos</span><span class="p">)</span></div>
 
+    <span class="k">def</span> <span class="nf">highlightSelSpot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1">### Highlight the plot corresponding to a selected spot ###</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="p">,</span><span class="s2">&quot;lines_map&quot;</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">_</span><span class="p">,</span><span class="n">lines</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">lines_map</span><span class="p">):</span>
+                <span class="n">lines</span><span class="o">.</span><span class="n">set_linewidth</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">lines_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">selectedItems</span><span class="p">()[</span><span class="mi">0</span><span class="p">]]</span>
+                <span class="n">line</span><span class="o">.</span><span class="n">set_linewidth</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">updatePlot</span><span class="p">()</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
+    
     <span class="k">def</span> <span class="nf">removeLastSpot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">item</span><span class="p">)</span> <span class="o">==</span> <span class="n">QGraphicsSpotItem</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">removeItem</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">line</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">lines_map</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+                    <span class="n">line</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">updatePlot</span><span class="p">()</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
                 <span class="k">break</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">spots</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">spots</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
@@ -1161,6 +1197,13 @@
 
     <span class="k">def</span> <span class="nf">stopProcessing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span> <span class="o">=</span> <span class="kc">True</span>
+    
+    <span class="k">def</span> <span class="nf">pauseProcessing</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;paused&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">paused</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">paused</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">paused</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">plot</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="s1">&#39;worker&#39;</span><span class="p">):</span>
@@ -1177,6 +1220,9 @@
             <span class="n">time_before</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">initial_energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_energy</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">paused</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processRunAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processPauseAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">setInteractive</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">processRemoveSpot</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
@@ -1191,6 +1237,17 @@
             <span class="k">for</span> <span class="n">image</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">loader</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="p">:</span>
                     <span class="k">break</span>
+                <span class="k">while</span> <span class="bp">self</span><span class="o">.</span><span class="n">paused</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">processPauseAction</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Resume&quot;</span><span class="p">)</span>
+                    <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mf">0.1</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">view</span><span class="o">.</span><span class="n">setInteractive</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">QApplication</span><span class="o">.</span><span class="n">processEvents</span><span class="p">()</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">update_positions</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">spots</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">current_energy</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">stopped</span><span class="p">:</span>
+                        <span class="k">break</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">processPauseAction</span><span class="o">.</span><span class="n">setText</span><span class="p">(</span><span class="s2">&quot;Pause&quot;</span><span class="p">)</span>
+                <span class="c1">#self.view.setInteractive(False)</span>
                 <span class="n">QApplication</span><span class="o">.</span><span class="n">processEvents</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">setImage</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">process</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
@@ -1203,6 +1260,9 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">clearPlotButton</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">slider</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">processRemoveSpot</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">createDataframe</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processRunAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">processPauseAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Total time acquisition:&quot;</span><span class="p">,</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">time_before</span><span class="p">,</span> <span class="s2">&quot;s&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">disableInput</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -1227,77 +1287,85 @@
 
 <div class="viewcode-block" id="MainWindow.fileQuit"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.fileQuit">[docs]</a>    <span class="k">def</span> <span class="nf">fileQuit</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Special quit-function as the normal window closing might leave something on the background &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pauseProcessing</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stopProcessing</span><span class="p">()</span>
         <span class="n">QApplication</span><span class="o">.</span><span class="n">closeAllWindows</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
 
 <div class="viewcode-block" id="MainWindow.saveSpots"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.saveSpots">[docs]</a>    <span class="k">def</span> <span class="nf">saveSpots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Saves the spot locations to a file, uses workers saveLoc-function&quot;&quot;&quot;</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;loc_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_energy</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;eV.pkl&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Saves the spot locations to a file, uses workers saveLoc-method&quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s2">&quot;loc-spots_&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">initial_energy</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;eV.csv&quot;</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                     <span class="s2">&quot;Save the spot locations to a file&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">saveLoc</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MainWindow.loadSpots"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.loadSpots">[docs]</a>    <span class="k">def</span> <span class="nf">loadSpots</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Load saved spot positions&quot;&quot;&quot;</span>
-        <span class="c1"># This can probably be done in a better way</span>
+        <span class="sd">&quot;&quot;&quot;Load Spots location from csv file&quot;&quot;&quot;</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Open spot location file&#39;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
-            <span class="c1"># pickle doesn&#39;t recognise the file opened by PyQt&#39;s openfile dialog as a file so &#39;normal&#39; file processing</span>
-            <span class="n">pkl_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
-            <span class="c1"># loading the zipped info to &quot;location&quot;</span>
-            <span class="n">location</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pkl_file</span><span class="p">)</span>
-            <span class="n">pkl_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="c1"># unzipping the &quot;location&quot;</span>
-            <span class="n">energy</span><span class="p">,</span> <span class="n">locationx</span><span class="p">,</span> <span class="n">locationy</span><span class="p">,</span> <span class="n">radius</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">location</span><span class="p">)</span>
-            <span class="c1"># NEED TO FIGURE OUT HOW TO GET ALL THE SPOTS TO RESPECTIVE ENERGIES, now only loads the first energy&#39;s spots</span>
-            <span class="c1"># improving might involve modifying the algorithm for calculating intensity</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">removeAll</span><span class="p">()</span>
-            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">energy</span><span class="p">)):</span>
-                <span class="c1">#for j in range(len(energy[i])):</span>
-                <span class="c1"># only taking the first energy location, [0] -&gt; [j] for all, but now puts every spot to the first energy</span>
-                <span class="n">point</span> <span class="o">=</span> <span class="n">QPointF</span><span class="p">(</span><span class="n">locationx</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">locationy</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-                <span class="n">item</span> <span class="o">=</span> <span class="n">QGraphicsSpotItem</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">radius</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-                <span class="c1"># adding the item to the gui</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">addSpot</span><span class="p">(</span><span class="n">item</span><span class="p">)</span></div>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;.csv&quot;</span><span class="p">:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">energy</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Energy&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                    <span class="n">numSpots</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">df</span><span class="o">.</span><span class="n">columns</span><span class="p">)</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">/</span><span class="mi">3</span><span class="p">)</span>
+                    <span class="n">locationx</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;x #&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numSpots</span><span class="p">)]</span>
+                    <span class="n">locationy</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;y #&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numSpots</span><span class="p">)]</span>
+                    <span class="n">radius</span> <span class="o">=</span> <span class="p">[</span><span class="n">df</span><span class="p">[</span><span class="s1">&#39;r #&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numSpots</span><span class="p">)]</span>
+                    <span class="c1"># NEED TO FIGURE OUT HOW TO GET ALL THE SPOTS TO RESPECTIVE ENERGIES, now only loads the first energy&#39;s spots</span>
+                    <span class="c1"># improving might involve modifying the algorithm for calculating intensity</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pkl_file</span><span class="p">:</span>
+                        <span class="n">location</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pkl_file</span><span class="p">)</span>
+                    <span class="n">energy</span><span class="p">,</span> <span class="n">locationx</span><span class="p">,</span> <span class="n">locationy</span><span class="p">,</span> <span class="n">radius</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">location</span><span class="p">)</span>
+                    <span class="n">numSpots</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">energy</span><span class="p">)</span>
+            
+                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">removeAll</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numSpots</span><span class="p">):</span>
+                    <span class="c1"># only taking the first energy location, [0] -&gt; [j] for all, but now puts every spot to the first energy</span>
+                    <span class="n">point</span> <span class="o">=</span> <span class="n">QPointF</span><span class="p">(</span><span class="n">locationx</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">],</span> <span class="n">locationy</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="n">item</span> <span class="o">=</span> <span class="n">QGraphicsSpotItem</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">radius</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="c1"># adding the item to the gui</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">addSpot</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid file for spot locations...&quot;</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MainWindow.saveCenter"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.saveCenter">[docs]</a>    <span class="k">def</span> <span class="nf">saveCenter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Saves the center locations to a file&quot;&quot;&quot;</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;loc_center.pkl&#39;</span>
+        <span class="sd">&quot;&quot;&quot;Saves the center locations to a file, uses workers saveCenter-method&quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;loc-center.csv&#39;</span>
         <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getSaveFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
                                                     <span class="s2">&quot;Save the center location to a file&quot;</span><span class="p">,</span>
                                                     <span class="n">filename</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
-            <span class="n">zipped</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">x</span><span class="p">()],</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">y</span><span class="p">()]))</span>
-            <span class="n">output</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
-            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">zipped</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
-            <span class="n">output</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">saveCenter</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MainWindow.loadCenter"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.loadCenter">[docs]</a>    <span class="k">def</span> <span class="nf">loadCenter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Load saved center position from file&quot;&quot;&quot;</span>
-        <span class="c1"># This can probably be done in a better way</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                                                    <span class="s2">&quot;Open center location file&quot;</span><span class="p">))</span>
+        <span class="sd">&quot;&quot;&quot;Load Center location from csv file&quot;&quot;&quot;</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">qt_filedialog_convert</span><span class="p">(</span><span class="n">QFileDialog</span><span class="o">.</span><span class="n">getOpenFileName</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s1">&#39;Open spot location file&#39;</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">hasattr</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="p">,</span> <span class="s2">&quot;center&quot;</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">filename</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;.csv&quot;</span><span class="p">:</span>
+                    <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">skipinitialspace</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="n">cLocx</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Center x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                    <span class="n">cLocy</span> <span class="o">=</span> <span class="n">df</span><span class="p">[</span><span class="s1">&#39;Center y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># pickle doesn&#39;t recognise the file opened by PyQt&#39;s openfile dialog as a file so &#39;normal&#39; file processing</span>
+                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">pkl_file</span><span class="p">:</span>
+                        <span class="n">location</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pkl_file</span><span class="p">)</span>
+                    <span class="n">cLocx</span><span class="p">,</span> <span class="n">cLocy</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">location</span><span class="p">)</span>
+                
                 <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">removeCenter</span><span class="p">()</span>
-            <span class="c1"># pickle doesn&#39;t recognise the file opened by PyQt&#39;s openfile dialog as a file so &#39;normal&#39; file processing</span>
-            <span class="n">pkl_file</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span>
-            <span class="c1"># loading the zipped info to &quot;location&quot;</span>
-            <span class="n">location</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">pkl_file</span><span class="p">)</span>
-            <span class="n">pkl_file</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="c1"># unzipping the &quot;location&quot;</span>
-            <span class="n">cLocx</span><span class="p">,</span> <span class="n">cLocy</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">location</span><span class="p">)</span>
-            <span class="n">point</span> <span class="o">=</span> <span class="n">QPointF</span><span class="p">(</span><span class="n">cLocx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cLocy</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-            <span class="n">item</span> <span class="o">=</span> <span class="n">QGraphicsCenterItem</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">QGraphicsCenterItem_size</span><span class="p">)</span>
-            <span class="c1"># adding the item to the gui</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">clearSelection</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-            <span class="n">item</span><span class="o">.</span><span class="n">setSelected</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">item</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">setFocusItem</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveCenterAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span></div></div>
+                <span class="n">point</span> <span class="o">=</span> <span class="n">QPointF</span><span class="p">(</span><span class="n">cLocx</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cLocy</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="n">item</span> <span class="o">=</span> <span class="n">QGraphicsCenterItem</span><span class="p">(</span><span class="n">point</span><span class="p">,</span> <span class="n">config</span><span class="o">.</span><span class="n">QGraphicsCenterItem_size</span><span class="p">)</span>
+                <span class="c1"># adding the item to the gui</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">clearSelection</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">addItem</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="n">item</span><span class="o">.</span><span class="n">setSelected</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">center</span> <span class="o">=</span> <span class="n">item</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">setFocusItem</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">fileSaveCenterAction</span><span class="o">.</span><span class="n">setEnabled</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Invalid file for center location...&quot;</span><span class="p">)</span></div></div>
 
 <div class="viewcode-block" id="Worker"><a class="viewcode-back" href="../../api.html#easyleed.gui.Worker">[docs]</a><span class="k">class</span> <span class="nc">Worker</span><span class="p">(</span><span class="n">QObject</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot; Worker that manages the spots.</span>
@@ -1306,27 +1374,38 @@
 <span class="sd">        - key: spot</span>
 <span class="sd">        - value: SpotModel, Tracker</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spots</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">energy</span><span class="p">,</span> <span class="n">parent</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">Worker</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">parent</span><span class="p">)</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">spot</span> <span class="ow">in</span> <span class="n">spots</span><span class="p">:</span>
-            <span class="n">pos</span> <span class="o">=</span> <span class="n">spot</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tracker</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spots</span> <span class="o">=</span> <span class="n">spots</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots</span><span class="p">)):</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">center</span><span class="p">:</span>
-                <span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">spot</span><span class="o">.</span><span class="n">radius</span><span class="p">(),</span> <span class="n">energy</span><span class="p">,</span> <span class="n">center</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">center</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tracker</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">spots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">radius</span><span class="p">(),</span> <span class="n">energy</span><span class="p">,</span> <span class="n">center</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">center</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
                             <span class="n">input_precision</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">Tracking_inputPrecision</span><span class="p">,</span>
                             <span class="n">window_scaling</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">Tracking_windowScalingOn</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">tracker</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">spot</span><span class="o">.</span><span class="n">radius</span><span class="p">(),</span> <span class="n">energy</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">tracker</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">Tracker</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">spots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">radius</span><span class="p">(),</span> <span class="n">energy</span><span class="p">,</span>
                             <span class="n">input_precision</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">Tracking_inputPrecision</span><span class="p">,</span>
                             <span class="n">window_scaling</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">Tracking_windowScalingOn</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spot</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">QSpotModel</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="n">tracker</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">spots</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="n">QSpotModel</span><span class="p">(</span><span class="bp">self</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">tracker</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 
         <span class="k">for</span> <span class="n">view</span><span class="p">,</span> <span class="n">tup</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">iteritems</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">):</span>
             <span class="c1"># view = QGraphicsSpotItem, tup = (QSpotModel, tracker) -&gt; tup[0] = QSpotModel</span>
             <span class="n">tup</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">positionChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">onPositionChange</span><span class="p">)</span>
             <span class="n">tup</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">radiusChanged</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">view</span><span class="o">.</span><span class="n">onRadiusChange</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">update_positions</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">spots</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">energy</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spots</span><span class="p">)):</span>
+            <span class="c1">#for spot in self.scene.spots:</span>
+            <span class="n">pos</span> <span class="o">=</span> <span class="n">spots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">scenePos</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tracker</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">init_tracker</span><span class="p">(</span><span class="n">pos</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">pos</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span> <span class="n">spots</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">radius</span><span class="p">(),</span> <span class="n">energy</span><span class="p">,</span> <span class="n">center</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="n">center</span><span class="o">.</span><span class="n">y</span><span class="p">(),</span>
+                    <span class="n">input_precision</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">Tracking_inputPrecision</span><span class="p">,</span>
+                    <span class="n">window_scaling</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">Tracking_windowScalingOn</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">isPausedSetFlag</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">flag</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">isPausedFlag</span> <span class="o">=</span> <span class="n">flag</span>
 
     <span class="k">def</span> <span class="nf">process</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">config</span><span class="o">.</span><span class="n">GraphicsScene_intensTimeOn</span><span class="p">:</span>
@@ -1342,48 +1421,62 @@
         <span class="sd">&quot;&quot;&quot; Return the number of processed images. &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Worker.saveIntensity"><a class="viewcode-back" href="../../api.html#easyleed.gui.Worker.saveIntensity">[docs]</a>    <span class="k">def</span> <span class="nf">saveIntensity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;save intensities&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Worker.createDataframe"><a class="viewcode-back" href="../../api.html#easyleed.gui.Worker.createDataframe">[docs]</a>    <span class="k">def</span> <span class="nf">createDataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot; Create internal dataframe with intensities, spot locations, and center &quot;&quot;&quot;</span>
         <span class="n">spots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">spots</span>
+        <span class="n">bs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">Processing_backgroundSubstractionOn</span>
+        
         <span class="n">intensities</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spot</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">intensity</span> <span class="k">for</span> <span class="n">spot</span> <span class="ow">in</span> <span class="n">spots</span><span class="p">]</span>
         <span class="n">energy</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spots</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span>
-        <span class="n">zipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="o">*</span><span class="n">intensities</span><span class="p">)))</span>
-        <span class="n">bs</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">Processing_backgroundSubstractionOn</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">zipped</span><span class="p">,</span>
-                   <span class="n">header</span><span class="o">=</span><span class="s1">&#39;energy, intensity 1, intensity 2, ..., [background substraction = </span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">bs</span><span class="p">)</span>
+        
+        <span class="c1"># Extract average spot intensity</span>
+        <span class="n">intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numProcessed</span><span class="p">())</span>
+        <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">tracker</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">):</span>
+            <span class="n">intensity</span> <span class="o">+=</span> <span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">intensity</span>
+        <span class="n">intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">([</span><span class="n">i</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">intensity</span><span class="p">])</span>
+        
+        <span class="c1"># Save spot intensities in dataframe</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdframe</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;Energy&#39;</span><span class="p">:</span> <span class="n">energy</span><span class="p">})</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spots</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pdframe</span><span class="p">[</span><span class="s1">&#39;Intensity #&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spots</span><span class="p">[</span><span class="n">s</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">intensity</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdframe</span><span class="p">[</span><span class="s1">&#39;Average&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">intensity</span>
 
-        <span class="c1"># Save Average intensity (if checkbox selected)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">plotwid</span><span class="o">.</span><span class="n">averageCheck</span><span class="o">.</span><span class="n">isChecked</span><span class="p">():</span>
-            <span class="n">intensity</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">numProcessed</span><span class="p">())</span>
-            <span class="k">for</span> <span class="n">model</span><span class="p">,</span> <span class="n">tracker</span> <span class="ow">in</span> <span class="n">six</span><span class="o">.</span><span class="n">itervalues</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">):</span>
-                <span class="n">intensity</span> <span class="o">+=</span> <span class="n">model</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">intensity</span>
-            <span class="n">intensity</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span><span class="o">/</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">intensity</span><span class="p">]</span>
-            <span class="n">zipped</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="n">intensity</span><span class="p">))</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">filename</span><span class="o">+</span><span class="s1">&#39;_avg&#39;</span><span class="p">,</span> <span class="n">zipped</span><span class="p">,</span>
-                   <span class="n">header</span><span class="o">=</span><span class="s1">&#39;energy, avg. intensity [background substraction = </span><span class="si">%s</span><span class="s1">]&#39;</span> <span class="o">%</span> <span class="n">bs</span><span class="p">)</span></div>
+        <span class="n">numEnergies</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spots</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">x</span><span class="p">)</span>
+        <span class="c1"># Save spots coordinates and radius in dataframe</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spots</span><span class="p">)):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pdframe</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">pdframe</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>\
+                <span class="s1">&#39;x #&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spots</span><span class="p">[</span><span class="n">s</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numEnergies</span><span class="p">)],</span>
+                <span class="s1">&#39;y #&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spots</span><span class="p">[</span><span class="n">s</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numEnergies</span><span class="p">)],</span>
+                <span class="s1">&#39;r #&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="p">:</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spots</span><span class="p">[</span><span class="n">s</span><span class="p">]][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">radius</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">numEnergies</span><span class="p">)]}))</span>
 
-<span class="c1">#        # save positions</span>
-<span class="c1">#        x = [model.m.x for model, tracker \</span>
-<span class="c1">#                in six.itervalues(self.spots_map)]</span>
-<span class="c1">#        y = [model.m.y for model, tracker \</span>
-<span class="c1">#                in six.itervalues(self.spots_map)]</span>
-<span class="c1">#        x.extend(y)</span>
-<span class="c1">#        zipped = np.asarray(list(zip(energy[0], *x))</span>
-<span class="c1">#        np.savetxt(filename, zipped,</span>
-<span class="c1">#                   header=&#39;energy, x, y&#39;)</span>
+        <span class="c1"># Save Center coordinates in dataframe</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">center</span><span class="p">,</span> <span class="s2">&quot;x&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pdframe</span><span class="p">[</span><span class="s1">&#39;Center x&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">x</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">pdframe</span><span class="p">[</span><span class="s1">&#39;Center y&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">y</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdframe</span><span class="p">[</span><span class="s1">&#39;Background substraction&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">bs</span></div>
+
+<div class="viewcode-block" id="Worker.saveIntensity"><a class="viewcode-back" href="../../api.html#easyleed.gui.Worker.saveIntensity">[docs]</a>    <span class="k">def</span> <span class="nf">saveIntensity</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;save intensities&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdframe</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Worker.saveLoc"><a class="viewcode-back" href="../../api.html#easyleed.gui.Worker.saveLoc">[docs]</a>    <span class="k">def</span> <span class="nf">saveLoc</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;save spot locations&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;save spots location&quot;&quot;&quot;</span>
         <span class="n">spots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">spots</span>
-        <span class="n">energy</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spot</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">energy</span> <span class="k">for</span> <span class="n">spot</span> <span class="ow">in</span> <span class="n">spots</span><span class="p">]</span>
-        <span class="n">locationx</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spot</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">x</span> <span class="k">for</span> <span class="n">spot</span> <span class="ow">in</span> <span class="n">spots</span><span class="p">]</span>
-        <span class="n">locationy</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spot</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">y</span> <span class="k">for</span> <span class="n">spot</span> <span class="ow">in</span> <span class="n">spots</span><span class="p">]</span>
-        <span class="n">radius</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">spots_map</span><span class="p">[</span><span class="n">spot</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">m</span><span class="o">.</span><span class="n">radius</span> <span class="k">for</span> <span class="n">spot</span> <span class="ow">in</span> <span class="n">spots</span><span class="p">]</span>
-        <span class="n">locations</span> <span class="o">=</span> <span class="p">[</span><span class="n">locationx</span><span class="p">,</span> <span class="n">locationy</span><span class="p">,</span> <span class="n">radius</span><span class="p">]</span>
-        <span class="n">zipped</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">energy</span><span class="p">,</span> <span class="o">*</span><span class="n">locations</span><span class="p">))</span>
-        <span class="n">output</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;wb&#39;</span><span class="p">)</span>
-        <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">zipped</span><span class="p">,</span> <span class="n">output</span><span class="p">)</span>
-        <span class="n">output</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div></div>
+        <span class="n">locationCols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Energy&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spots</span><span class="p">)):</span>
+            <span class="n">locationCols</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;x #&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span> <span class="s1">&#39;y #&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">),</span><span class="s1">&#39;r #&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">+</span><span class="mi">1</span><span class="p">)])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdframe</span><span class="p">[</span><span class="n">locationCols</span><span class="p">]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Worker.saveCenter"><a class="viewcode-back" href="../../api.html#easyleed.gui.Worker.saveCenter">[docs]</a>    <span class="k">def</span> <span class="nf">saveCenter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;save center location&quot;&quot;&quot;</span>
+        <span class="n">spots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">spots</span>
+        <span class="n">centerCols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Energy&#39;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spots</span><span class="p">)):</span>
+            <span class="n">centerCols</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;Center x&#39;</span><span class="p">,</span> <span class="s1">&#39;Center y&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pdframe</span><span class="p">[</span><span class="n">centerCols</span><span class="p">]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
+
 </pre></div>
 
             </div>
@@ -1399,7 +1492,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2017-11-07.
+      Last updated on 2017-11-19.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>

@@ -16,6 +16,7 @@ EasyLEED is written in `Python <http://www.python.org/>`_ and relies on the foll
 - Numpy >1.5 and Scipy >0.9 `<http://www.scipy.org/>`_
 - Matplotlib >0.9 `<http://matplotlib.org/>`_ 
 - Pillow (for .tif, .png, .jpg) `<https://python-pillow.github.io/>`_
+- Pandas `<https://pandas.pydata.org/>`_
 
 There are also two optional dependencies:
 - PyFITS `<http://www.stsci.edu/resources/software_hardware/pyfits/>`_ for loading .fits file
@@ -40,7 +41,10 @@ All required packages can be obtained through `MacPorts <http://www.macports.org
     sudo port install py-numpy
     sudo port install py-scipy
     sudo port install py-matplotlib
-    sudo port install py-pillow 
+    sudo port install py-pillow
+    sudo port install py-pandas
+
+Note: when using python 3, replace `py-` with `py36-` 
 
 Run
 ---

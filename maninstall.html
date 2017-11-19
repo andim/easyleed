@@ -6,14 +6,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>EasyLEED: LEED I(E)-spectra analysis &#8212; EasyLEED 2.4 documentation</title>
+    <title>EasyLEED: LEED I(E)-spectra analysis &#8212; EasyLEED 2.5 documentation</title>
     <link rel="stylesheet" href="_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="_static/print.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    './',
-        VERSION:     '2.4',
+        VERSION:     '2.5',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -49,7 +49,7 @@
 <h1>Manual Installation<a class="headerlink" href="#manual-installation" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="download">
 <h2>Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h2>
-<p>EasyLEED is open-source software licensed under the GPL v2. The software can be downloaded as a zip-file (<a class="reference download internal" href="_downloads/source.zip" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">ZIP-File</span></code></a>, last update 2017-11-07). Alternatively the developer version of the code can be obtained by cloning the git repository: <a class="reference external" href="https://github.com/andim/easyleed/">https://github.com/andim/easyleed/</a></p>
+<p>EasyLEED is open-source software licensed under the GPL v2. The software can be downloaded as a zip-file (<a class="reference download internal" href="_downloads/source.zip" download=""><code class="xref download docutils literal"><span class="pre">Download</span> <span class="pre">ZIP-File</span></code></a>, last update 2017-11-19). Alternatively the developer version of the code can be obtained by cloning the git repository: <a class="reference external" href="https://github.com/andim/easyleed/">https://github.com/andim/easyleed/</a></p>
 </div>
 <div class="section" id="dependencies">
 <h2>Dependencies<a class="headerlink" href="#dependencies" title="Permalink to this headline">¶</a></h2>
@@ -60,6 +60,7 @@
 <li>Numpy &gt;1.5 and Scipy &gt;0.9 <a class="reference external" href="http://www.scipy.org/">http://www.scipy.org/</a></li>
 <li>Matplotlib &gt;0.9 <a class="reference external" href="http://matplotlib.org/">http://matplotlib.org/</a></li>
 <li>Pillow (for .tif, .png, .jpg) <a class="reference external" href="https://python-pillow.github.io/">https://python-pillow.github.io/</a></li>
+<li>Pandas <a class="reference external" href="https://pandas.pydata.org/">https://pandas.pydata.org/</a></li>
 </ul>
 <p>There are also two optional dependencies:
 - PyFITS <a class="reference external" href="http://www.stsci.edu/resources/software_hardware/pyfits/">http://www.stsci.edu/resources/software_hardware/pyfits/</a> for loading .fits file
@@ -77,8 +78,10 @@
 <span class="n">sudo</span> <span class="n">port</span> <span class="n">install</span> <span class="n">py</span><span class="o">-</span><span class="n">scipy</span>
 <span class="n">sudo</span> <span class="n">port</span> <span class="n">install</span> <span class="n">py</span><span class="o">-</span><span class="n">matplotlib</span>
 <span class="n">sudo</span> <span class="n">port</span> <span class="n">install</span> <span class="n">py</span><span class="o">-</span><span class="n">pillow</span>
+<span class="n">sudo</span> <span class="n">port</span> <span class="n">install</span> <span class="n">py</span><span class="o">-</span><span class="n">pandas</span>
 </pre></div>
 </div>
+<p>Note: when using python 3, replace <cite>py-</cite> with <cite>py36-</cite></p>
 </div>
 </div>
 <div class="section" id="run">
@@ -101,7 +104,7 @@
 
     <div class="footer" role="contentinfo">
         &#169; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2017-11-07.
+      Last updated on 2017-11-19.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
