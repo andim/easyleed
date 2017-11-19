@@ -1,6 +1,18 @@
 Changelog
 ==========
 
+Version 2.5
+-----------
+
+(NF):
+- intensities are correctly saved as *.csv, along with spot and center locations
+- added dependency: use of pandas dataframes for internal data tracking
+- spots and center locations are saved/loaded as csv (old pkl format can still be read)
+- fix crash when deselecting average plot after clearing plot
+- UI: selecting a spot after analysis highlights the corresponding curve
+- UI: Removing a spot also removes the corresponding curve
+- Runs can now be paused-resumed with spots in different positions
+
 Version 2.4
 -----------
 
