@@ -1184,7 +1184,7 @@ class MainWindow(QMainWindow):
             self.processRemoveSpot.setEnabled(False)
             self.scene.clearSelection()
             self.worker = Worker(self.scene.spots, self.scene.center, self.current_energy, parent=self)
-            self.fileSaveAction.setEnabled(True)
+            self.fileSaveAction.setEnabled(False)
             self.fileSaveSpotsAction.setEnabled(True)
             self.plotwid.clearPlotButton.setEnabled(False)
             if config.GraphicsScene_livePlottingOn:
@@ -1217,6 +1217,7 @@ class MainWindow(QMainWindow):
             self.slider.setEnabled(True)
             self.processRemoveSpot.setEnabled(True)
             self.worker.createDataframe()
+            self.fileSaveAction.setEnabled(True)
             self.processRunAction.setEnabled(True)
             self.processPauseAction.setEnabled(False)
             print("Total time acquisition:", time.time() - time_before, "s")
@@ -1352,6 +1353,8 @@ class Worker(QObject):
             tup[0].positionChanged.connect(view.onPositionChange)
             tup[0].radiusChanged.connect(view.onRadiusChange)
 
+        self.pdframe = pd.DataFrame()
+
     def update_positions(self, spots, center, energy):
         for i in range(len(spots)):
             #for spot in self.scene.spots:
@@ -1399,7 +1402,8 @@ class Worker(QObject):
         intensity = np.asarray([i/len(self.spots_map) for i in intensity])
         
         # Save spot intensities in dataframe
-        self.pdframe = pd.DataFrame({'Energy': energy})
+        #self.pdframe = pd.DataFrame({'Energy': energy})
+        self.pdframe['Energy'] = energy
         for s in range(len(spots)):
             self.pdframe['Intensity #'+str(s+1)] = self.spots_map[spots[s]][0].m.intensity
         self.pdframe['Average'] = intensity
