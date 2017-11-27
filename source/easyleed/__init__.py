@@ -20,7 +20,7 @@ The EasyLEED package is divided into several subpackages:
 
 """
 
-__version__ = "2.4"
+__version__ = "2.5"
 __author__ = "Andreas Mayer, Hanna Salopaasi, Nicola Ferralis"
 
 from .defaultconfig import *
