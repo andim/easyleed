@@ -1356,7 +1356,14 @@ class Worker(QObject):
         for i in range(len(spots)):
             #for spot in self.scene.spots:
             pos = spots[i].scenePos()
-            self.tracker[i].init_tracker(pos.x(), pos.y(), spots[i].radius(), energy, center.x(), center.y(),
+            if center:
+                x_center = center.x()
+                y_center = center.y()
+            else:
+                x_center = None
+                y_center = None
+            self.tracker[i].init_tracker(pos.x(), pos.y(), spots[i].radius(), energy,
+                    x_center, y_center,
                     input_precision=config.Tracking_inputPrecision,
                     window_scaling=config.Tracking_windowScalingOn)
 
