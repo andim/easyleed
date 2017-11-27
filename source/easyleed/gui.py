@@ -206,12 +206,13 @@ class GraphicsScene(QGraphicsScene):
             if self.itemAt(event.scenePos(), transform):
                 super(GraphicsScene, self).mousePressEvent(event)
             elif event.button() == Qt.LeftButton:
-                item = QGraphicsSpotItem(event.scenePos(),
+                if self.parent().paused == False:
+                    item = QGraphicsSpotItem(event.scenePos(),
                         config.GraphicsScene_defaultRadius)
-                self.addSpot(item)
-                # Enable spots to be saved when present on the image
-                #if len(self.spots) > 0:
-                #    self.parent().fileSaveSpotsAction.setEnabled(True)
+                    self.addSpot(item)
+                    # Enable spots to be saved when present on the image
+                    #if len(self.spots) > 0:
+                    #    self.parent().fileSaveSpotsAction.setEnabled(True)
 
             elif event.button() == Qt.RightButton:
                 if self.center is None:
@@ -802,6 +803,7 @@ class MainWindow(QMainWindow):
         self.setGeometry(10, 30, 660, 480)
         self.setCentralWidget(self.view)
         self.scene.selectionChanged.connect(self.highlightSelSpot)
+        self.paused = False
 
         #### define actions ####
 
