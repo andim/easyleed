@@ -1448,7 +1448,6 @@ class Worker(QObject):
         """save center location"""
         spots = self.parent().scene.spots
         centerCols = ['Energy']
-        for s in range(len(spots)):
-            centerCols.extend(['Center x', 'Center y'])
+        centerCols.extend(['Center x', 'Center y'])
         self.pdframe[centerCols].to_csv(filename, sep=',', index=False)
 
