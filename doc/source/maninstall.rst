@@ -44,7 +44,7 @@ All required packages can be obtained through `MacPorts <http://www.macports.org
     sudo port install py-pillow
     sudo port install py-pandas
 
-Note: when using python 3, replace `py-` with `py36-' 
+Note: when using python 3, replace `py-` with `py36-` 
 
 Run
 ---
