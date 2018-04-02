@@ -1294,7 +1294,15 @@ class MainWindow(QMainWindow):
                                                     "Save the center location to a file",
                                                     filename))
         if filename:
-            self.worker.saveCenter(filename)
+            if hasattr(self, "worker"):
+                self.worker.saveCenter(filename)
+            else:
+                import csv
+                center = [["Energy","Center x","Center y"],
+                            [self.current_energy, self.scene.center.x(), self.scene.center.y()]]
+                with open(filename, "w") as f:
+                    writer = csv.writer(f, delimiter=',', lineterminator='\n')
+                    writer.writerows(center)
 
     def loadCenter(self):
         """Load Center location from csv file"""
@@ -1440,7 +1448,6 @@ class Worker(QObject):
         """save center location"""
         spots = self.parent().scene.spots
         centerCols = ['Energy']
-        for s in range(len(spots)):
-            centerCols.extend(['Center x', 'Center y'])
+        centerCols.extend(['Center x', 'Center y'])
         self.pdframe[centerCols].to_csv(filename, sep=',', index=False)
 
