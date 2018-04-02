@@ -6,14 +6,14 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>EasyLEED: LEED I(E)-spectra analysis &#8212; EasyLEED 2.5.1 documentation</title>
+    <title>EasyLEED: LEED I(E)-spectra analysis &#8212; EasyLEED 2.5.2 documentation</title>
     <link rel="stylesheet" href="../../_static/easyleed.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" href="../../_static/print.css" type="text/css" />
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
         URL_ROOT:    '../../',
-        VERSION:     '2.5.1',
+        VERSION:     '2.5.2',
         COLLAPSE_INDEX: false,
         FILE_SUFFIX: '.html',
         HAS_SOURCE:  true,
@@ -1340,7 +1340,15 @@
                                                     <span class="s2">&quot;Save the center location to a file&quot;</span><span class="p">,</span>
                                                     <span class="n">filename</span><span class="p">))</span>
         <span class="k">if</span> <span class="n">filename</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">saveCenter</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span></div>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;worker&quot;</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">worker</span><span class="o">.</span><span class="n">saveCenter</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="kn">import</span> <span class="nn">csv</span>
+                <span class="n">center</span> <span class="o">=</span> <span class="p">[[</span><span class="s2">&quot;Energy&quot;</span><span class="p">,</span><span class="s2">&quot;Center x&quot;</span><span class="p">,</span><span class="s2">&quot;Center y&quot;</span><span class="p">],</span>
+                            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">current_energy</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">x</span><span class="p">(),</span> <span class="bp">self</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">center</span><span class="o">.</span><span class="n">y</span><span class="p">()]]</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">lineterminator</span><span class="o">=</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">writer</span><span class="o">.</span><span class="n">writerows</span><span class="p">(</span><span class="n">center</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="MainWindow.loadCenter"><a class="viewcode-back" href="../../api.html#easyleed.gui.MainWindow.loadCenter">[docs]</a>    <span class="k">def</span> <span class="nf">loadCenter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Load Center location from csv file&quot;&quot;&quot;</span>
@@ -1486,8 +1494,7 @@
         <span class="sd">&quot;&quot;&quot;save center location&quot;&quot;&quot;</span>
         <span class="n">spots</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">parent</span><span class="p">()</span><span class="o">.</span><span class="n">scene</span><span class="o">.</span><span class="n">spots</span>
         <span class="n">centerCols</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Energy&#39;</span><span class="p">]</span>
-        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spots</span><span class="p">)):</span>
-            <span class="n">centerCols</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;Center x&#39;</span><span class="p">,</span> <span class="s1">&#39;Center y&#39;</span><span class="p">])</span>
+        <span class="n">centerCols</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="s1">&#39;Center x&#39;</span><span class="p">,</span> <span class="s1">&#39;Center y&#39;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">pdframe</span><span class="p">[</span><span class="n">centerCols</span><span class="p">]</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">sep</span><span class="o">=</span><span class="s1">&#39;,&#39;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></div></div>
 
 </pre></div>
@@ -1504,8 +1511,8 @@
     src="https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67" alt="Fork me on GitHub" /></a>
 
     <div class="footer" role="contentinfo">
-        &#169; Copyright 2010-15, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
-      Last updated on 2017-11-28.
+        &#169; Copyright 2010-18, Andreas Mayer, Hanna Salopaasi, Nicola Ferralis.
+      Last updated on 2018-04-02.
       Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.6.3.
     </div>
   </body>
