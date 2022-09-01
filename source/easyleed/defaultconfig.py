@@ -38,7 +38,7 @@ class Configuration():
             }
     def defineGUIConfig(self):
         self.conf['GUI'] = {
-            'GraphicsScene_defaultRadius' : 40,
+            'GraphicsScene_defaultRadius' : 40.0,
             'GraphicsScene_livePlottingOn' : True,
             'GraphicsScene_intensTimeOn' : False,
             'GraphicsScene_plotAverage' : False,
@@ -52,13 +52,13 @@ class Configuration():
             }
     def defineTrackingConfig(self):
         self.conf['Tracking'] = {
-            'Tracking_inputPrecision' : 2,
+            'Tracking_inputPrecision' : 2.0,
             'Tracking_windowScalingOn' : True,
-            'Tracking_minWindowSize' : 0,
+            'Tracking_minWindowSize' : 0.0,
             'Tracking_guessFunc' : "Gaussian fit",
             'Tracking_processNoisePosition' : 0.1,
             'Tracking_processNoiseVelocity' : 0.0,
-            'Tracking_gamma' : 8,
+            'Tracking_gamma' : 8.0,
             'Tracking_minRsq' : 0.8,
             'Tracking_fitRegionFactor' : 1.5,
             }

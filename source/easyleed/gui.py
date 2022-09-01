@@ -497,25 +497,25 @@ class ParameterSettingWidget(QWidget):
 
     def initUI(self):
         # Buttons/elements
-        self.inputPrecision = QSpinBox(self)
+        self.inputPrecision = QDoubleSpinBox(self)
         self.inputPrecision.setWrapping(True)
         self.inputPrecision.setValue(config.Tracking_inputPrecision)
         self.ipLabel = QLabel("User input precision", self)
         self.inputPrecision.editingFinished.connect(self.collectParameters)
 
-        self.integrationWindowRadiusNew = QSpinBox(self)
+        self.integrationWindowRadiusNew = QDoubleSpinBox(self)
         self.integrationWindowRadiusNew.setWrapping(True)
         self.integrationWindowRadiusNew.setValue(config.GraphicsScene_defaultRadius)
         self.iwrnLabel = QLabel("Default radius of a new spot", self)
         self.integrationWindowRadiusNew.editingFinished.connect(self.collectParameters)
 
-        self.integrationWindowRadius = QSpinBox(self)
+        self.integrationWindowRadius = QDoubleSpinBox(self)
         self.integrationWindowRadius.setWrapping(True)
         self.integrationWindowRadius.setValue(config.Tracking_minWindowSize)
         self.iwrLabel = QLabel("Minimal radius of the integration window", self)
         self.integrationWindowRadius.editingFinished.connect(self.collectParameters)
 
-        self.validationRegionSize = QSpinBox(self)
+        self.validationRegionSize = QDoubleSpinBox(self)
         self.validationRegionSize.setWrapping(True)
         self.validationRegionSize.setValue(config.Tracking_gamma)
         self.vrsLabel = QLabel("Size of the validation region", self)
