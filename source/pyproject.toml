@@ -1,0 +1,63 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "EasyLEED"
+version = "2.5.2"
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "scipy",
+    "pillow",
+    "pathlib",
+    "pandas",
+    "scikit-image",
+    "PyQt5"
+    ]
+    
+authors = [{ name="Andreas Mayer", email="andimscience@gmail.com" },
+    {name="Hanna Salopaasi"},
+    {name= "Nicola Ferralis"},
+    ]
+    
+maintainers = [
+  {name = "Andreas Mayer", email = "andimscience@gmail.com"}
+    ]
+
+description = "Automated extraction of intensity-energy spectra from low-energy electron diffraction patterns"
+
+readme = "../README.md"
+
+license = {text = "GNU General Public License v2 (GPLv2)"}
+
+requires-python = ">=3.9"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: GNU General Public License v2 (GPLv2)",
+    "Operating System :: OS Independent",
+    "Development Status :: 5 - Production/Stable",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+]
+
+[project.optional-dependencies]
+skimage = ["scikit-image"]
+fits = ["pyfits"]
+
+[project.gui-scripts]
+easyleed = "easyleed.__main__:main"
+
+[project.urls]
+Homepage = "https://andim.github.io/easyleed/"
+Documentation = "https://qimmuno.com/easyleed/userdoc.html"
+Repository = "https://github.com/andim/easyleed.git"
+Issues = "https://andim.github.io/easyleed/issues"
+Changelog = "https://github.com/andim/easyleed/blob/master/changelog"
